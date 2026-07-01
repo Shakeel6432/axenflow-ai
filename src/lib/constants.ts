@@ -3,7 +3,7 @@ export const siteConfig = {
   tagline: "AI Automation Agency | Bots, Scraping & Workflows",
   description:
     "We build AI bots, web scrapers, WhatsApp automations, and workflow systems that run your business on autopilot. 86+ projects delivered worldwide.",
-  email: "hello@axenflow.ai",
+  email: "hello@axenflowai.com",
   url: "https://axenflow.ai",
 };
 

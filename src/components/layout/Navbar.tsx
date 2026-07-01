@@ -17,20 +17,24 @@ export function Navbar() {
   const { theme, toggle } = useTheme();
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 30);
+    const handler = () => setScrolled(window.scrollY > 20);
+    handler();
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
     <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-        scrolled
-          ? "backdrop-blur-2xl shadow-lg"
-          : "bg-transparent",
-      )}
-      style={scrolled ? { background: "var(--c-nav)", borderBottom: "1px solid var(--c-border)" } : undefined}
+      className="fixed inset-x-0 top-0 z-50 backdrop-blur-2xl transition-shadow duration-300"
+      style={{
+        background: "var(--c-nav)",
+        borderBottom: scrolled ? "1px solid var(--c-border)" : "1px solid transparent",
+        boxShadow: scrolled ? "0 4px 20px rgba(0,0,0,0.15)" : "none",
+      }}
     >
       <Container>
         <div className="flex h-20 items-center justify-between lg:h-[5.5rem]">

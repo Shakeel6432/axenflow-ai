@@ -6,16 +6,16 @@ import { serviceOptions } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 
 type FormData = {
-  fullName: string; email: string; company: string; website: string;
+  fullName: string; email: string; phone: string; company: string; website: string;
   country: string; industry: string; requiredService: string;
   currentProblem: string; projectDetails: string; expectedGoal: string;
-  budget: string; deadline: string; services: string[];
+  budget: string; deadline: string; services: string[]; message: string;
 };
 
 const init: FormData = {
-  fullName: "", email: "", company: "", website: "", country: "", industry: "",
+  fullName: "", email: "", phone: "", company: "", website: "", country: "", industry: "",
   requiredService: "", currentProblem: "", projectDetails: "", expectedGoal: "",
-  budget: "", deadline: "", services: [],
+  budget: "", deadline: "", services: [], message: "",
 };
 
 export function ClientRequirementForm() {
@@ -35,7 +35,10 @@ export function ClientRequirementForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          message: form.message || [form.currentProblem, form.projectDetails, form.expectedGoal].filter(Boolean).join("\n\n"),
+        }),
       });
 
       const data = await res.json();
@@ -83,15 +86,16 @@ export function ClientRequirementForm() {
         {([
           ["fullName", "Full Name *", "John Doe"],
           ["email", "Business Email *", "john@company.com", "email"],
+          ["phone", "Phone (Optional)", "+1 234 567 890", "tel"],
           ["company", "Company Name *", "Your Company"],
           ["website", "Website", "https://"],
           ["country", "Country *", "United States"],
           ["industry", "Industry *", "E-commerce"],
         ] as const).map(([key, label, ph, type]) => (
-          <div key={key}>
+          <div key={key} className={key === "phone" ? "" : ""}>
             <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--c-text-dim)" }}>{label}</label>
             <input
-              required={!ph.startsWith("https")}
+              required={!label.includes("Optional") && !ph.startsWith("https")}
               type={type ?? "text"}
               className="form-input"
               placeholder={ph}
