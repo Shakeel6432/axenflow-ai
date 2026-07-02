@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         <div className="glass-card mx-auto max-w-3xl rounded-2xl p-8 sm:p-12">
           <div className="space-y-8">
             {[
-              { h: "Information We Collect", p: "When you submit our contact form, we collect your name, email, company details, and project information you provide voluntarily." },
+              { h: "Information We Collect", p: "When you contact us by email or Fiverr, we collect the name, email, and project information you choose to share with us." },
               { h: "How We Use Your Information", p: "We use your data solely to respond to inquiries and deliver requested services. We never sell personal data to third parties." },
             ].map(({ h, p }) => (
               <div key={h}>

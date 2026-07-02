@@ -1,15 +1,16 @@
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ClientRequirementForm } from "@/components/forms/ClientRequirementForm";
+import { ContactGuidelines } from "@/components/contact/ContactGuidelines";
 
 export function ClientFormSection() {
   return (
     <Section id="inquiry" style={{ background: "var(--c-bg-alt)" }}>
-      <div className="mx-auto max-w-2xl">
-        <SectionHeading title="Start a Project" description="Fill this out and we'll get back to you within 24 hours with a plan and quote." />
-        <div className="glass-card rounded-2xl p-7 sm:p-10">
-          <ClientRequirementForm />
-        </div>
+      <SectionHeading
+        title="Start a Project"
+        description="Contact us by email or Fiverr. Send your project details and we will discuss the best solution for your business."
+      />
+      <div className="mx-auto max-w-5xl">
+        <ContactGuidelines compact />
       </div>
     </Section>
   );

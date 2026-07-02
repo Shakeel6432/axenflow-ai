@@ -4,7 +4,26 @@ export const siteConfig = {
   description:
     "We build AI bots, web scrapers, WhatsApp automations, and workflow systems that run your business on autopilot. 86+ projects delivered worldwide.",
   email: "hello@axenflowai.com",
+  fiverrUrl: "https://www.fiverr.com/shakeel644",
   url: "https://axenflow.ai",
+};
+
+export const contactGuidelines = {
+  emailSubject: "New Project Inquiry - AxenFlow AI",
+  responseTime: "Under 24 hours",
+  emailDetails: [
+    "Your name and company",
+    "The service you need (automation, scraping, bots, etc.)",
+    "What problem you want to solve",
+    "Project scope, goals, and expected outcome",
+    "Budget range and timeline (if available)",
+  ],
+  fiverrSteps: [
+    "Open our Fiverr profile and choose a service or send a custom request",
+    "Share your project details in the Fiverr chat",
+    "Discuss scope, timeline, and pricing before we start",
+    "Place your order securely through Fiverr when you are ready",
+  ],
 };
 
 export const navLinks = [

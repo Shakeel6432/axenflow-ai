@@ -20,14 +20,14 @@ export function HeroSection() {
   const isDark = theme === "dark";
 
   return (
-    <section className="relative overflow-hidden pt-28 pb-16 lg:pt-36 lg:pb-24">
+    <section className="relative overflow-hidden pt-24 pb-16 lg:pt-28 lg:pb-24">
       {/* Background elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {/* Aurora gradient layers */}
         <motion.div
           animate={{ x: [0, 30, -20, 0], y: [0, -20, 10, 0], scale: [1, 1.1, 0.95, 1] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[200px] left-1/2 h-[700px] w-[1100px] -translate-x-1/2 rounded-full bg-indigo-500/[0.1] blur-[160px]"
+          className="absolute -top-[200px] left-1/2 h-[700px] w-[1100px] -translate-x-1/2 rounded-full bg-indigo-500/[0.07] blur-[160px]"
         />
         <motion.div
           animate={{ x: [0, -25, 15, 0], y: [0, 15, -25, 0] }}

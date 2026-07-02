@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const ZEPTO_API_URL = "https://api.zeptomail.in/v1.1/email";
+const ZEPTO_API_URL = "https://api.zeptomail.com/v1.1/email";
 
 export async function POST(req: Request) {
   try {
