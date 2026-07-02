@@ -26,6 +26,41 @@ export const contactGuidelines = {
   ],
 };
 
+export function getProjectInquiryEmailText() {
+  const body = [
+    "Hi AxenFlow AI,",
+    "",
+    "I would like to discuss a new project. Here are my details:",
+    "",
+    "Name:",
+    "Company:",
+    "Service Needed:",
+    "Project Details:",
+    "Budget:",
+    "Timeline:",
+    "",
+    "Thanks,",
+  ].join("\n");
+
+  return {
+    email: siteConfig.email,
+    subject: contactGuidelines.emailSubject,
+    body,
+    fullText: `To: ${siteConfig.email}\nSubject: ${contactGuidelines.emailSubject}\n\n${body}`,
+  };
+}
+
+export function getProjectInquiryMailtoLink() {
+  const { email, subject, body } = getProjectInquiryEmailText();
+
+  const params = new URLSearchParams({
+    subject,
+    body,
+  });
+
+  return `mailto:${email}?${params.toString()}`;
+}
+
 export const navLinks = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },

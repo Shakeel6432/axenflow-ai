@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Mail, MessageSquare, ArrowRight, CheckCircle2, ExternalLink, Clock } from "lucide-react";
-import { contactGuidelines, siteConfig } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { Mail, MessageSquare, CheckCircle2, ExternalLink, Clock } from "lucide-react";
+import { contactGuidelines, getProjectInquiryMailtoLink, siteConfig } from "@/lib/constants";
+import { EmailInquiryButton } from "@/components/contact/EmailInquiryButton";
 
-const mailtoLink = `mailto:${siteConfig.email}?subject=${encodeURIComponent(contactGuidelines.emailSubject)}`;
+const mailtoLink = getProjectInquiryMailtoLink();
 
 type ContactGuidelinesProps = {
   compact?: boolean;
@@ -26,7 +26,7 @@ export function ContactGuidelines({ compact = false }: ContactGuidelinesProps) {
 
           <div className="mt-5 rounded-xl p-4" style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}>
             <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--c-text-muted)" }}>Send your email to</p>
-            <a href={mailtoLink} className="mt-1 block text-base font-semibold text-indigo-500 transition hover:text-teal-500">
+            <a href={mailtoLink} className="mt-1 block cursor-pointer text-base font-semibold text-indigo-500 transition hover:text-teal-500">
               {siteConfig.email}
             </a>
           </div>
@@ -40,15 +40,8 @@ export function ContactGuidelines({ compact = false }: ContactGuidelinesProps) {
             ))}
           </ul>
 
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <a
-              href={mailtoLink}
-              className={cn(
-                "btn-main inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-base font-semibold transition-all duration-300 active:scale-[0.97]"
-              )}
-            >
-              Send Project Details <ArrowRight size={16} />
-            </a>
+          <div className="relative z-10 mt-6 flex flex-wrap items-center gap-4">
+            <EmailInquiryButton />
             <span className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: "var(--c-text-muted)" }}>
               <Clock size={14} /> Response within {contactGuidelines.responseTime}
             </span>
