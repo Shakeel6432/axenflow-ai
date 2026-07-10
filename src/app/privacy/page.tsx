@@ -6,7 +6,7 @@ import { Section } from "@/components/ui/Section";
 export const metadata: Metadata = {
   title: "Privacy Policy | AxenFlow AI",
   description: "Read AxenFlow AI's privacy policy. We explain what data we collect, how we use it, and how we protect your information.",
-  alternates: { canonical: "https://axenflow.ai/privacy" },
+  alternates: { canonical: "https://www.axenflowai.com/privacy" },
 };
 
 export default function PrivacyPage() {

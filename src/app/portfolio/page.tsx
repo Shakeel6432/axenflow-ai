@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "Portfolio | Automation Projects & Case Studies",
   description: "See real automation projects by AxenFlow AI including lead scrapers, WhatsApp bots, email agents, CRM workflows, and more. All running in production for real clients.",
   keywords: ["AI automation portfolio", "WhatsApp bot case study", "web scraping project", "automation case studies"],
-  alternates: { canonical: "https://axenflow.ai/portfolio" },
+  alternates: { canonical: "https://www.axenflowai.com/portfolio" },
 };
 
 export default function PortfolioPage() {

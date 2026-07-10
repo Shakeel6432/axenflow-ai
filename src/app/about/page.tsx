@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 export const metadata: Metadata = {
   title: "About Us | Meet the Team Behind AxenFlow AI",
   description: "AxenFlow AI is an automation agency with 86+ projects delivered across 15+ countries. We build bots, scrapers, and workflows that actually work in production.",
-  alternates: { canonical: "https://axenflow.ai/about" },
+  alternates: { canonical: "https://www.axenflowai.com/about" },
 };
 
 const colors = ["#6366f1", "#14b8a6", "#f59e0b", "#818cf8"];

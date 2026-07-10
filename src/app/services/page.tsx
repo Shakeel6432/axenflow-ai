@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "Services | AI Bots, Scraping, WhatsApp & Email Automation",
   description: "AxenFlow AI offers AI automation, WhatsApp bots, web scraping, AI email agents, n8n/Make workflow automation, and custom AI solutions. See what we can build for you.",
   keywords: ["AI automation services", "WhatsApp bot service", "web scraping agency", "email automation", "n8n developer", "Make.com expert"],
-  alternates: { canonical: "https://axenflow.ai/services" },
+  alternates: { canonical: "https://www.axenflowai.com/services" },
 };
 
 const serviceIcons = [

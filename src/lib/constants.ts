@@ -5,7 +5,7 @@ export const siteConfig = {
     "We build AI bots, web scrapers, WhatsApp automations, and workflow systems that run your business on autopilot. 86+ projects delivered worldwide.",
   email: "hello@axenflowai.com",
   fiverrUrl: "https://www.fiverr.com/shakeel644",
-  url: "https://axenflow.ai",
+  url: "https://www.axenflowai.com",
 };
 
 export const contactGuidelines = {

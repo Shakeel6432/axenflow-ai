@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "Contact | Start Your Automation Project",
   description: "Contact AxenFlow AI by email or Fiverr. Send your project details, discuss your requirements, and get a response within 24 hours.",
   keywords: ["hire AI automation agency", "contact AxenFlow AI", "automation project inquiry", "Fiverr automation developer"],
-  alternates: { canonical: "https://axenflow.ai/contact" },
+  alternates: { canonical: "https://www.axenflowai.com/contact" },
 };
 
 const cards = [

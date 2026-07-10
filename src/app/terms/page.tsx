@@ -6,7 +6,7 @@ import { Section } from "@/components/ui/Section";
 export const metadata: Metadata = {
   title: "Terms of Service | AxenFlow AI",
   description: "AxenFlow AI terms of service. Covers project scope, payments, delivery timelines, and intellectual property rights.",
-  alternates: { canonical: "https://axenflow.ai/terms" },
+  alternates: { canonical: "https://www.axenflowai.com/terms" },
 };
 
 export default function TermsPage() {
