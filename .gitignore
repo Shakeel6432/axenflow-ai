@@ -48,3 +48,9 @@ next-env.d.ts
 axenflow-ai.zip
 java_v3.zip
 
+
+# large installer binaries (hosted via GitHub Releases)
+public/downloads/*.rar
+public/downloads/*.exe
+public/downloads/*.zip
+
