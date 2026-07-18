@@ -2,15 +2,12 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
-import { extractTurnstileToken, getClientIp, getRequestHostname, verifyTurnstileToken } from "@/lib/turnstile";
 
 const signupSchema = z.object({
   name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100),
   email: z.string().trim().email("Enter a valid email").max(200),
   password: z.string().min(8, "Password must be at least 8 characters").max(128),
   confirmPassword: z.string(),
-  turnstileToken: z.string().optional(),
-  "cf-turnstile-response": z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -27,15 +24,6 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       const msg = parsed.error.issues[0]?.message || "Invalid input";
       return NextResponse.json({ error: msg }, { status: 400 });
-    }
-
-    const captcha = await verifyTurnstileToken(extractTurnstileToken(body), {
-      remoteip: getClientIp(req),
-      requestHostname: getRequestHostname(req),
-      expectedAction: "signup",
-    });
-    if (!captcha.ok) {
-      return NextResponse.json({ error: captcha.error || "Captcha verification failed." }, { status: 400 });
     }
 
     const email = parsed.data.email.toLowerCase();

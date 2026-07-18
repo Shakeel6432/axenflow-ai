@@ -54,3 +54,4 @@ public/downloads/*.rar
 public/downloads/*.exe
 public/downloads/*.zip
 
+.vercel

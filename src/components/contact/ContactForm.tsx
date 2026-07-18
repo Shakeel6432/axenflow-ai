@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Paperclip, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Turnstile } from "@/components/contact/Turnstile";
 
 const MAX_FILES = 3;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -22,17 +21,11 @@ export function ContactForm() {
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [honeypot, setHoneypot] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const onToken = useCallback((token: string) => setTurnstileToken(token), []);
-  const onExpire = useCallback(() => setTurnstileToken(""), []);
-
-  const fileLabel = useMemo(
-    () => (files.length ? `${files.length} file${files.length > 1 ? "s" : ""} selected` : "Add PDF, DOC, PNG, JPG, or ZIP"),
-    [files.length]
-  );
+  const fileLabel =
+    files.length ? `${files.length} file${files.length > 1 ? "s" : ""} selected` : "Add PDF, DOC, PNG, JPG, or ZIP";
 
   const onFilesChange = (list: FileList | null) => {
     if (!list?.length) return;
@@ -64,7 +57,6 @@ export function ContactForm() {
     setMessage("");
     setFiles([]);
     setHoneypot("");
-    setTurnstileToken("");
     setErrorMsg("");
   };
 
@@ -80,8 +72,6 @@ export function ContactForm() {
       form.set("phone", phone);
       form.set("message", message);
       form.set("website", honeypot);
-      form.set("turnstileToken", turnstileToken);
-      form.set("cf-turnstile-response", turnstileToken);
       for (const file of files) {
         form.append("attachments", file);
       }
@@ -273,8 +263,6 @@ export function ContactForm() {
           </ul>
         )}
       </div>
-
-      <Turnstile action="contact" onToken={onToken} onExpire={onExpire} />
 
       <Button type="submit" disabled={busy} className="w-full justify-center">
         {busy ? (

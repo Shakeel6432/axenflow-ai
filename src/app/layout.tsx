@@ -48,7 +48,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en" data-theme="dark" className={`${inter.variable} ${space.variable} h-full`} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://challenges.cloudflare.com" />
         <link rel="icon" href="/favicon.ico?v=11" sizes="any" />
         <link rel="icon" href="/favicon.png?v=11" type="image/png" />
         <link rel="shortcut icon" href="/favicon.ico?v=11" />

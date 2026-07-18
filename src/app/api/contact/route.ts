@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { isSmtpConfigured, sendContactEmail, type MailAttachment } from "@/lib/smtp";
-import { extractTurnstileToken, getClientIp, getRequestHostname, verifyTurnstileToken } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
+
+function getClientIp(req: Request): string | undefined {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0]?.trim();
+  return req.headers.get("x-real-ip")?.trim() || undefined;
+}
 
 const MAX_FILES = 3;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -142,7 +147,6 @@ export async function POST(req: Request) {
     let email = "";
     let phone = "";
     let message = "";
-    let turnstileToken: string | undefined;
     let attachments: MailAttachment[] = [];
     const extra: Record<string, string> = {};
 
@@ -158,7 +162,6 @@ export async function POST(req: Request) {
       email = field(form, "email").trim();
       phone = field(form, "phone").trim();
       message = field(form, "message").trim();
-      turnstileToken = field(form, "turnstileToken") || field(form, "cf-turnstile-response") || undefined;
 
       const parsed = await parseAttachments(form);
       if (!parsed.ok) {
@@ -177,7 +180,6 @@ export async function POST(req: Request) {
       email = String(body.email || "").trim();
       phone = String(body.phone || "").trim();
       message = String(body.message || "").trim();
-      turnstileToken = extractTurnstileToken(body);
 
       const maybe = [
         ["Company", body.company],
@@ -206,15 +208,6 @@ export async function POST(req: Request) {
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
-    }
-
-    const captcha = await verifyTurnstileToken(turnstileToken, {
-      remoteip: ip,
-      requestHostname: getRequestHostname(req),
-      expectedAction: "contact",
-    });
-    if (!captcha.ok) {
-      return NextResponse.json({ error: captcha.error || "Captcha verification failed." }, { status: 400 });
     }
 
     const submittedAt = new Date().toISOString();

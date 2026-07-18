@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
-import { AuthCaptchaField, useAuthCaptcha } from "@/components/auth/AuthCaptcha";
 
 export function SignUpForm() {
   const router = useRouter();
@@ -15,18 +14,10 @@ export function SignUpForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const captcha = useAuthCaptcha();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    const captchaError = captcha.requireToken();
-    if (captchaError) {
-      setError(captchaError);
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -38,15 +29,12 @@ export function SignUpForm() {
           email,
           password,
           confirmPassword,
-          turnstileToken: captcha.token,
-          "cf-turnstile-response": captcha.token,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Could not create account");
         setLoading(false);
-        captcha.reset();
         return;
       }
       setSuccess(true);
@@ -121,9 +109,6 @@ export function SignUpForm() {
             placeholder="Repeat password"
           />
         </Field>
-
-        {/* Cloudflare Turnstile slot — enable with env keys / NEXT_PUBLIC_TURNSTILE_FORCE=true */}
-        <AuthCaptchaField action="signup" onToken={captcha.onToken} onExpire={captcha.onExpire} />
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 

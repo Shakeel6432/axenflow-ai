@@ -4,7 +4,6 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { AuthCaptchaField, useAuthCaptcha } from "@/components/auth/AuthCaptcha";
 
 const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim());
 
@@ -15,43 +14,17 @@ export function SignInForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const captcha = useAuthCaptcha();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    const captchaError = captcha.requireToken();
-    if (captchaError) {
-      setError(captchaError);
-      return;
-    }
-
     setLoading(true);
 
     try {
-      const captchaRes = await fetch("/api/auth/captcha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          turnstileToken: captcha.token,
-          action: "login",
-          "cf-turnstile-response": captcha.token,
-        }),
-      });
-      const captchaData = await captchaRes.json();
-      if (!captchaRes.ok) {
-        setError(captchaData.error || "Captcha verification failed.");
-        setLoading(false);
-        captcha.reset();
-        return;
-      }
-
       const res = await signIn("credentials", { email, password, redirect: false, callbackUrl });
       setLoading(false);
       if (res?.error) {
         setError("Invalid email or password");
-        captcha.reset();
         return;
       }
       window.location.href = callbackUrl;
@@ -93,9 +66,6 @@ export function SignInForm() {
             placeholder="Your password"
           />
         </div>
-
-        {/* Cloudflare Turnstile slot — enable with env keys / NEXT_PUBLIC_TURNSTILE_FORCE=true */}
-        <AuthCaptchaField action="login" onToken={captcha.onToken} onExpire={captcha.onExpire} />
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 
