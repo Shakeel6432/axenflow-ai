@@ -90,11 +90,10 @@ function UserActions({ mobile }: { mobile: boolean }) {
 }
 
 export function NavbarAuth({ mobile = false }: { mobile?: boolean }) {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
-  // Never show a spinner. Prefer authenticated UI when session is known;
-  // while resolving, keep guest buttons so the navbar stays stable.
-  if (status === "authenticated" || session?.user) {
+  // Never show a spinner. While session resolves, keep guest buttons stable.
+  if (status === "authenticated") {
     return <UserActions mobile={mobile} />;
   }
 
