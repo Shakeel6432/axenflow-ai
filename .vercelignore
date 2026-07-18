@@ -1,0 +1,3 @@
+# Large local archives / data not needed for the Vercel build upload
+*.zip
+scripts/*.tsv
