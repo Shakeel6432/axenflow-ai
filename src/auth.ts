@@ -6,6 +6,8 @@ import bcrypt from "bcryptjs";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Prevent build-time crash when AUTH_SECRET is not yet injected in CI.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "axenflow-build-placeholder",
   adapter: isDatabaseConfigured() ? PrismaAdapter(prisma) : undefined,
   session: { strategy: "jwt" },
   providers: [
