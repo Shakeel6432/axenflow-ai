@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { FooterCta } from "@/components/layout/FooterCta";
+import { SsrBootLoader } from "@/components/layout/SsrBootLoader";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SessionProvider } from "@/components/auth/SessionProvider";
+import { auth } from "@/auth";
 import { siteConfig } from "@/lib/constants";
 import "./globals.css";
 
@@ -11,8 +15,8 @@ const space = Space_Grotesk({ subsets: ["latin"], variable: "--font-space", weig
 
 export const metadata: Metadata = {
   title: { default: `${siteConfig.name} | AI Bots, Web Scraping & Workflow Automation Agency`, template: `%s | ${siteConfig.name}` },
-  description: "AxenFlow AI builds custom AI bots, web scrapers, WhatsApp automation, email agents, and n8n/Make workflows. 86+ projects delivered. Get a free quote today.",
-  keywords: ["AI automation agency", "WhatsApp bot development", "web scraping service", "n8n automation", "Make.com workflows", "AI email agent", "business automation", "custom AI chatbot"],
+  description: "AxenFlow AI builds custom AI bots, web scrapers, AI WhatsApp agents, email agents, and n8n/Make workflows. 86+ projects delivered. Get a free quote today.",
+  keywords: ["AI automation agency", "AI WhatsApp agents", "web scraping service", "n8n automation", "Make.com workflows", "AI email agent", "business automation", "custom AI chatbot"],
   icons: {
     icon: [
       { url: "/favicon.ico?v=11", sizes: "any" },
@@ -32,29 +36,39 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "AxenFlow AI | AI Automation Agency",
-    description: "Custom AI bots, web scraping, WhatsApp automation & workflows. 86+ projects delivered worldwide.",
+    description: "Custom AI bots, web scraping, AI WhatsApp agents & workflows. 86+ projects delivered worldwide.",
   },
   robots: { index: true, follow: true },
   alternates: { canonical: siteConfig.url },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const session = await auth();
+
   return (
     <html lang="en" data-theme="dark" className={`${inter.variable} ${space.variable} h-full`} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://challenges.cloudflare.com" />
         <link rel="icon" href="/favicon.ico?v=11" sizes="any" />
         <link rel="icon" href="/favicon.png?v=11" type="image/png" />
         <link rel="shortcut icon" href="/favicon.ico?v=11" />
         <link rel="apple-touch-icon" href="/favicon.png?v=11" />
         <script dangerouslySetInnerHTML={{ __html: `try{const t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t)}catch(e){}` }} />
       </head>
-      <body className="site-bg min-h-full flex flex-col antialiased font-[var(--font-inter)]">
-        <ThemeProvider>
-          <div aria-hidden className="grid-bg pointer-events-none fixed inset-0 -z-10" />
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </ThemeProvider>
+      <body className="site-bg min-h-screen flex flex-col antialiased font-[var(--font-inter)]">
+        <SsrBootLoader />
+        <SessionProvider session={session}>
+          <ThemeProvider>
+            <div aria-hidden className="grid-bg pointer-events-none fixed inset-0 -z-10" />
+            <Navbar />
+            {/* FooterCta stays in layout on every page — do not remove. mt-auto pins it to first-screen bottom when content is short. */}
+            <main className="relative flex w-full min-h-[100dvh] flex-col bg-transparent">
+              <div className="flex min-h-0 w-full flex-1 flex-col">{children}</div>
+              <FooterCta />
+            </main>
+            <Footer />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

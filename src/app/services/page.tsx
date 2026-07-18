@@ -3,12 +3,11 @@ import { Bot, MessageCircle, Mail, Globe, Workflow, Cpu } from "lucide-react";
 import { services } from "@/lib/constants";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
-import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "Services | AI Bots, Scraping, WhatsApp & Email Automation",
-  description: "AxenFlow AI offers AI automation, WhatsApp bots, web scraping, AI email agents, n8n/Make workflow automation, and custom AI solutions. See what we can build for you.",
-  keywords: ["AI automation services", "WhatsApp bot service", "web scraping agency", "email automation", "n8n developer", "Make.com expert"],
+  title: "Services | AI Bots, Scraping, WhatsApp & Email Agents",
+  description: "AxenFlow AI offers AI automation, AI WhatsApp agents, web scraping, AI email agents, n8n/Make workflow automation, and custom AI solutions. See what we can build for you.",
+  keywords: ["AI automation services", "AI WhatsApp agents", "web scraping agency", "email automation", "n8n developer", "Make.com expert"],
   alternates: { canonical: "https://www.axenflowai.com/services" },
 };
 
@@ -24,23 +23,38 @@ const serviceIcons = [
 export default function ServicesPage() {
   return (
     <>
-      <PageHero title="What We Can Build for You" description="From simple bots to complex multi-tool automations, here is everything we offer." />
-      <Section>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <PageHero
+        title="What We Can Build for You"
+        description="From simple bots to complex multi-tool automations, here is everything we offer."
+      />
+      <Section tight>
+        <div className="mx-auto grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, i) => {
             const si = serviceIcons[i];
             return (
-              <article key={service.title} className={`glass-card group overflow-hidden rounded-2xl border ${si.border} p-8 transition-all duration-300 hover:scale-[1.02]`}>
-                <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-b ${si.bg}`} style={{ border: `1px solid ${si.color}30` }}>
-                  <si.Icon size={26} style={{ color: si.color }} strokeWidth={1.8} />
+              <article
+                key={service.title}
+                className={`glass-card group overflow-hidden rounded-2xl border ${si.border} p-5 transition-all duration-300 hover:scale-[1.02] sm:p-6`}
+              >
+                <div
+                  className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-b ${si.bg}`}
+                  style={{ border: `1px solid ${si.color}30` }}
+                >
+                  <si.Icon size={22} style={{ color: si.color }} strokeWidth={1.8} />
                 </div>
-                <h2 className="font-[var(--font-space)] mb-3 text-lg font-bold" style={{ color: "var(--c-heading)" }}>{service.title}</h2>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--c-text-dim)" }}>{service.description}</p>
+                <h2
+                  className="font-[var(--font-space)] mb-2 text-base font-bold sm:text-lg"
+                  style={{ color: "var(--c-heading)" }}
+                >
+                  {service.title}
+                </h2>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--c-text-dim)" }}>
+                  {service.description}
+                </p>
               </article>
             );
           })}
         </div>
-        <div className="mt-14 text-center"><Button href="/contact" size="lg">Get a Free Quote</Button></div>
       </Section>
     </>
   );

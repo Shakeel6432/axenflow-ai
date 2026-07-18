@@ -20,7 +20,7 @@ export function HeroSection() {
   const isDark = theme === "dark";
 
   return (
-    <section className="relative overflow-hidden pt-24 pb-16 lg:pt-28 lg:pb-24">
+    <section className="relative overflow-hidden pt-20 pb-14 lg:pt-24 lg:pb-20">
       {/* Background elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {/* Aurora gradient layers */}
@@ -166,10 +166,10 @@ export function HeroSection() {
       </div>
 
       <Container>
-        <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
+        <div className="grid items-stretch gap-10 lg:grid-cols-12 lg:gap-10">
           {/* Left Content */}
           <motion.div
-            className="lg:col-span-6"
+            className="flex h-full flex-col lg:col-span-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -178,10 +178,10 @@ export function HeroSection() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold"
+              className="mb-6 inline-flex w-fit max-w-full items-center gap-2 self-start rounded-full px-4 py-1.5 text-xs font-semibold"
               style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.2)" }}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse" />
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400 animate-pulse" />
               Available for new projects
             </motion.div>
 
@@ -250,7 +250,7 @@ export function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.9 }}
-              className="mt-10 flex items-center gap-4 rounded-2xl px-5 py-3.5"
+              className="mt-8 flex items-center gap-4 rounded-2xl px-5 py-3.5"
               style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
             >
               <div className="flex -space-x-3">
@@ -268,16 +268,34 @@ export function HeroSection() {
                 <p className="text-xs font-medium" style={{ color: "var(--c-text-muted)" }}>Rated 5/5 by our clients</p>
               </div>
             </motion.div>
+
+            <div className="mt-auto grid grid-cols-3 gap-3 pt-6">
+              {stats.map((s, i) => (
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 + i * 0.12 }}
+                  className="glass-card group rounded-xl px-4 py-5 text-center transition-all duration-300"
+                >
+                  <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110" style={{ background: s.bg, border: `1px solid ${s.color}20` }}>
+                    <s.icon size={18} style={{ color: s.color }} />
+                  </div>
+                  <p className="font-[var(--font-space)] text-2xl font-bold" style={{ color: "var(--c-heading)" }}>{s.value}</p>
+                  <p className="mt-0.5 text-xs" style={{ color: "var(--c-text-muted)" }}>{s.label}</p>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
 
           {/* Right Content */}
           <motion.div
-            className="lg:col-span-6"
+            className="lg:col-span-6 h-full"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <div className="relative">
+            <div className="relative h-full min-h-[340px] lg:min-h-full">
               <div className="absolute -inset-6 z-0 rounded-3xl bg-gradient-to-br from-indigo-500/15 via-teal-500/10 to-violet-500/10 blur-2xl" />
 
               <motion.div
@@ -315,7 +333,7 @@ export function HeroSection() {
               </motion.div>
 
               <div
-                className="relative z-10 overflow-hidden rounded-2xl"
+                className="relative z-10 h-full min-h-[340px] overflow-hidden rounded-2xl lg:min-h-[500px]"
                 style={{
                   background: isDark
                     ? "linear-gradient(145deg, #1a1040 0%, #0c2a3a 40%, #0a1628 100%)"
@@ -331,26 +349,15 @@ export function HeroSection() {
                       : "radial-gradient(circle at 30% 20%, rgba(99,102,241,0.15), transparent 60%), radial-gradient(circle at 70% 80%, rgba(20,184,166,0.12), transparent 50%)"
                   }}
                 />
-                <Image src="/images/hero/Img.png" alt="AxenFlow AI automation dashboard" width={680} height={520} className="relative z-10 w-full object-cover" priority />
+                <Image
+                  src="/images/hero/Img.png"
+                  alt="AxenFlow AI automation dashboard"
+                  width={680}
+                  height={560}
+                  className="relative z-10 h-full min-h-[340px] w-full object-cover object-center lg:min-h-[500px]"
+                  priority
+                />
               </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              {stats.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 + i * 0.12 }}
-                  className="glass-card group rounded-xl px-4 py-5 text-center transition-all duration-300"
-                >
-                  <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110" style={{ background: s.bg, border: `1px solid ${s.color}20` }}>
-                    <s.icon size={18} style={{ color: s.color }} />
-                  </div>
-                  <p className="font-[var(--font-space)] text-2xl font-bold" style={{ color: "var(--c-heading)" }}>{s.value}</p>
-                  <p className="mt-0.5 text-xs" style={{ color: "var(--c-text-muted)" }}>{s.label}</p>
-                </motion.div>
-              ))}
             </div>
           </motion.div>
         </div>

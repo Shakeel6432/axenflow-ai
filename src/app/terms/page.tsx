@@ -13,7 +13,7 @@ export default function TermsPage() {
   return (
     <>
       <PageHero title="Terms of Service" description={`Last updated: ${new Date().getFullYear()}`} />
-      <Section className="!py-16">
+      <Section tight>
         <div className="glass-card mx-auto max-w-3xl rounded-2xl p-8 sm:p-12">
           <div className="space-y-8">
             {[

@@ -1,12 +1,54 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/constants";
+import { prisma, isDatabaseConfigured } from "@/lib/db";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/services", "/portfolio", "/about", "/contact", "/privacy", "/terms"];
-  return routes.map((route) => ({
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticRoutes = ["", "/leads", "/services", "/portfolio", "/about", "/contact", "/privacy", "/terms"];
+  const entries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
     url: `${siteConfig.url}${route}`,
     lastModified: new Date(),
-    changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : 0.8,
+    changeFrequency: route === "" || route === "/leads" ? "daily" : "monthly",
+    priority: route === "" ? 1 : route === "/leads" ? 0.9 : 0.8,
   }));
+
+  if (!isDatabaseConfigured()) return entries;
+
+  try {
+    const [categories, cities, states] = await Promise.all([
+      prisma.category.findMany({ select: { slug: true } }),
+      prisma.city.findMany({ select: { slug: true } }),
+      prisma.state.findMany({ select: { slug: true } }),
+    ]);
+
+    for (const category of categories) {
+      entries.push({
+        url: `${siteConfig.url}/${category.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      });
+
+      for (const city of cities) {
+        entries.push({
+          url: `${siteConfig.url}/${category.slug}-in-${city.slug}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly",
+          priority: 0.6,
+        });
+      }
+
+      for (const state of states) {
+        entries.push({
+          url: `${siteConfig.url}/${category.slug}-in-${state.slug}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly",
+          priority: 0.6,
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Sitemap generation skipped DB routes:", error);
+  }
+
+  return entries;
 }

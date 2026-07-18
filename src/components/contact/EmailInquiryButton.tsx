@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { ArrowRight, Copy, Check, Mail, X } from "lucide-react";
 import { getProjectInquiryEmailText } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -23,9 +24,12 @@ export function EmailInquiryButton({ className }: EmailInquiryButtonProps) {
       if (e.key === "Escape") setOpen(false);
     };
 
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
+      document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
@@ -49,6 +53,123 @@ export function EmailInquiryButton({ className }: EmailInquiryButtonProps) {
     }
   };
 
+  // Portal only after user opens (client-only) — no mounted flag needed
+  const modal =
+    open && typeof document !== "undefined"
+      ? createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
+            <button
+              type="button"
+              aria-label="Close dialog"
+              className="absolute inset-0 bg-black/65 backdrop-blur-sm"
+              onClick={() => setOpen(false)}
+            />
+
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="email-popup-title"
+              className="relative z-10 flex max-h-[min(90dvh,640px)] w-full max-w-md flex-col overflow-hidden rounded-2xl shadow-2xl"
+              style={{ background: "var(--c-surface-solid)", border: "1px solid var(--c-border)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="shrink-0 border-b px-5 pb-4 pt-5 sm:px-6" style={{ borderColor: "var(--c-border)" }}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg transition hover:scale-105"
+                  style={{
+                    background: "var(--c-hover-bg)",
+                    border: "1px solid var(--c-border)",
+                    color: "var(--c-text-dim)",
+                  }}
+                  aria-label="Close"
+                >
+                  <X size={14} />
+                </button>
+
+                <p id="email-popup-title" className="pr-10 text-base font-bold sm:text-lg" style={{ color: "var(--c-heading)" }}>
+                  Copy and send via your email app
+                </p>
+                <p className="mt-1 text-xs leading-relaxed sm:text-sm" style={{ color: "var(--c-text-muted)" }}>
+                  Click copy, open Gmail or Outlook, paste the details, and send to us.
+                </p>
+              </div>
+
+              <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-4 sm:px-6">
+                <div
+                  className="rounded-xl p-3.5"
+                  style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
+                >
+                  <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--c-text-muted)" }}>
+                    Email Address
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-indigo-500">{emailData.email}</span>
+                    <button
+                      type="button"
+                      onClick={() => copyText(emailData.email, "email")}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+                      style={{
+                        background: "rgba(99, 102, 241, 0.12)",
+                        color: "#6366f1",
+                        border: "1px solid rgba(99, 102, 241, 0.2)",
+                      }}
+                    >
+                      {copied === "email" ? <Check size={12} /> : <Copy size={12} />}
+                      {copied === "email" ? "Copied!" : "Copy Email"}
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-xl p-3.5"
+                  style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
+                >
+                  <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--c-text-muted)" }}>
+                    Message Template
+                  </p>
+                  <pre
+                    className="mt-2 max-h-40 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed sm:max-h-48"
+                    style={{ color: "var(--c-text-dim)" }}
+                  >
+                    {emailData.fullText}
+                  </pre>
+                  <button
+                    type="button"
+                    onClick={() => copyText(emailData.fullText, "message")}
+                    className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition sm:w-auto"
+                    style={{
+                      background: "rgba(20, 184, 166, 0.12)",
+                      color: "#14b8a6",
+                      border: "1px solid rgba(20, 184, 166, 0.2)",
+                    }}
+                  >
+                    {copied === "message" ? <Check size={12} /> : <Copy size={12} />}
+                    {copied === "message" ? "Message Copied!" : "Copy Message"}
+                  </button>
+                </div>
+              </div>
+
+              <div
+                className="shrink-0 border-t px-5 py-3.5 sm:px-6"
+                style={{ borderColor: "var(--c-border)" }}
+              >
+                <a
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailData.email)}&su=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-500 transition hover:text-teal-500"
+                >
+                  <Mail size={15} /> Open in Gmail (optional)
+                </a>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   return (
     <>
       <button
@@ -61,100 +182,7 @@ export function EmailInquiryButton({ className }: EmailInquiryButtonProps) {
       >
         Send Project Details <ArrowRight size={16} />
       </button>
-
-      {open && (
-        <>
-          <div
-            aria-hidden
-            className="pointer-events-none fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
-          />
-
-          <div className="pointer-events-none fixed inset-0 z-[101] flex items-center justify-center p-4">
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="email-popup-title"
-              className="pointer-events-auto relative w-full max-w-md rounded-xl p-4 shadow-2xl sm:p-5"
-              style={{ background: "var(--c-surface-solid)", border: "1px solid var(--c-border)" }}
-            >
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg transition hover:scale-105"
-                style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-text-dim)" }}
-                aria-label="Close"
-              >
-                <X size={14} />
-              </button>
-
-              <div className="pr-8">
-                <p id="email-popup-title" className="text-base font-bold" style={{ color: "var(--c-heading)" }}>
-                  Copy and send via your email app
-                </p>
-                <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--c-text-muted)" }}>
-                  Click copy, open Gmail or Outlook, paste the details, and send to us.
-                </p>
-              </div>
-
-              <div className="mt-3 space-y-2">
-                <div
-                  className="rounded-lg p-3"
-                  style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
-                >
-                  <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--c-text-muted)" }}>
-                    Email Address
-                  </p>
-                  <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-indigo-500">{emailData.email}</span>
-                    <button
-                      type="button"
-                      onClick={() => copyText(emailData.email, "email")}
-                      className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition"
-                      style={{ background: "rgba(99, 102, 241, 0.12)", color: "#6366f1", border: "1px solid rgba(99, 102, 241, 0.2)" }}
-                    >
-                      {copied === "email" ? <Check size={12} /> : <Copy size={12} />}
-                      {copied === "email" ? "Copied!" : "Copy Email"}
-                    </button>
-                  </div>
-                </div>
-
-                <div
-                  className="rounded-lg p-3"
-                  style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
-                >
-                  <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--c-text-muted)" }}>
-                    Message Template
-                  </p>
-                  <pre
-                    className="mt-1.5 max-h-28 overflow-y-auto whitespace-pre-wrap text-[11px] leading-relaxed"
-                    style={{ color: "var(--c-text-dim)" }}
-                  >
-                    {emailData.fullText}
-                  </pre>
-                  <button
-                    type="button"
-                    onClick={() => copyText(emailData.fullText, "message")}
-                    className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-md px-2.5 py-2 text-[11px] font-semibold transition sm:w-auto"
-                    style={{ background: "rgba(20, 184, 166, 0.12)", color: "#14b8a6", border: "1px solid rgba(20, 184, 166, 0.2)" }}
-                  >
-                    {copied === "message" ? <Check size={12} /> : <Copy size={12} />}
-                    {copied === "message" ? "Message Copied!" : "Copy Message"}
-                  </button>
-                </div>
-              </div>
-
-              <a
-                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailData.email)}&su=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-500 transition hover:text-teal-500"
-              >
-                <Mail size={14} /> Open in Gmail (optional)
-              </a>
-            </div>
-          </div>
-        </>
-      )}
+      {modal}
     </>
   );
 }

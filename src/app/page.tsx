@@ -5,7 +5,6 @@ import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { ProcessSection } from "@/components/home/ProcessSection";
 import { PortfolioSection } from "@/components/home/PortfolioSection";
 import { IndustriesSection } from "@/components/home/IndustriesSection";
-
 import { FAQSection } from "@/components/home/FAQSection";
 import { ClientFormSection } from "@/components/home/ClientFormSection";
 
@@ -19,7 +18,6 @@ export default function HomePage() {
       <ProcessSection />
       <PortfolioSection />
       <IndustriesSection />
-
       <FAQSection />
       <ClientFormSection />
     </>

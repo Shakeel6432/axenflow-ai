@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "AxenFlow AI",
   tagline: "AI Automation Agency | Bots, Scraping & Workflows",
   description:
-    "We build AI bots, web scrapers, WhatsApp automations, and workflow systems that run your business on autopilot. 86+ projects delivered worldwide.",
+    "We build AI bots, web scrapers, AI WhatsApp agents, and workflow systems that run your business on autopilot. 86+ projects delivered worldwide.",
   email: "hello@axenflowai.com",
   fiverrUrl: "https://www.fiverr.com/shakeel644",
   url: "https://www.axenflowai.com",
@@ -63,6 +63,8 @@ export function getProjectInquiryMailtoLink() {
 
 export const navLinks = [
   { label: "Home", href: "/" },
+  { label: "Leads", href: "/leads" },
+  { label: "Tools", href: "/tools" },
   { label: "Services", href: "/services" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "About", href: "/about" },
@@ -78,9 +80,9 @@ export const services = [
     image: "/images/service/img1.png",
   },
   {
-    title: "WhatsApp Automation",
+    title: "AI WhatsApp Agents",
     description:
-      "Set up WhatsApp bots that handle leads, answer questions, book appointments, and follow up with customers automatically.",
+      "Deploy AI WhatsApp agents that handle leads, answer questions, book appointments, and follow up with customers automatically.",
     icon: "/images/v1/icon-s2.svg",
     image: "/images/service/img2.png",
   },
@@ -204,8 +206,8 @@ export const portfolioItems = [
   },
   {
     title: "WhatsApp Booking Bot",
-    category: "WhatsApp Automation",
-    description: "A clinic in Dubai uses this bot to handle appointment bookings, reminders, and patient follow-ups on WhatsApp.",
+    category: "AI WhatsApp Agents",
+    description: "A clinic in Dubai uses this AI WhatsApp agent to handle appointment bookings, reminders, and patient follow-ups.",
     image: "/images/portfolio/img2.png",
   },
   {
@@ -246,9 +248,9 @@ export const faqs = [
       "Simple bots and scrapers are done in 2–5 days. Bigger projects with multiple integrations usually take 1–3 weeks. We'll give you a clear timeline before we start.",
   },
   {
-    question: "Do you work with clients outside Pakistan?",
+    question: "Do you work with clients worldwide?",
     answer:
-      "Yes, most of our clients are international. We've worked with businesses in the US, UK, UAE, Australia, and across Europe. Everything is done remotely.",
+      "Yes — most of our clients are international. We've worked with businesses in the US, UK, UAE, Australia, and across Europe. Everything is done remotely.",
   },
   {
     question: "What tools do you work with?",
@@ -269,7 +271,7 @@ export const faqs = [
 
 export const serviceOptions = [
   "AI Automation",
-  "WhatsApp Automation",
+  "AI WhatsApp Agents",
   "Web Scraping",
   "AI Email Agent",
   "Workflow Automation",
@@ -279,6 +281,7 @@ export const serviceOptions = [
 export const footerLinks = {
   quick: [
     { label: "Home", href: "/" },
+    { label: "Leads", href: "/leads" },
     { label: "About", href: "/about" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "Contact", href: "/contact" },

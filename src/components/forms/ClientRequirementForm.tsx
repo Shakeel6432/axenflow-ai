@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { CheckCircle2, Send, Loader2, AlertCircle } from "lucide-react";
 import { serviceOptions } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
+import { Turnstile } from "@/components/contact/Turnstile";
 
 type FormData = {
   fullName: string; email: string; phone: string; company: string; website: string;
@@ -22,6 +23,9 @@ export function ClientRequirementForm() {
   const [form, setForm] = useState<FormData>(init);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const onToken = useCallback((token: string) => setTurnstileToken(token), []);
+  const onExpire = useCallback(() => setTurnstileToken(""), []);
 
   const set = (k: keyof FormData, v: string | string[]) => setForm((p) => ({ ...p, [k]: v }));
   const toggle = (s: string) => set("services", form.services.includes(s) ? form.services.filter((x) => x !== s) : [...form.services, s]);
@@ -37,6 +41,7 @@ export function ClientRequirementForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          turnstileToken,
           message: form.message || [form.currentProblem, form.projectDetails, form.expectedGoal].filter(Boolean).join("\n\n"),
         }),
       });
@@ -148,6 +153,8 @@ export function ClientRequirementForm() {
           <input className="form-input" placeholder="2 weeks" value={form.deadline} onChange={(e) => set("deadline", e.target.value)} disabled={status === "loading"} />
         </div>
       </div>
+
+      <Turnstile action="contact" onToken={onToken} onExpire={onExpire} />
 
       <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={status === "loading"}>
         {status === "loading" ? (
