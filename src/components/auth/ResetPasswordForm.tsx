@@ -51,7 +51,7 @@ export function ResetPasswordForm() {
   if (!email || !token) {
     return (
       <div className="glass-card w-full rounded-2xl p-6 sm:p-8">
-        <p className="text-sm text-red-500">This reset link is invalid. Please request a new one.</p>
+        <p className="text-sm text-red-500">This reset link is invalid. Please request a new code.</p>
         <Link href="/forgot-password" className="mt-4 inline-block text-sm font-semibold text-indigo-500 hover:text-teal-500">
           Forgot password
         </Link>

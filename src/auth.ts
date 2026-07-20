@@ -5,11 +5,20 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 
+function resolveAuthSecret() {
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (secret && secret !== "axenflow-build-placeholder") return secret;
+  if (process.env.NODE_ENV === "production" && process.env.VERCEL_ENV === "production") {
+    throw new Error("AUTH_SECRET must be set to a strong random value in production.");
+  }
+  // Local/CI only — never use this string in live production.
+  return secret || "axenflow-dev-only-secret-change-me";
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // Prevent build-time crash when AUTH_SECRET is not yet injected in CI.
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "axenflow-build-placeholder",
+  secret: resolveAuthSecret(),
   adapter: isDatabaseConfigured() ? PrismaAdapter(prisma) : undefined,
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
   providers: [
     // Enable when GOOGLE_CLIENT_* (or AUTH_GOOGLE_*) are set.
     // Also set NEXT_PUBLIC_GOOGLE_CLIENT_ID so the Sign In button appears.
@@ -19,7 +28,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           Google({
             clientId: (process.env.GOOGLE_CLIENT_ID || process.env.AUTH_GOOGLE_ID)!,
             clientSecret: (process.env.GOOGLE_CLIENT_SECRET || process.env.AUTH_GOOGLE_SECRET)!,
-            allowDangerousEmailAccountLinking: true,
+            // Prevent account takeover via same-email Google sign-in.
+            allowDangerousEmailAccountLinking: false,
           }),
         ]
       : []),
@@ -53,6 +63,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       if (trigger === "update" && session) {
         if (typeof session.name === "string") token.name = session.name;
+        // Refresh role from DB on session.update()
+        if (token.uid && isDatabaseConfigured()) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: String(token.uid) },
+            select: { role: true, name: true },
+          });
+          if (dbUser) {
+            token.role = dbUser.role;
+            if (dbUser.name) token.name = dbUser.name;
+          }
+        }
       }
       return token;
     },

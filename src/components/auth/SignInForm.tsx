@@ -5,12 +5,13 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { PasswordField } from "@/components/auth/PasswordField";
+import { safeCallbackUrl } from "@/lib/safe-callback-url";
 
 const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim());
 
 export function SignInForm() {
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") || "/dashboard";
+  const callbackUrl = safeCallbackUrl(params.get("callbackUrl"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -58,7 +59,10 @@ export function SignInForm() {
             <label className="text-xs font-semibold tracking-wide" style={{ color: "var(--c-text-dim)" }}>
               Password
             </label>
-            <Link href="/forgot-password" className="text-xs font-semibold text-indigo-500 hover:text-teal-500">
+            <Link
+              href={email.trim() ? `/forgot-password?email=${encodeURIComponent(email.trim())}` : "/forgot-password"}
+              className="text-xs font-semibold text-indigo-500 hover:text-teal-500"
+            >
               Forgot password?
             </Link>
           </div>

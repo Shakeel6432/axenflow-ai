@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
+import { rateLimit } from "@/lib/rate-limit";
 
 const signupSchema = z.object({
   name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100),
@@ -13,10 +14,22 @@ const signupSchema = z.object({
   path: ["confirmPassword"],
 });
 
+function getClientIp(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0]?.trim() || "anonymous";
+  return req.headers.get("x-real-ip")?.trim() || "anonymous";
+}
+
 export async function POST(req: Request) {
   try {
     if (!isDatabaseConfigured()) {
       return NextResponse.json({ error: "Database is not configured." }, { status: 503 });
+    }
+
+    const ip = getClientIp(req);
+    const limited = rateLimit(`signup:ip:${ip}`, 8, 60 * 60 * 1000);
+    if (!limited.ok) {
+      return NextResponse.json({ error: "Too many signup attempts. Try again later." }, { status: 429 });
     }
 
     const body = await req.json();
@@ -27,9 +40,18 @@ export async function POST(req: Request) {
     }
 
     const email = parsed.data.email.toLowerCase();
+    const emailLimited = rateLimit(`signup:email:${email}`, 5, 60 * 60 * 1000);
+    if (!emailLimited.ok) {
+      return NextResponse.json({ error: "Too many signup attempts for this email." }, { status: 429 });
+    }
+
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
+      // Generic message reduces account enumeration
+      return NextResponse.json(
+        { error: "Unable to create account with that email. Try signing in or resetting your password." },
+        { status: 409 }
+      );
     }
 
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);

@@ -31,6 +31,10 @@ export function getMailTransporter(): Transporter {
       secure: port === 465,
       requireTLS: port === 587,
       auth: { user, pass },
+      connectionTimeout: 20_000,
+      greetingTimeout: 20_000,
+      socketTimeout: 30_000,
+      tls: { minVersion: "TLSv1.2" },
     });
   }
 
@@ -67,6 +71,8 @@ export async function sendMail(opts: {
     });
   } catch (error) {
     const err = error as { code?: string; responseCode?: number };
+    // Drop cached transporter so a corrected SMTP_PASS is picked up after env reload
+    transporter = null;
     if (err.code === "EAUTH" || err.responseCode === 535) {
       throw new Error(
         "SMTP login failed. Check SMTP_USER / SMTP_PASS (Zoho app password) in .env.local and restart the server."
@@ -106,6 +112,7 @@ export async function sendContactEmail(opts: {
     });
   } catch (error) {
     const err = error as { code?: string; responseCode?: number; message?: string };
+    transporter = null;
     if (err.code === "EAUTH" || err.responseCode === 535) {
       throw new Error(
         "SMTP login failed. Check SMTP_USER / SMTP_PASS (Zoho app password) in .env.local and restart the server."

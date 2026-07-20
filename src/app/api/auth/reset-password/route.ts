@@ -5,15 +5,17 @@ import { z } from "zod";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
 
-const bodySchema = z.object({
-  email: z.string().trim().email(),
-  token: z.string().trim().min(20).max(200),
-  password: z.string().min(8, "Password must be at least 8 characters").max(128),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const bodySchema = z
+  .object({
+    email: z.string().trim().email(),
+    token: z.string().trim().min(6, "Enter the security code or use the email link").max(200),
+    password: z.string().min(8, "Password must be at least 8 characters").max(128),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -32,8 +34,8 @@ export async function POST(req: Request) {
     }
 
     const ip = getClientIp(req);
-    const limited = rateLimit(`reset:${ip}`, 10, 60 * 60 * 1000);
-    if (!limited.ok) {
+    const ipLimited = rateLimit(`reset:ip:${ip}`, 10, 60 * 60 * 1000);
+    if (!ipLimited.ok) {
       return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
     }
 
@@ -43,25 +45,42 @@ export async function POST(req: Request) {
     }
 
     const email = parsed.data.email.toLowerCase();
-    const identifier = `password-reset:${email}`;
-    const tokenHash = hashToken(parsed.data.token);
+    const emailLimited = rateLimit(`reset:email:${email}`, 8, 60 * 60 * 1000);
+    if (!emailLimited.ok) {
+      return NextResponse.json({ error: "Too many attempts for this email. Request a new code." }, { status: 429 });
+    }
 
-    const record = await prisma.verificationToken.findUnique({
-      where: { identifier_token: { identifier, token: tokenHash } },
-    });
+    const rawToken = parsed.data.token.trim();
+    const tokenHash = hashToken(rawToken);
+    const otpIdentifier = `password-reset-otp:${email}`;
+    const linkIdentifier = `password-reset-link:${email}`;
+    const legacyIdentifier = `password-reset:${email}`;
+
+    const record =
+      (await prisma.verificationToken.findUnique({
+        where: { identifier_token: { identifier: otpIdentifier, token: tokenHash } },
+      })) ||
+      (await prisma.verificationToken.findUnique({
+        where: { identifier_token: { identifier: linkIdentifier, token: tokenHash } },
+      })) ||
+      (await prisma.verificationToken.findUnique({
+        where: { identifier_token: { identifier: legacyIdentifier, token: tokenHash } },
+      }));
 
     if (!record || record.expires.getTime() < Date.now()) {
       if (record) {
-        await prisma.verificationToken.delete({
-          where: { identifier_token: { identifier, token: tokenHash } },
-        }).catch(() => undefined);
+        await prisma.verificationToken
+          .delete({
+            where: { identifier_token: { identifier: record.identifier, token: record.token } },
+          })
+          .catch(() => undefined);
       }
-      return NextResponse.json({ error: "Reset link is invalid or has expired." }, { status: 400 });
+      return NextResponse.json({ error: "Code or link is invalid or has expired. Request a new one." }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email }, select: { id: true } });
     if (!user) {
-      return NextResponse.json({ error: "Reset link is invalid or has expired." }, { status: 400 });
+      return NextResponse.json({ error: "Code or link is invalid or has expired. Request a new one." }, { status: 400 });
     }
 
     const hashed = await bcrypt.hash(parsed.data.password, 12);
@@ -70,8 +89,8 @@ export async function POST(req: Request) {
         where: { id: user.id },
         data: { password: hashed },
       }),
-      prisma.verificationToken.delete({
-        where: { identifier_token: { identifier, token: tokenHash } },
+      prisma.verificationToken.deleteMany({
+        where: { identifier: { in: [otpIdentifier, linkIdentifier, legacyIdentifier] } },
       }),
     ]);
 

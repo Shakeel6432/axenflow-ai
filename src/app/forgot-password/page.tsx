@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -15,14 +16,16 @@ export default function ForgotPasswordPage() {
     <>
       <PageHero
         title="Forgot Password"
-        description="Enter your email and we’ll send a secure link to reset your password."
+        description="Enter your registered email. We’ll send a secure one-time code and reset link."
       />
       <Section tight>
         <AuthShell
           title="Reset your password"
-          description="We’ll email you a one-hour reset link. For security, the link can only be used once."
+          description="Security code is emailed only to your account address, expires in 15 minutes, and can be used once."
         >
-          <ForgotPasswordForm />
+          <Suspense fallback={<p className="text-sm" style={{ color: "var(--c-text-muted)" }}>Loading...</p>}>
+            <ForgotPasswordForm />
+          </Suspense>
         </AuthShell>
       </Section>
     </>
