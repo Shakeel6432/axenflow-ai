@@ -55,18 +55,27 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
   const page = Math.max(1, Number(pageParam || 1));
   const { categorySlug, locationSlug } = parseSeoSlug(slug);
 
-  const category = await prisma.category.findUnique({ where: { slug: categorySlug } });
+  let category: { id: string; name: string; slug: string } | null = null;
+  try {
+    category = await prisma.category.findUnique({ where: { slug: categorySlug } });
+  } catch {
+    notFound();
+  }
   if (!category) notFound();
 
   let cityName: string | undefined;
   let stateName: string | undefined;
 
   if (locationSlug) {
-    const city = await prisma.city.findFirst({ where: { slug: locationSlug } });
-    const state = !city ? await prisma.state.findFirst({ where: { slug: locationSlug } }) : null;
-    if (!city && !state) notFound();
-    cityName = city?.name;
-    stateName = state?.name;
+    try {
+      const city = await prisma.city.findFirst({ where: { slug: locationSlug } });
+      const state = !city ? await prisma.state.findFirst({ where: { slug: locationSlug } }) : null;
+      if (!city && !state) notFound();
+      cityName = city?.name;
+      stateName = state?.name;
+    } catch {
+      notFound();
+    }
   }
 
   const session = await auth();

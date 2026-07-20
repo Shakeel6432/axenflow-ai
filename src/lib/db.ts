@@ -28,6 +28,17 @@ export function getPrisma(): PrismaClient {
   return globalForPrisma.prisma;
 }
 
+/** Soft DB probe used by APIs — never throws. */
+export async function pingDatabase(): Promise<boolean> {
+  if (!isDatabaseConfigured()) return false;
+  try {
+    await getPrisma().$queryRaw`SELECT 1`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Backwards-compatible export used by services.
  * Uses a Proxy so importing this module never throws during evaluation.

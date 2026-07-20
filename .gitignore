@@ -55,3 +55,6 @@ public/downloads/*.exe
 public/downloads/*.zip
 
 .vercel
+
+VERCEL_ENV_TO_ADD.txt
+
