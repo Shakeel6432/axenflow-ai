@@ -6,8 +6,8 @@ type LogoProps = { size?: "nav" | "footer"; className?: string };
 
 export function Logo({ size = "nav", className }: LogoProps) {
   const dim = size === "nav"
-    ? { w: 200, h: 54, cls: "h-9 w-auto max-w-[9.5rem] sm:h-10 sm:max-w-[11rem] lg:h-11 lg:max-w-[12.5rem]" }
-    : { w: 200, h: 54, cls: "h-10 w-auto max-w-[11rem] sm:h-11" };
+    ? { w: 520, h: 140, cls: "h-[6.5rem] w-auto sm:h-[8rem]" }
+    : { w: 520, h: 140, cls: "h-[6.5rem] w-auto sm:h-[8rem]" };
 
   return (
     <Link href="/" className={cn("inline-flex shrink-0 items-center", className)}>
