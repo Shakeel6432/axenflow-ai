@@ -34,20 +34,23 @@ export function AuthShell({
   points = defaultPoints,
 }: AuthShellProps) {
   return (
-    <div className="mx-auto grid w-full max-w-5xl items-center gap-8 lg:grid-cols-2 lg:gap-12">
-      <aside className="relative">
+    <div className="mx-auto grid w-full max-w-5xl items-start gap-6 sm:gap-8 xl:grid-cols-2 xl:items-center xl:gap-12">
+      {/* Form first on phone / desktop-site-on-mobile; copy beside it on xl+ */}
+      <div className="order-1 w-full min-w-0 xl:order-2">{children}</div>
+
+      <aside className="order-2 relative min-w-0 xl:order-1">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-400">{eyebrow}</p>
         <h2
-          className="mt-3 font-[var(--font-space)] text-2xl font-bold tracking-tight sm:text-3xl"
+          className="mt-2 font-[var(--font-space)] text-xl font-bold tracking-tight sm:mt-3 sm:text-2xl xl:text-3xl"
           style={{ color: "var(--c-heading)" }}
         >
           {title}
         </h2>
-        <p className="mt-3 max-w-md text-sm leading-relaxed sm:text-base" style={{ color: "var(--c-text-dim)" }}>
+        <p className="mt-2 max-w-md text-sm leading-relaxed sm:mt-3 sm:text-base" style={{ color: "var(--c-text-dim)" }}>
           {description}
         </p>
 
-        <ul className="mt-7 space-y-4">
+        <ul className="mt-5 hidden space-y-4 sm:mt-7 sm:block">
           {points.map(({ icon: Icon, title: pointTitle, text }) => (
             <li key={pointTitle} className="flex gap-3">
               <span
@@ -56,7 +59,7 @@ export function AuthShell({
               >
                 <Icon size={16} />
               </span>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-semibold" style={{ color: "var(--c-heading)" }}>
                   {pointTitle}
                 </p>
@@ -68,13 +71,11 @@ export function AuthShell({
           ))}
         </ul>
 
-        <p className="mt-7 inline-flex items-center gap-2 text-xs font-medium" style={{ color: "var(--c-text-muted)" }}>
-          <CheckCircle2 size={14} className="text-teal-500" />
+        <p className="mt-4 inline-flex items-center gap-2 text-xs font-medium sm:mt-7" style={{ color: "var(--c-text-muted)" }}>
+          <CheckCircle2 size={14} className="shrink-0 text-teal-500" />
           Free account, secure login, and reply within 24h on projects
         </p>
       </aside>
-
-      <div className="w-full">{children}</div>
     </div>
   );
 }

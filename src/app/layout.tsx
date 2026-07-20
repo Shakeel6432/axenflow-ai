@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -12,6 +12,12 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const space = Space_Grotesk({ subsets: ["latin"], variable: "--font-space", weight: ["400", "500", "600", "700"] });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: { default: `${siteConfig.name} | AI Bots, Web Scraping & Workflow Automation Agency`, template: `%s | ${siteConfig.name}` },
@@ -54,15 +60,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <link rel="apple-touch-icon" href="/favicon.png?v=11" />
         <script dangerouslySetInnerHTML={{ __html: `try{const t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t)}catch(e){}` }} />
       </head>
-      <body className="site-bg min-h-screen flex flex-col antialiased font-[var(--font-inter)]">
+      <body className="site-bg flex min-h-screen flex-col overflow-x-clip antialiased font-[var(--font-inter)]">
         <SsrBootLoader />
         <SessionProvider session={session}>
           <ThemeProvider>
             <div aria-hidden className="grid-bg pointer-events-none fixed inset-0 -z-10" />
             <Navbar />
-            {/* FooterCta stays in layout on every page — do not remove. mt-auto pins it to first-screen bottom when content is short. */}
-            <main className="relative flex w-full min-h-[100dvh] flex-col bg-transparent">
-              <div className="flex min-h-0 w-full flex-1 flex-col">{children}</div>
+            {/* FooterCta stays in layout on every page — do not remove. */}
+            <main className="relative flex w-full flex-1 flex-col bg-transparent">
+              <div className="w-full flex-1">{children}</div>
               <FooterCta />
             </main>
             <Footer />

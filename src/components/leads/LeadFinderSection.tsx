@@ -227,8 +227,8 @@ export function LeadFinderSection({
         />
       )}
 
-      <div className="glass-card mx-auto w-full max-w-5xl rounded-2xl p-5 sm:p-8">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="glass-card mx-auto w-full max-w-5xl rounded-2xl p-4 sm:p-6 lg:p-8">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
           <Field label="Search Keyword">
             <input
               className="form-input"

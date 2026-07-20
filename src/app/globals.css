@@ -90,6 +90,7 @@ html {
   scroll-behavior: smooth;
   background-color: var(--c-bg);
   min-height: 100%;
+  overflow-x: clip;
   transition: background-color 0.25s ease;
 }
 
@@ -99,6 +100,8 @@ body {
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.25s ease, color 0.25s ease;
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
 }
 
 ::selection {
@@ -299,13 +302,20 @@ body {
   border: 1px solid var(--c-border);
   border-radius: 1rem;
   backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .glass-card:hover {
   border-color: var(--c-border-hover);
   box-shadow: var(--c-card-shadow);
-  transform: translateY(-2px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .glass-card:hover {
+    transform: translateY(-2px);
+  }
 }
 
 [data-theme="light"] .glass-card {
@@ -407,6 +417,8 @@ body {
 /* ─── Form ─── */
 .form-input {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   border-radius: 0.75rem;
   border: 1.5px solid var(--c-border);
   background: var(--c-input-bg);

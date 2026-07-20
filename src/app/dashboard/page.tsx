@@ -65,12 +65,12 @@ export default async function DashboardPage() {
         description="Your AxenFlow AI workspace for lead tools, downloads, and account controls."
       />
       <Section tight>
-        <div className="mx-auto grid w-full max-w-4xl gap-4 sm:grid-cols-2">
+        <div className="mx-auto grid w-full max-w-4xl gap-3 sm:grid-cols-2 sm:gap-4">
           {cards.map(({ title, description, href, icon: Icon }) => (
             <Link
               key={href}
               href={href}
-              className="glass-card group rounded-2xl p-6 transition hover:-translate-y-0.5"
+              className="glass-card group rounded-2xl p-5 sm:p-6"
             >
               <div
                 className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl"

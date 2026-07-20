@@ -17,7 +17,7 @@ export function PageHero({ title, description, large = false, align = "left" }: 
     <section
       className={cn(
         "page-hero relative shrink-0 overflow-hidden",
-        large ? "pt-28 pb-16 lg:pt-32 lg:pb-20" : "pt-24 pb-5 lg:pt-28 lg:pb-6"
+        large ? "pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-32 lg:pb-20" : "pt-20 pb-4 sm:pt-24 sm:pb-5 lg:pt-28 lg:pb-6"
       )}
       style={{ borderBottom: "1px solid var(--c-border)" }}
     >
