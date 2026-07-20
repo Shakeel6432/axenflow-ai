@@ -15,17 +15,42 @@ export function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [needsVerify, setNeedsVerify] = useState(false);
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setInfo("");
+    setNeedsVerify(false);
     setLoading(true);
 
     try {
       const res = await signIn("credentials", { email, password, redirect: false, callbackUrl });
       setLoading(false);
       if (res?.error) {
+        const code = String(res.error || "");
+        if (code.includes("EMAIL_NOT_VERIFIED") || code === "email_not_verified") {
+          setNeedsVerify(true);
+          setError("Please confirm your email before signing in.");
+          return;
+        }
+
+        // Auth.js often maps thrown errors to CredentialsSignin — check account status
+        const statusRes = await fetch("/api/auth/email-status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const status = await statusRes.json().catch(() => ({}));
+        if (status?.code === "EMAIL_NOT_VERIFIED") {
+          setNeedsVerify(true);
+          setError("Please confirm your email before signing in.");
+          return;
+        }
+
         setError("Invalid email or password");
         return;
       }
@@ -33,6 +58,24 @@ export function SignInForm() {
     } catch {
       setError("Network error. Please try again.");
       setLoading(false);
+    }
+  };
+
+  const resend = async () => {
+    setResending(true);
+    setInfo("");
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      setInfo(data.message || data.error || "If needed, a confirmation email was sent.");
+    } catch {
+      setInfo("Network error. Please try again.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -76,6 +119,17 @@ export function SignInForm() {
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
+        {info && <p className="text-sm text-teal-500">{info}</p>}
+        {needsVerify && (
+          <button
+            type="button"
+            disabled={resending || !email.trim()}
+            onClick={resend}
+            className="text-sm font-semibold text-indigo-500 hover:text-teal-500 disabled:opacity-60"
+          >
+            {resending ? "Sending..." : "Resend confirmation email"}
+          </button>
+        )}
 
         <button
           type="submit"

@@ -15,7 +15,7 @@ const cards = [
   {
     title: "Lead Finder Tool",
     description: "Search leads, bulk-select, export CSV/Excel/JSON, and save lists.",
-    href: "/leads",
+    href: "/tools",
     icon: Search,
   },
   {

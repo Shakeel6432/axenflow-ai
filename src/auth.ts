@@ -49,6 +49,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user?.password) return null;
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) return null;
+        if (!user.emailVerified) {
+          // Signal client to show verify/resend messaging
+          throw new Error("EMAIL_NOT_VERIFIED");
+        }
         return { id: user.id, email: user.email, name: user.name, image: user.image };
       },
     }),

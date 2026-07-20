@@ -3,16 +3,20 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
+import { isSmtpConfigured } from "@/lib/smtp";
+import { sendEmailVerification } from "@/lib/email-verification";
 
-const signupSchema = z.object({
-  name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100),
-  email: z.string().trim().email("Enter a valid email").max(200),
-  password: z.string().min(8, "Password must be at least 8 characters").max(128),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const signupSchema = z
+  .object({
+    name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100),
+    email: z.string().trim().email("Enter a valid email").max(200),
+    password: z.string().min(8, "Password must be at least 8 characters").max(128),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 function getClientIp(req: Request): string {
   const forwarded = req.headers.get("x-forwarded-for");
@@ -24,6 +28,13 @@ export async function POST(req: Request) {
   try {
     if (!isDatabaseConfigured()) {
       return NextResponse.json({ error: "Database is not configured." }, { status: 503 });
+    }
+
+    if (!isSmtpConfigured()) {
+      return NextResponse.json(
+        { error: "Email service is not configured. Please try again later." },
+        { status: 503 }
+      );
     }
 
     const ip = getClientIp(req);
@@ -46,12 +57,43 @@ export async function POST(req: Request) {
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      // Generic message reduces account enumeration
+    if (existing?.emailVerified) {
       return NextResponse.json(
         { error: "Unable to create account with that email. Try signing in or resetting your password." },
         { status: 409 }
       );
+    }
+
+    // Unverified account: refresh password/name and resend confirmation
+    if (existing && !existing.emailVerified) {
+      const passwordHash = await bcrypt.hash(parsed.data.password, 12);
+      await prisma.user.update({
+        where: { id: existing.id },
+        data: {
+          name: parsed.data.name,
+          password: passwordHash,
+        },
+      });
+
+      try {
+        await sendEmailVerification({
+          email,
+          name: parsed.data.name,
+          req,
+        });
+      } catch (mailError) {
+        console.error("Signup resend verification email error:", mailError);
+        return NextResponse.json(
+          { error: "Account saved, but confirmation email could not be sent. Try again shortly." },
+          { status: 503 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        requiresVerification: true,
+        message: "Check your email and confirm your address before signing in.",
+      });
     }
 
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);
@@ -60,14 +102,30 @@ export async function POST(req: Request) {
         name: parsed.data.name,
         email,
         password: passwordHash,
+        emailVerified: null,
       },
       select: { id: true, name: true, email: true },
     });
 
+    try {
+      await sendEmailVerification({
+        email: user.email!,
+        name: user.name || parsed.data.name,
+        req,
+      });
+    } catch (mailError) {
+      console.error("Signup verification email error:", mailError);
+      await prisma.user.delete({ where: { id: user.id } }).catch(() => undefined);
+      return NextResponse.json(
+        { error: "Could not send confirmation email. Please try again." },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      message: "Account created successfully. You can sign in now.",
-      user,
+      requiresVerification: true,
+      message: "Account created. Check your email and confirm your address before signing in.",
     });
   } catch (error) {
     console.error("Signup error:", error);

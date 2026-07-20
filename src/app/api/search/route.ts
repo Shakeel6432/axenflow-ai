@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { rateLimit } from "@/lib/rate-limit";
+import { assertApiBotGuard, antiScrapeHeaders, getClientIpFromHeaders } from "@/lib/bot-guard";
 import { redactBusinessList } from "@/lib/redact-business";
 import { searchBusinesses } from "@/services/search.service";
 
@@ -32,10 +33,22 @@ const schema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
-  const limited = rateLimit(`search:${ip}`, 60, 60_000);
+  const bot = assertApiBotGuard(req, { strict: true });
+  if (!bot.ok) return bot.response;
+
+  const ip = getClientIpFromHeaders(req.headers);
+  const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+
+  const limited = userId
+    ? rateLimit(`search:user:${userId}`, 120, 60_000)
+    : rateLimit(`search:guest:${ip}`, bot.suspicious ? 10 : 20, 60_000);
+
   if (!limited.ok) {
-    return NextResponse.json({ error: "Too many requests. Please try again shortly." }, { status: 429 });
+    return NextResponse.json(
+      { error: "Too many requests. Please try again shortly." },
+      { status: 429, headers: antiScrapeHeaders() }
+    );
   }
 
   const parsed = schema.safeParse(Object.fromEntries(req.nextUrl.searchParams.entries()));
@@ -44,25 +57,31 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const session = await auth();
-    const userId = (session?.user as { id?: string } | undefined)?.id;
+    const page = userId ? parsed.data.page : 1;
+    const pageSize = userId ? Math.min(parsed.data.pageSize ?? 20, 50) : Math.min(parsed.data.pageSize ?? 3, 3);
+
+    if (!userId && (parsed.data.page ?? 1) > 1) {
+      return NextResponse.json(
+        { error: "Sign in to browse more results." },
+        { status: 401, headers: antiScrapeHeaders() }
+      );
+    }
+
     const data = await searchBusinesses({
       ...parsed.data,
+      page,
+      pageSize,
       userId: userId || undefined,
     });
 
-    // Guests see owner + location teaser; phone/email/website only after sign-in
     const results = userId ? data.results : redactBusinessList(data.results);
 
     return NextResponse.json(
       { ...data, results },
       {
-        headers: {
-          "Cache-Control": userId
-            ? "private, no-store"
-            : "public, s-maxage=30, stale-while-revalidate=120",
+        headers: antiScrapeHeaders({
           "X-RateLimit-Remaining": String(limited.remaining),
-        },
+        }),
       }
     );
   } catch (error) {

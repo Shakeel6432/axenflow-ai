@@ -24,9 +24,7 @@ export function SsrBootLoader() {
           <span className="ssr-boot__ring ssr-boot__ring--b" />
           <span className="ssr-boot__dot" />
         </div>
-        <p className="ssr-boot__brand">
-          AxenFlow<span>AI</span>
-        </p>
+        <p className="ssr-boot__brand">AxenFlowAI</p>
         <p className="ssr-boot__hint">Preparing…</p>
         <div className="ssr-boot__bar" aria-hidden>
           <span className="ssr-boot__bar-fill" />

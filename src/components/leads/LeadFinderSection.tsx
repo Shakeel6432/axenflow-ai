@@ -18,6 +18,7 @@ import {
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
+import { GlassSelect } from "@/components/ui/GlassSelect";
 import { LeadBulkToolbar } from "@/components/leads/LeadBulkToolbar";
 import { formatDisplayAddress } from "@/lib/address";
 import { MAIN_CATEGORIES, getMainCategoryName, getSubcategoriesForMain } from "@/lib/category-taxonomy";
@@ -237,64 +238,85 @@ export function LeadFinderSection({
             />
           </Field>
           <Field label="Main Category">
-            <select
-              className="form-input"
+            <GlassSelect
+              aria-label="Main Category"
               value={mainCategory}
-              onChange={(e) => {
-                setMainCategory(e.target.value);
+              onChange={(v) => {
+                setMainCategory(v);
                 setCategory("");
               }}
-            >
-              <option value="">All main categories</option>
-              {MAIN_CATEGORIES.map((m) => (
-                <option key={m.slug} value={m.name}>{m.name}</option>
-              ))}
-            </select>
+              options={[
+                { value: "", label: "All main categories" },
+                ...MAIN_CATEGORIES.map((m) => ({ value: m.name, label: m.name })),
+              ]}
+            />
           </Field>
           <Field label="Sub Category">
-            <select
-              className="form-input"
+            <GlassSelect
+              aria-label="Sub Category"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={setCategory}
               disabled={!subcategoryOptions.length}
-            >
-              <option value="">All sub categories</option>
-              {subcategoryOptions.map((name) => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
+              options={[
+                { value: "", label: "All sub categories" },
+                ...subcategoryOptions.map((name) => ({ value: name, label: name })),
+              ]}
+            />
           </Field>
           <Field label="Country">
-            <select className="form-input" value={country} onChange={(e) => { setCountry(e.target.value); setState(""); setCity(""); }}>
-              <option value="">All countries</option>
-              {countries.map((c) => (
-                <option key={c.id} value={c.name}>{c.name}</option>
-              ))}
-            </select>
+            <GlassSelect
+              aria-label="Country"
+              value={country}
+              onChange={(v) => {
+                setCountry(v);
+                setState("");
+                setCity("");
+              }}
+              options={[
+                { value: "", label: "All countries" },
+                ...countries.map((c) => ({ value: c.name, label: c.name })),
+              ]}
+            />
           </Field>
           <Field label="State">
-            <select className="form-input" value={state} onChange={(e) => { setState(e.target.value); setCity(""); }} disabled={!country && !states.length}>
-              <option value="">All states</option>
-              {states.map((s) => (
-                <option key={s.id} value={s.name}>{s.name}</option>
-              ))}
-            </select>
+            <GlassSelect
+              aria-label="State"
+              value={state}
+              onChange={(v) => {
+                setState(v);
+                setCity("");
+              }}
+              disabled={!country && !states.length}
+              options={[
+                { value: "", label: "All states" },
+                ...states.map((s) => ({ value: s.name, label: s.name })),
+              ]}
+            />
           </Field>
           <Field label="City">
-            <select className="form-input" value={city} onChange={(e) => setCity(e.target.value)} disabled={!state && !cities.length}>
-              <option value="">All cities</option>
-              {cities.map((c) => (
-                <option key={c.id} value={c.name}>{c.name}</option>
-              ))}
-            </select>
+            <GlassSelect
+              aria-label="City"
+              value={city}
+              onChange={setCity}
+              disabled={!state && !cities.length}
+              options={[
+                { value: "", label: "All cities" },
+                ...cities.map((c) => ({ value: c.name, label: c.name })),
+              ]}
+            />
           </Field>
           <Field label="Sort By">
-            <select className="form-input" value={sort} onChange={(e) => setSort(e.target.value as SearchSort)}>
-              <option value="newest">Newest</option>
-              <option value="rating">Highest Rating</option>
-              <option value="reviews">Most Reviews</option>
-              <option value="alphabetical">Alphabetical</option>
-            </select>
+            <GlassSelect
+              aria-label="Sort By"
+              value={sort}
+              onChange={(v) => setSort(v as SearchSort)}
+              options={[
+                { value: "newest", label: "Newest" },
+                { value: "rating", label: "Highest Rating" },
+                { value: "reviews", label: "Most Reviews" },
+                { value: "alphabetical", label: "Alphabetical" },
+              ]}
+            />
           </Field>
         </div>
 

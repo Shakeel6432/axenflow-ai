@@ -2,23 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { Mail } from "lucide-react";
 import { PasswordField } from "@/components/auth/PasswordField";
 
 export function SignUpForm() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [successEmail, setSuccessEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendMsg, setResendMsg] = useState("");
+  const [resending, setResending] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setResendMsg("");
     setLoading(true);
 
     try {
@@ -38,25 +39,65 @@ export function SignUpForm() {
         setLoading(false);
         return;
       }
-      setSuccess(true);
+      setSuccessEmail(email.trim().toLowerCase());
       setLoading(false);
-      window.setTimeout(() => router.push("/signin"), 1500);
     } catch {
       setError("Network error. Please try again.");
       setLoading(false);
     }
   };
 
-  if (success) {
+  const resend = async () => {
+    if (!successEmail) return;
+    setResending(true);
+    setResendMsg("");
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: successEmail }),
+      });
+      const data = await res.json();
+      setResendMsg(data.message || data.error || "Request sent.");
+    } catch {
+      setResendMsg("Network error. Please try again.");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  if (successEmail) {
     return (
       <div className="glass-card w-full rounded-2xl p-6 text-center sm:p-8">
-        <CheckCircle2 className="mx-auto mb-3 text-teal-500" size={40} />
+        <Mail className="mx-auto mb-3 text-indigo-400" size={40} />
         <h2 className="text-lg font-semibold" style={{ color: "var(--c-heading)" }}>
-          Account created
+          Confirm your email
         </h2>
         <p className="mt-2 text-sm" style={{ color: "var(--c-text-muted)" }}>
-          Redirecting you to sign in…
+          We sent a confirmation link to <strong style={{ color: "var(--c-heading)" }}>{successEmail}</strong>.
+          Open it to activate your account, then sign in.
         </p>
+        <p className="mt-3 text-xs" style={{ color: "var(--c-text-dim)" }}>
+          Check Inbox and Spam. The link expires in 24 hours.
+        </p>
+        <button
+          type="button"
+          disabled={resending}
+          onClick={resend}
+          className="mt-5 text-sm font-semibold text-indigo-500 hover:text-teal-500 disabled:opacity-60"
+        >
+          {resending ? "Sending..." : "Resend confirmation email"}
+        </button>
+        {resendMsg && (
+          <p className="mt-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
+            {resendMsg}
+          </p>
+        )}
+        <div className="mt-5">
+          <Link href="/signin" className="text-sm font-semibold text-indigo-500 hover:text-teal-500">
+            Go to Sign In
+          </Link>
+        </div>
       </div>
     );
   }

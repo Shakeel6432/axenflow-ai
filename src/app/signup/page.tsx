@@ -17,14 +17,10 @@ export default function SignUpPage() {
         title="Create Account"
         description="Register to unlock Lead Finder, download desktop scrapers, and track your activity."
       />
-      {/*
-        justify-start + compact shell: taller signup form still leaves room for
-        the layout FooterCta (“Got a project in mind?”) on the first screen — same as /signin.
-      */}
-      <Section tight className="justify-start py-2 lg:py-3">
+      <Section tight>
         <AuthShell
           title="Create your free account"
-          description="Join AxenFlow AI to unlock Lead Finder, save lists, export data, and download desktop scrapers."
+          description="We will email a confirmation link. Confirm your address, then sign in to unlock Lead Finder and downloads."
         >
           <SignUpForm />
         </AuthShell>

@@ -1,11 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
+import { rateLimit } from "@/lib/rate-limit";
+import { assertApiBotGuard, getClientIpFromHeaders } from "@/lib/bot-guard";
 
 type CacheEntry<T> = { at: number; data: T };
 let countriesCache: CacheEntry<unknown> | null = null;
 const TTL_MS = 5 * 60 * 1000;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const bot = assertApiBotGuard(req);
+  if (!bot.ok) return bot.response;
+
+  const ip = getClientIpFromHeaders(req.headers);
+  const limited = rateLimit(`countries:${ip}`, 60, 60_000);
+  if (!limited.ok) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   if (!isDatabaseConfigured()) return NextResponse.json([]);
 
   try {
