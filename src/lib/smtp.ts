@@ -43,6 +43,39 @@ export type MailAttachment = {
   contentType?: string;
 };
 
+export async function sendMail(opts: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  replyTo?: string;
+}) {
+  const { user } = getSmtpConfig();
+  if (!user) {
+    throw new Error("SMTP_USER missing.");
+  }
+
+  const mailer = getMailTransporter();
+  try {
+    return await mailer.sendMail({
+      from: `"AxenFlow AI" <${user}>`,
+      to: opts.to,
+      replyTo: opts.replyTo,
+      subject: opts.subject,
+      html: opts.html,
+      text: opts.text,
+    });
+  } catch (error) {
+    const err = error as { code?: string; responseCode?: number };
+    if (err.code === "EAUTH" || err.responseCode === 535) {
+      throw new Error(
+        "SMTP login failed. Check SMTP_USER / SMTP_PASS (Zoho app password) in .env.local and restart the server."
+      );
+    }
+    throw error;
+  }
+}
+
 export async function sendContactEmail(opts: {
   subject: string;
   html: string;

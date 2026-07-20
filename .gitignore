@@ -58,3 +58,4 @@ public/downloads/*.zip
 
 VERCEL_ENV_TO_ADD.txt
 
+.env*

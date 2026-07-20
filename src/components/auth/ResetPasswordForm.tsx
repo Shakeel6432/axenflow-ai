@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { PasswordField } from "@/components/auth/PasswordField";
 
-export function SignUpForm() {
+export function ResetPasswordForm() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const params = useSearchParams();
+  const email = params.get("email") || "";
+  const token = params.get("token") || "";
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,40 +21,50 @@ export function SignUpForm() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
+    if (!email || !token) {
+      setError("Reset link is incomplete. Request a new one.");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          confirmPassword,
-        }),
+        body: JSON.stringify({ email, token, password, confirmPassword }),
       });
       const data = await res.json();
+      setLoading(false);
       if (!res.ok) {
-        setError(data.error || "Could not create account");
-        setLoading(false);
+        setError(data.error || "Could not reset password.");
         return;
       }
       setSuccess(true);
-      setLoading(false);
-      window.setTimeout(() => router.push("/signin"), 1500);
+      window.setTimeout(() => router.push("/signin"), 1600);
     } catch {
       setError("Network error. Please try again.");
       setLoading(false);
     }
   };
 
+  if (!email || !token) {
+    return (
+      <div className="glass-card w-full rounded-2xl p-6 sm:p-8">
+        <p className="text-sm text-red-500">This reset link is invalid. Please request a new one.</p>
+        <Link href="/forgot-password" className="mt-4 inline-block text-sm font-semibold text-indigo-500 hover:text-teal-500">
+          Forgot password
+        </Link>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="glass-card w-full rounded-2xl p-6 text-center sm:p-8">
         <CheckCircle2 className="mx-auto mb-3 text-teal-500" size={40} />
         <h2 className="text-lg font-semibold" style={{ color: "var(--c-heading)" }}>
-          Account created
+          Password updated
         </h2>
         <p className="mt-2 text-sm" style={{ color: "var(--c-text-muted)" }}>
           Redirecting you to sign in…
@@ -64,30 +76,15 @@ export function SignUpForm() {
   return (
     <div className="glass-card w-full rounded-2xl p-6 sm:p-8">
       <form onSubmit={onSubmit} className="space-y-5" noValidate>
-        <Field label="Full Name">
-          <input
-            className="form-input"
-            required
-            minLength={2}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoComplete="name"
-            placeholder="Your name"
-          />
-        </Field>
-        <Field label="Email">
-          <input
-            className="form-input"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            placeholder="you@company.com"
-          />
-        </Field>
+        <div>
+          <label className="mb-2 block text-xs font-semibold tracking-wide" style={{ color: "var(--c-text-dim)" }}>
+            Email
+          </label>
+          <input className="form-input" type="email" value={email} readOnly disabled />
+        </div>
+
         <PasswordField
-          label="Password"
+          label="New password"
           value={password}
           onChange={setPassword}
           required
@@ -96,7 +93,7 @@ export function SignUpForm() {
           placeholder="At least 8 characters"
         />
         <PasswordField
-          label="Confirm Password"
+          label="Confirm new password"
           value={confirmPassword}
           onChange={setConfirmPassword}
           required
@@ -112,26 +109,15 @@ export function SignUpForm() {
           disabled={loading}
           className="btn-main w-full rounded-xl px-5 py-3.5 text-sm font-semibold disabled:opacity-60"
         >
-          {loading ? "Creating account..." : "Create Account"}
+          {loading ? "Updating..." : "Update password"}
         </button>
       </form>
+
       <p className="mt-5 text-center text-sm" style={{ color: "var(--c-text-dim)" }}>
-        Already have an account?{" "}
         <Link href="/signin" className="font-semibold text-indigo-500 hover:text-teal-500">
-          Sign in
+          Back to Sign In
         </Link>
       </p>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="mb-2 block text-xs font-semibold tracking-wide" style={{ color: "var(--c-text-dim)" }}>
-        {label}
-      </label>
-      {children}
     </div>
   );
 }

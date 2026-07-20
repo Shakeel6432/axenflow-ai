@@ -4,6 +4,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { PasswordField } from "@/components/auth/PasswordField";
 
 const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim());
 
@@ -53,15 +54,18 @@ export function SignInForm() {
         </div>
 
         <div>
-          <label className="mb-2 block text-xs font-semibold tracking-wide" style={{ color: "var(--c-text-dim)" }}>
-            Password
-          </label>
-          <input
-            className="form-input"
-            type="password"
-            required
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <label className="text-xs font-semibold tracking-wide" style={{ color: "var(--c-text-dim)" }}>
+              Password
+            </label>
+            <Link href="/forgot-password" className="text-xs font-semibold text-indigo-500 hover:text-teal-500">
+              Forgot password?
+            </Link>
+          </div>
+          <PasswordField
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={setPassword}
+            required
             autoComplete="current-password"
             placeholder="Your password"
           />
