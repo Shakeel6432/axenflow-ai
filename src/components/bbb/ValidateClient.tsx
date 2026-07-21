@@ -2,147 +2,108 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { rowsToCsv, type ValidatedLead } from "@/lib/bbb-validate";
 
-type Row = Record<string, string>;
-
-const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-
-function firstValue(raw: string) {
-  const parts = String(raw || "")
-    .split(/[|;,]+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-  return parts[0] || "";
-}
-
-function phoneStatus(raw: string) {
-  const phone = firstValue(raw);
-  if (!phone) return "Unknown";
-  const digits = phone.replace(/\D+/g, "");
-  if (/^\+?1?\d{10}$/.test(digits) || (digits.length >= 7 && digits.length <= 15)) {
-    return "Valid";
-  }
-  return "Invalid";
-}
-
-function emailStatus(raw: string) {
-  const email = firstValue(raw).toLowerCase();
-  if (!email) return "Unknown";
-  return EMAIL_RE.test(email) ? "Valid" : "Invalid";
-}
-
-function parseCsv(text: string): Row[] {
-  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim());
-  if (!lines.length) return [];
-  const headers = splitCsvLine(lines[0]);
-  return lines.slice(1).map((line) => {
-    const cols = splitCsvLine(line);
-    const row: Row = {};
-    headers.forEach((h, i) => {
-      row[h] = cols[i] ?? "";
-    });
-    return row;
-  });
-}
-
-function splitCsvLine(line: string): string[] {
-  const out: string[] = [];
-  let cur = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        cur += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-    if (ch === "," && !inQuotes) {
-      out.push(cur);
-      cur = "";
-      continue;
-    }
-    cur += ch;
-  }
-  out.push(cur);
-  return out.map((s) => s.trim());
-}
-
-function toCsv(rows: Row[], headers: string[]) {
-  const esc = (v: string) => {
-    const s = String(v ?? "");
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  return [headers.join(","), ...rows.map((r) => headers.map((h) => esc(r[h] || "")).join(","))].join(
-    "\n"
-  );
-}
+type ValidateResponse = {
+  ok?: boolean;
+  error?: string;
+  total?: number;
+  valid?: number;
+  invalid?: number;
+  unknown?: number;
+  emails_valid?: number;
+  phones_valid?: number;
+  phones_collapsed?: number;
+  emails_collapsed?: number;
+  rows?: ValidatedLead[];
+};
 
 export function ValidateClient() {
-  const [rows, setRows] = useState<Row[]>([]);
+  const [rows, setRows] = useState<ValidatedLead[]>([]);
   const [fileName, setFileName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState("Preparing...");
   const [msg, setMsg] = useState("");
+  const [stats, setStats] = useState({
+    total: 0,
+    valid: 0,
+    invalid: 0,
+    unknown: 0,
+    emails_valid: 0,
+    phones_valid: 0,
+    phones_collapsed: 0,
+    emails_collapsed: 0,
+  });
 
-  const stats = useMemo(() => {
-    let phonesCollapsed = 0;
-    let valid = 0;
-    let invalid = 0;
-    let unknown = 0;
-    for (const r of rows) {
-      const phones = String(r["Phone Numbers"] || "");
-      if (/[|;,]/.test(phones) && phones.split(/[|;,]/).filter((p) => p.trim()).length > 1) {
-        phonesCollapsed += 1;
-      }
-      const status = r["Lead Status"] || "Unknown";
-      if (status === "Valid") valid += 1;
-      else if (status === "Invalid") invalid += 1;
-      else unknown += 1;
-    }
-    return { phonesCollapsed, valid, invalid, unknown, total: rows.length };
-  }, [rows]);
+  const preview = useMemo(() => rows.slice(0, 12), [rows]);
 
   async function onFile(file: File | null) {
     if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      setMsg("Please upload a .csv file from the BBB scraper.");
+      return;
+    }
+
     setBusy(true);
-    setMsg("Reading CSV...");
+    setProgress("Uploading and validating...");
+    setMsg("");
+    setRows([]);
+
     try {
-      const text = await file.text();
-      const parsed = parseCsv(text);
-      const cleaned = parsed.map((row) => {
-        const phone = firstValue(row["Phone Numbers"] || row.phone || "");
-        const email = firstValue(row.Emails || row.email || "");
-        const es = emailStatus(email);
-        const ps = phoneStatus(phone);
-        let lead = "Unknown";
-        if (es === "Invalid" || ps === "Invalid") lead = "Invalid";
-        else if (es === "Valid" || ps === "Valid") lead = "Valid";
-        return {
-          ...row,
-          "Phone Numbers": phone,
-          Emails: email,
-          "Email Status": es,
-          "Phone Status": ps,
-          "Lead Status": lead,
-        };
+      const form = new FormData();
+      form.append("file", file);
+
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), 90000);
+
+      const res = await fetch("/api/bbb/validate", {
+        method: "POST",
+        body: form,
+        signal: controller.signal,
       });
-      setRows(cleaned);
+      window.clearTimeout(timer);
+
+      const data = (await res.json().catch(() => ({}))) as ValidateResponse;
+      if (!res.ok) {
+        throw new Error(data.error || "Validation failed");
+      }
+
+      const nextRows = data.rows || [];
+      setRows(nextRows);
       setFileName(file.name);
-      setMsg(`Validated ${cleaned.length} rows. Multi-phone cells reduced to one number.`);
+      setStats({
+        total: data.total || nextRows.length,
+        valid: data.valid || 0,
+        invalid: data.invalid || 0,
+        unknown: data.unknown || 0,
+        emails_valid: data.emails_valid || 0,
+        phones_valid: data.phones_valid || 0,
+        phones_collapsed: data.phones_collapsed || 0,
+        emails_collapsed: data.emails_collapsed || 0,
+      });
+      setMsg(
+        `Done: ${data.total || 0} rows · ${data.phones_collapsed || 0} multi-phone cleaned · ` +
+          `${data.emails_valid || 0} valid emails · ${data.phones_valid || 0} valid phones`
+      );
     } catch (err) {
-      setMsg(err instanceof Error ? err.message : "Could not read file");
+      const text =
+        err instanceof Error
+          ? err.name === "AbortError"
+            ? "Validation timed out. Try a smaller CSV."
+            : err.message
+          : "Could not validate file";
+      setMsg(text);
     } finally {
       setBusy(false);
+      setProgress("Preparing...");
     }
   }
 
   function download() {
     if (!rows.length) return;
-    const headers = Object.keys(rows[0]);
-    const blob = new Blob([toCsv(rows, headers)], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob(["\uFEFF" + rowsToCsv(rows)], {
+      type: "text/csv;charset=utf-8",
+    });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = fileName.replace(/\.csv$/i, "") + "_validated.csv";
@@ -151,44 +112,52 @@ export function ValidateClient() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-5">
+    <div className="mx-auto w-full max-w-4xl space-y-5">
       {busy && (
         <div
           className="fixed inset-0 z-50 grid place-items-center"
           style={{ background: "rgba(5,5,9,0.72)", backdropFilter: "blur(8px)" }}
         >
           <div
-            className="rounded-2xl px-8 py-6 text-center"
+            className="w-[min(340px,calc(100vw-2rem))] rounded-2xl px-8 py-6 text-center"
             style={{ border: "1px solid var(--c-border)", background: "var(--c-card, #12101c)" }}
           >
-            <div
-              className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-2 border-indigo-400 border-t-transparent"
-            />
+            <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-2 border-indigo-400 border-t-transparent" />
             <p className="font-semibold" style={{ color: "var(--c-heading)" }}>
               Validating leads
             </p>
             <p className="mt-1 text-sm" style={{ color: "var(--c-text-dim)" }}>
-              Cleaning phones and checking emails...
+              {progress}
+            </p>
+            <p className="mt-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
+              Cleaning phones, checking email domains...
             </p>
           </div>
         </div>
       )}
 
       <label
-        className="flex cursor-pointer flex-col items-center justify-center rounded-2xl px-6 py-10 text-center"
+        className="flex cursor-pointer flex-col items-center justify-center rounded-2xl px-6 py-10 text-center transition hover:opacity-95"
         style={{ border: "1px dashed var(--c-border)", background: "var(--c-hover-bg)" }}
       >
-        <span className="font-[var(--font-space)] text-lg font-semibold" style={{ color: "var(--c-heading)" }}>
+        <span
+          className="font-[var(--font-space)] text-lg font-semibold"
+          style={{ color: "var(--c-heading)" }}
+        >
           Upload scraper CSV
         </span>
-        <span className="mt-1 text-sm" style={{ color: "var(--c-text-dim)" }}>
-          We keep one phone per row and mark email/phone Valid, Invalid, or Unknown
+        <span className="mt-1 max-w-md text-sm" style={{ color: "var(--c-text-dim)" }}>
+          Keeps one phone per row, formats US numbers, and checks email syntax + domain (MX/DNS).
         </span>
         <input
           type="file"
           accept=".csv,text/csv"
           className="mt-4 text-sm"
-          onChange={(e) => onFile(e.target.files?.[0] || null)}
+          disabled={busy}
+          onChange={(e) => {
+            void onFile(e.target.files?.[0] || null);
+            e.currentTarget.value = "";
+          }}
         />
       </label>
 
@@ -203,16 +172,23 @@ export function ValidateClient() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               ["Total", stats.total],
-              ["Valid", stats.valid],
+              ["Valid leads", stats.valid],
               ["Invalid", stats.invalid],
-              ["Phones cleaned", stats.phonesCollapsed],
+              ["Unknown", stats.unknown],
+              ["Valid emails", stats.emails_valid],
+              ["Valid phones", stats.phones_valid],
+              ["Phones cleaned", stats.phones_collapsed],
+              ["Emails cleaned", stats.emails_collapsed],
             ].map(([label, value]) => (
               <div
                 key={String(label)}
                 className="rounded-xl p-3"
                 style={{ border: "1px solid var(--c-border)" }}
               >
-                <div className="text-xs uppercase tracking-wide" style={{ color: "var(--c-text-muted)" }}>
+                <div
+                  className="text-xs uppercase tracking-wide"
+                  style={{ color: "var(--c-text-muted)" }}
+                >
                   {label}
                 </div>
                 <div className="mt-1 text-xl font-bold" style={{ color: "var(--c-heading)" }}>
@@ -221,9 +197,55 @@ export function ValidateClient() {
               </div>
             ))}
           </div>
-          <Button type="button" onClick={download} variant="green">
-            Download validated CSV
-          </Button>
+
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" onClick={download} variant="green">
+              Download validated CSV
+            </Button>
+          </div>
+
+          <div className="overflow-x-auto rounded-2xl" style={{ border: "1px solid var(--c-border)" }}>
+            <table className="min-w-full text-left text-sm">
+              <thead style={{ background: "var(--c-hover-bg)" }}>
+                <tr>
+                  {["Business Name", "Phone", "Email", "Email Status", "Phone Status", "Lead"].map(
+                    (h) => (
+                      <th
+                        key={h}
+                        className="whitespace-nowrap px-3 py-2 font-semibold"
+                        style={{ color: "var(--c-heading)" }}
+                      >
+                        {h}
+                      </th>
+                    )
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {preview.map((row, i) => (
+                  <tr key={`${row["Business Name"]}-${i}`} style={{ borderTop: "1px solid var(--c-border)" }}>
+                    <td className="max-w-[180px] truncate px-3 py-2" style={{ color: "var(--c-heading)" }}>
+                      {row["Business Name"] || "-"}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2" style={{ color: "var(--c-text-dim)" }}>
+                      {row["Phone Numbers"] || "-"}
+                    </td>
+                    <td className="max-w-[200px] truncate px-3 py-2" style={{ color: "var(--c-text-dim)" }}>
+                      {row.Emails || "-"}
+                    </td>
+                    <td className="px-3 py-2">{row["Email Status"]}</td>
+                    <td className="px-3 py-2">{row["Phone Status"]}</td>
+                    <td className="px-3 py-2 font-medium">{row["Lead Status"]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {rows.length > preview.length && (
+              <p className="px-3 py-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
+                Showing first {preview.length} of {rows.length} rows. Download CSV for full results.
+              </p>
+            )}
+          </div>
         </>
       )}
     </div>
