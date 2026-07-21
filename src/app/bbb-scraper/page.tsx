@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowUpRight,
   CheckCircle2,
   Download,
   Mail,
@@ -55,7 +54,7 @@ const features = [
   {
     icon: Download,
     title: "CSV & Excel export",
-    body: "Export full sheets or only validated rows. Free plan includes 100 exported leads; Pro unlocks unlimited exports.",
+    body: "Export full sheets from the desktop app. Free plan hard-stops at 100 leads until Pro. Validate and AI Outreach open on the website.",
   },
   {
     icon: Sparkles,
@@ -75,7 +74,7 @@ const faqs = [
   },
   {
     q: "Free vs Pro?",
-    a: "Free includes manual scraping and up to 100 exported leads per account usage. Pro unlocks unlimited exports and is activated with a license key inside the desktop app.",
+    a: "Free includes manual scraping with a hard limit of 100 leads until you buy Pro. Validation and AI Outreach run on the website. Pro unlocks unlimited scraping with a license key in the desktop app.",
   },
   {
     q: "Do I need a VPN?",
