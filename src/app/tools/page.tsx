@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Wrench, Sparkles, ShieldCheck } from "lucide-react";
+import { Wrench, Sparkles, ShieldCheck, Mail, Phone } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 
 export const metadata: Metadata = {
   title: "Tools",
-  description: "AxenFlow AI tools hub.",
+  description: "AxenFlow AI tools hub: lead finder, scrapers, email validator, phone validator.",
 };
 
 const tools = [
@@ -18,9 +18,24 @@ const tools = [
     icon: Sparkles,
   },
   {
-    title: "BBB Scraper",
+    title: "Email Validator",
     description:
-      "Desktop BBB lead tool with validation, Free/Pro exports, and AI outreach drafts.",
+      "Syntax, DNS, MX, disposable, role flags, and hard-bounce estimates. Single email or CSV.",
+    href: "/tools/email-validator",
+    status: "Live",
+    icon: Mail,
+  },
+  {
+    title: "Phone Validator",
+    description:
+      "Format check, US normalize, keep one number, reject short codes or toll-free.",
+    href: "/tools/phone-validator",
+    status: "Live",
+    icon: Phone,
+  },
+  {
+    title: "BBB Scraper",
+    description: "Desktop BBB lead scraper. Validate emails and phones with the tools above.",
     href: "/bbb-scraper",
     status: "Live",
     icon: Wrench,
@@ -47,7 +62,7 @@ export default function ToolsPage() {
     <>
       <PageHero
         title="Tools"
-        description="Lead Finder is live. Download AxenFlow AI scrapers for fresh leads."
+        description="Lead Finder, Email Validator, Phone Validator, and desktop scrapers."
       />
       <Section tight>
         <div className="mx-auto grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -63,7 +78,10 @@ export default function ToolsPage() {
               >
                 <Icon size={18} />
               </div>
-              <div className="mb-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "var(--c-hover-bg)", color: "var(--c-text-dim)" }}>
+              <div
+                className="mb-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                style={{ background: "var(--c-hover-bg)", color: "var(--c-text-dim)" }}
+              >
                 {status}
               </div>
               <h2 className="text-lg font-semibold" style={{ color: "var(--c-heading)" }}>

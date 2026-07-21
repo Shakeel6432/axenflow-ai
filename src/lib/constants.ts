@@ -282,9 +282,10 @@ export const footerLinks = {
   quick: [
     { label: "Home", href: "/" },
     { label: "Leads", href: "/leads" },
+    { label: "Email Validator", href: "/tools/email-validator" },
+    { label: "Phone Validator", href: "/tools/phone-validator" },
     { label: "BBB Scraper", href: "/bbb-scraper" },
     { label: "About", href: "/about" },
-    { label: "Portfolio", href: "/portfolio" },
     { label: "Contact", href: "/contact" },
   ],
   services: services.map((s) => ({ label: s.title, href: "/services" })),

@@ -117,11 +117,11 @@ export default function BbbScraperPage() {
             <Button href="/download" size="lg" variant="green">
               Download desktop app <Download size={16} />
             </Button>
-            <Button href="/bbb-scraper/validate" size="lg" variant="outline">
-              Validate leads
+            <Button href="/tools/email-validator" size="lg" variant="outline">
+              Email Validator
             </Button>
-            <Button href="/bbb-scraper/outreach" size="lg" variant="outline">
-              AI Outreach
+            <Button href="/tools/phone-validator" size="lg" variant="outline">
+              Phone Validator
             </Button>
           </div>
         </Container>
