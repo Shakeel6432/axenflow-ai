@@ -3,12 +3,28 @@ import { siteConfig } from "@/lib/constants";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticRoutes = ["", "/leads", "/services", "/portfolio", "/about", "/contact", "/privacy", "/terms"];
+  const staticRoutes = [
+    "",
+    "/leads",
+    "/tools",
+    "/bbb-scraper",
+    "/services",
+    "/portfolio",
+    "/about",
+    "/contact",
+    "/privacy",
+    "/terms",
+  ];
   const entries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
     url: `${siteConfig.url}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" || route === "/leads" ? "daily" : "monthly",
-    priority: route === "" ? 1 : route === "/leads" ? 0.9 : 0.8,
+    priority:
+      route === ""
+        ? 1
+        : route === "/leads" || route === "/bbb-scraper"
+          ? 0.9
+          : 0.8,
   }));
 
   if (!isDatabaseConfigured()) return entries;

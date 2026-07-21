@@ -282,6 +282,7 @@ export const footerLinks = {
   quick: [
     { label: "Home", href: "/" },
     { label: "Leads", href: "/leads" },
+    { label: "BBB Scraper", href: "/bbb-scraper" },
     { label: "About", href: "/about" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "Contact", href: "/contact" },

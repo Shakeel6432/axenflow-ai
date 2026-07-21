@@ -18,6 +18,14 @@ const tools = [
     icon: Sparkles,
   },
   {
+    title: "BBB Scraper",
+    description:
+      "Desktop BBB lead tool with validation, Free/Pro exports, and AI outreach drafts.",
+    href: "/bbb-scraper",
+    status: "Live",
+    icon: Wrench,
+  },
+  {
     title: "Desktop Scrapers",
     description:
       "Agency products from AxenFlow AI for fresh leads. Use with a VPN, unpack the RAR, then run the app.",
