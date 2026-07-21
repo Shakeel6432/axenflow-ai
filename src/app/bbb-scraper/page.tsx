@@ -112,7 +112,7 @@ export default function BbbScraperPage() {
             BBB Scraper
           </h1>
           <p className="mt-3 max-w-xl text-base sm:text-lg" style={{ color: "var(--c-text-dim)" }}>
-            Turn BBB search into validated sales leads — scrape, clean, export, then outreach.
+            Turn BBB search into validated sales leads: scrape, clean, export, then outreach.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button href="/download" size="lg" variant="green">
@@ -134,7 +134,7 @@ export default function BbbScraperPage() {
             Built for production lead gen
           </h2>
           <p className="mt-2 max-w-2xl text-sm sm:text-base" style={{ color: "var(--c-text-dim)" }}>
-            Core scraping plus validation, Free/Pro licensing, dashboard stats, and AI drafts —
+            Core scraping plus validation, Free/Pro licensing, dashboard stats, and AI drafts,
             aligned with the AxenFlow BBB scraper roadmap.
           </p>
           <div className="mt-8 grid gap-6 sm:grid-cols-2">

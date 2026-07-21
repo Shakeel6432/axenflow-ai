@@ -17,6 +17,7 @@ type PageProps = {
 const RESERVED = new Set([
   "services", "about", "contact", "portfolio", "privacy", "terms", "leads", "admin", "api", "login", "auth",
   "signin", "signup", "dashboard", "tools", "download", "forgot-password", "reset-password", "verify-email",
+  "bbb-scraper",
 ]);
 
 function parseSeoSlug(slug: string) {
