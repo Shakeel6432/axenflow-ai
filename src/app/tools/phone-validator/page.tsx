@@ -9,7 +9,7 @@ import { PhoneValidatorClient } from "@/components/tools/PhoneValidatorClient";
 export const metadata: Metadata = {
   title: "Phone Validator",
   description:
-    "Validate phone numbers for every country: E.164 check, country detection, toll-free and premium filters.",
+    "Validate phone numbers for every country: E.164 check, country detection, toll free and premium filters.",
   alternates: { canonical: `${siteConfig.url}/tools/phone-validator` },
 };
 
@@ -18,7 +18,7 @@ export default function PhoneValidatorPage() {
     <>
       <PageHero
         title="Phone Validator"
-        description="Validate any country number locally: Mobile vs Landline vs VoIP, country, and likely operator — no third-party API."
+        description="Validate any country number locally: Mobile vs Landline vs VoIP, country, and likely operator. No third party API."
       />
       <Section tight>
         <Container>

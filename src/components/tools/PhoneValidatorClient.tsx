@@ -196,7 +196,7 @@ export function PhoneValidatorClient() {
           Checks to run
         </h2>
         <p className="mt-1 text-sm" style={{ color: "var(--c-text-dim)" }}>
-          Built locally (no third-party API). Detects Mobile vs Landline vs VoIP, country, and
+          Built locally (no third party API). Detects Mobile vs Landline vs VoIP, country, and
           likely operator from number prefixes where known.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -301,7 +301,7 @@ export function PhoneValidatorClient() {
           </label>
         </div>
         <p className="text-xs" style={{ color: "var(--c-text-muted)" }}>
-          Prefer +country code. Example: +14155552671 → Fixed or Mobile, United States.
+          Prefer +country code. Example: +14155552671 Fixed or Mobile, United States.
         </p>
       </section>
 

@@ -113,7 +113,7 @@ export async function POST(req: Request) {
       const phoneStatus = phonePick.status;
       const leadStatus = combineLeadStatus(emailStatus, phoneStatus);
 
-      const out: ValidatedLead & { _phonesCollapsed?: boolean; _emailsCollapsed?: boolean } = {
+      const out = {
         ...row,
         "Business Name": String(row["Business Name"] || row.name || "").trim(),
         "Phone Numbers": phonePick.phone,
@@ -133,7 +133,7 @@ export async function POST(req: Request) {
       if (row._phonesCollapsed) phonesCollapsed += 1;
       if (row._emailsCollapsed) emailsCollapsed += 1;
       const { _phonesCollapsed: _p, _emailsCollapsed: _e, ...rest } = row;
-      return rest;
+      return rest as ValidatedLead;
     });
 
     const counts = { Valid: 0, Invalid: 0, Unknown: 0, emails_valid: 0, phones_valid: 0 };
