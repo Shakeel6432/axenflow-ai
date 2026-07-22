@@ -365,3 +365,4 @@ export function HeroSection() {
     </section>
   );
 }
+

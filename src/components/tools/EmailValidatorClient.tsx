@@ -83,9 +83,8 @@ export function EmailValidatorClient() {
     await run(form);
   }
 
-  function download() {
-    if (!results.length) return;
-    const rows = results.map((r) => ({
+  function resultRows(source: Result[]) {
+    return source.map((r) => ({
       Email: r.email,
       Status: r.status,
       Syntax: r.syntax,
@@ -96,13 +95,134 @@ export function EmailValidatorClient() {
       "Hard Bounce Estimate": r.hardBounceEstimate,
       Notes: (r.notes || []).join("; "),
     }));
-    const blob = new Blob(["\uFEFF" + rowsToCsv(rows)], { type: "text/csv;charset=utf-8" });
+  }
+
+  function pickSource(cleanedOnly: boolean) {
+    const source = cleanedOnly
+      ? results.filter((r) => r.status === "Valid")
+      : results;
+    if (!source.length) {
+      setMsg(
+        cleanedOnly
+          ? "No valid emails left to download. Run validation first or clear filters."
+          : "No results to download"
+      );
+      return null;
+    }
+    return source;
+  }
+
+  function downloadCsv(cleanedOnly = false) {
+    const source = pickSource(cleanedOnly);
+    if (!source) return;
+    const blob = new Blob(["\uFEFF" + rowsToCsv(resultRows(source))], {
+      type: "text/csv;charset=utf-8",
+    });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "email-validated.csv";
+    a.download = cleanedOnly ? "email-validated-clean.csv" : "email-validated.csv";
     a.click();
     URL.revokeObjectURL(a.href);
+    setMsg(
+      cleanedOnly
+        ? `Downloaded ${source.length} valid email(s) as CSV`
+        : `Downloaded ${source.length} result(s) as CSV`
+    );
   }
+
+  function downloadJson(cleanedOnly = false) {
+    const source = pickSource(cleanedOnly);
+    if (!source) return;
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      cleaned: cleanedOnly,
+      total: source.length,
+      results: source,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json;charset=utf-8",
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = cleanedOnly ? "email-validated-clean.json" : "email-validated.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    setMsg(
+      cleanedOnly
+        ? `Downloaded ${source.length} valid email(s) as JSON`
+        : `Downloaded ${source.length} result(s) as JSON`
+    );
+  }
+
+  async function downloadExcel(cleanedOnly = false) {
+    const source = pickSource(cleanedOnly);
+    if (!source) return;
+    setBusy(true);
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Email Validator");
+      const rows = resultRows(source);
+      const headers = Object.keys(rows[0] || { Email: "" });
+      sheet.addRow(headers);
+      for (const row of rows) {
+        sheet.addRow(headers.map((h) => (row as Record<string, string>)[h] || ""));
+      }
+      sheet.getRow(1).font = { bold: true };
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = cleanedOnly ? "email-validated-clean.xlsx" : "email-validated.xlsx";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setMsg(
+        cleanedOnly
+          ? `Downloaded ${source.length} valid email(s) as Excel`
+          : `Downloaded ${source.length} result(s) as Excel`
+      );
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Excel download failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function cleanInvalid() {
+    const kept = results.filter((r) => r.status !== "Invalid");
+    const removed = results.length - kept.length;
+    if (!removed) {
+      setMsg("No invalid emails to remove");
+      return;
+    }
+    setResults(kept);
+    setCounts((prev) =>
+      prev
+        ? {
+            ...prev,
+            total: kept.length,
+            valid: kept.filter((r) => r.status === "Valid").length,
+            invalid: 0,
+            unknown: kept.filter((r) => r.status === "Unknown").length,
+            disposable: kept.filter((r) => r.disposable).length,
+            hardBounceLikely: kept.filter((r) => r.hardBounceEstimate === "Likely").length,
+          }
+        : null
+    );
+    setMsg(`Removed ${removed} invalid email(s). ${kept.length} left.`);
+  }
+
+  function clearResults() {
+    setResults([]);
+    setCounts(null);
+    setMsg("Results cleared. Validate a new email or upload a new file.");
+  }
+
+  const preview = results.slice(0, 8);
+  const invalidCount = results.filter((r) => r.status === "Invalid").length;
+  const validCount = results.filter((r) => r.status === "Valid").length;
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
@@ -178,10 +298,10 @@ export function EmailValidatorClient() {
             Validate email
           </Button>
           <label className="inline-flex cursor-pointer items-center rounded-xl px-4 py-2 text-sm font-semibold" style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}>
-            Upload CSV
+            Upload CSV / Excel / JSON
             <input
               type="file"
-              accept=".csv,text/csv"
+              accept=".csv,.xlsx,.json,text/csv,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className="hidden"
               onChange={(e) => {
                 void onFile(e.target.files?.[0] || null);
@@ -191,7 +311,8 @@ export function EmailValidatorClient() {
           </label>
         </div>
         <p className="text-xs" style={{ color: "var(--c-text-muted)" }}>
-          CSV should include an Emails / Email column (BBB scraper format works).
+          CSV / Excel need an Email column. JSON can be an emails array, results list, or objects with
+          email fields.
         </p>
       </section>
 
@@ -225,41 +346,107 @@ export function EmailValidatorClient() {
 
       {results.length > 0 && (
         <>
-          <Button type="button" variant="outline" onClick={download}>
-            Download results CSV
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!invalidCount}
+              onClick={cleanInvalid}
+            >
+              Clean invalid ({invalidCount})
+            </Button>
+            <Button type="button" variant="outline" onClick={clearResults}>
+              Clear results
+            </Button>
+          </div>
+          <div className="space-y-2 rounded-2xl p-4" style={{ border: "1px solid var(--c-border)" }}>
+            <p className="text-sm font-medium" style={{ color: "var(--c-heading)" }}>
+              Download clean (Valid only · {validCount})
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="green" onClick={() => downloadCsv(true)}>
+                CSV
+              </Button>
+              <Button type="button" variant="outline" onClick={() => void downloadExcel(true)}>
+                Excel
+              </Button>
+              <Button type="button" variant="outline" onClick={() => downloadJson(true)}>
+                JSON
+              </Button>
+            </div>
+            <p className="pt-2 text-sm font-medium" style={{ color: "var(--c-heading)" }}>
+              Download all ({results.length})
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="outline" onClick={() => downloadCsv(false)}>
+                CSV
+              </Button>
+              <Button type="button" variant="outline" onClick={() => void downloadExcel(false)}>
+                Excel
+              </Button>
+              <Button type="button" variant="outline" onClick={() => downloadJson(false)}>
+                JSON
+              </Button>
+            </div>
+          </div>
+          <p className="text-xs" style={{ color: "var(--c-text-muted)" }}>
+            Clean removes Invalid rows from this list first. Clean downloads export Valid emails only.
+          </p>
           <div className="overflow-x-auto rounded-2xl" style={{ border: "1px solid var(--c-border)" }}>
             <table className="min-w-full text-left text-sm">
               <thead style={{ background: "var(--c-hover-bg)" }}>
                 <tr>
                   {["Email", "Status", "Syntax", "DNS", "MX", "Hard bounce", "Notes"].map((h) => (
-                    <th key={h} className="whitespace-nowrap px-3 py-2 font-semibold" style={{ color: "var(--c-heading)" }}>
+                    <th
+                      key={h}
+                      className="whitespace-nowrap px-3 py-2 font-semibold"
+                      style={{ color: "var(--c-heading)" }}
+                    >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {results.slice(0, 50).map((r, i) => (
+                {preview.map((r, i) => (
                   <tr key={`${r.email}-${i}`} style={{ borderTop: "1px solid var(--c-border)" }}>
-                    <td className="max-w-[220px] truncate px-3 py-2" style={{ color: "var(--c-heading)" }}>
+                    <td
+                      className="max-w-[220px] truncate px-3 py-2"
+                      style={{ color: "var(--c-heading)" }}
+                    >
                       {r.email || "-"}
                     </td>
-                    <td className="px-3 py-2 font-medium">{r.status}</td>
+                    <td
+                      className="px-3 py-2 font-medium"
+                      style={{
+                        color:
+                          r.status === "Valid"
+                            ? "#14b8a6"
+                            : r.status === "Invalid"
+                              ? "#f87171"
+                              : "var(--c-heading)",
+                      }}
+                    >
+                      {r.status}
+                    </td>
                     <td className="px-3 py-2">{r.syntax}</td>
                     <td className="px-3 py-2">{r.dns}</td>
                     <td className="px-3 py-2">{r.mx}</td>
                     <td className="px-3 py-2">{r.hardBounceEstimate}</td>
-                    <td className="max-w-[240px] truncate px-3 py-2" style={{ color: "var(--c-text-dim)" }}>
+                    <td
+                      className="max-w-[240px] truncate px-3 py-2"
+                      style={{ color: "var(--c-text-dim)" }}
+                    >
                       {(r.notes || []).join("; ") || "-"}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {results.length > 50 && (
+            {results.length > preview.length && (
               <p className="px-3 py-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
-                Showing first 50 of {results.length}. Download CSV for full results.
+                Showing first {preview.length} of {results.length}. Download CSV, Excel, or JSON for
+                full results.
               </p>
             )}
           </div>

@@ -123,6 +123,9 @@ export default function BbbScraperPage() {
             <Button href="/tools/phone-validator" size="lg" variant="outline">
               Phone Validator
             </Button>
+            <Button href="/tools/ai-outreach" size="lg" variant="outline">
+              AI Outreach
+            </Button>
           </div>
         </Container>
       </section>

@@ -4,21 +4,21 @@ import { siteConfig } from "@/lib/constants";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
-import { PhoneValidatorClient } from "@/components/tools/PhoneValidatorClient";
+import { OutreachClient } from "@/components/bbb/OutreachClient";
 
 export const metadata: Metadata = {
-  title: "Phone Validator",
+  title: "AI Outreach",
   description:
-    "Validate phone numbers for every country: E.164 check, country detection, toll-free and premium filters.",
-  alternates: { canonical: `${siteConfig.url}/tools/phone-validator` },
+    "Generate cold emails, phone scripts, and follow-ups with your business name in Best regards.",
+  alternates: { canonical: `${siteConfig.url}/tools/ai-outreach` },
 };
 
-export default function PhoneValidatorPage() {
+export default function AiOutreachPage() {
   return (
     <>
       <PageHero
-        title="Phone Validator"
-        description="Validate any country number locally: Mobile vs Landline vs VoIP, country, and likely operator — no third-party API."
+        title="AI Outreach"
+        description="Chat to create a template, then add it to your CSV or Excel sheet."
       />
       <Section tight>
         <Container>
@@ -26,11 +26,14 @@ export default function PhoneValidatorPage() {
             <Link href="/tools/email-validator" className="text-indigo-500 hover:text-teal-500">
               Email Validator
             </Link>
+            <Link href="/tools/phone-validator" className="text-indigo-500 hover:text-teal-500">
+              Phone Validator
+            </Link>
             <Link href="/tools" className="text-indigo-500 hover:text-teal-500">
               All tools
             </Link>
           </div>
-          <PhoneValidatorClient />
+          <OutreachClient />
         </Container>
       </Section>
     </>

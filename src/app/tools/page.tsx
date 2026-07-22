@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Wrench, Sparkles, ShieldCheck, Mail, Phone } from "lucide-react";
+import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 
 export const metadata: Metadata = {
   title: "Tools",
-  description: "AxenFlow AI tools hub: lead finder, scrapers, email validator, phone validator.",
+  description:
+    "AxenFlow AI tools hub: lead finder, email validator, phone validator, AI outreach, desktop scrapers.",
 };
 
 const tools = [
@@ -28,17 +29,18 @@ const tools = [
   {
     title: "Phone Validator",
     description:
-      "Format check, US normalize, keep one number, reject short codes or toll-free.",
+      "International validation for every country, E.164 cleanup, country detection, toll-free filters.",
     href: "/tools/phone-validator",
     status: "Live",
     icon: Phone,
   },
   {
-    title: "BBB Scraper",
-    description: "Desktop BBB lead scraper. Validate emails and phones with the tools above.",
-    href: "/bbb-scraper",
+    title: "AI Outreach",
+    description:
+      "Cold emails, phone scripts, follow-ups. Single lead or CSV/Excel with templates beside each business.",
+    href: "/tools/ai-outreach",
     status: "Live",
-    icon: Wrench,
+    icon: MessageSquare,
   },
   {
     title: "Desktop Scrapers",
@@ -62,7 +64,7 @@ export default function ToolsPage() {
     <>
       <PageHero
         title="Tools"
-        description="Lead Finder, Email Validator, Phone Validator, and desktop scrapers."
+        description="Lead Finder, Email Validator, Phone Validator, AI Outreach, and desktop scrapers."
       />
       <Section tight>
         <div className="mx-auto grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">

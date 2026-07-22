@@ -4,9 +4,27 @@ import {
   DEFAULT_PHONE_OPTIONS,
   validatePhoneLocal,
   type PhoneCheckOptions,
+  type PhoneOutputFormat,
 } from "@/lib/validators/phone";
+import type { CountryCode } from "libphonenumber-js/max";
 
 export const runtime = "nodejs";
+
+function normalizeOptions(raw: Partial<PhoneCheckOptions> | null | undefined): PhoneCheckOptions {
+  const next: PhoneCheckOptions = { ...DEFAULT_PHONE_OPTIONS, ...(raw || {}) };
+  const fmt = String(next.outputFormat || "e164") as PhoneOutputFormat;
+  if (fmt === "e164" || fmt === "international" || fmt === "national" || fmt === "original") {
+    next.outputFormat = fmt;
+  } else {
+    next.outputFormat = "e164";
+  }
+  const legacy = raw as { normalizeUs?: boolean } | null | undefined;
+  if (legacy && "normalizeUs" in legacy && !raw?.outputFormat) {
+    next.outputFormat = legacy.normalizeUs ? "national" : "e164";
+  }
+  if (typeof next.defaultCountry !== "string") next.defaultCountry = "";
+  return next;
+}
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +38,7 @@ export async function POST(req: Request) {
       const optsRaw = String(form.get("options") || "");
       if (optsRaw) {
         try {
-          options = { ...DEFAULT_PHONE_OPTIONS, ...JSON.parse(optsRaw) };
+          options = normalizeOptions(JSON.parse(optsRaw));
         } catch {
           /* defaults */
         }
@@ -41,9 +59,13 @@ export async function POST(req: Request) {
         phone?: string;
         phones?: string[];
         csv?: string;
-        options?: Partial<PhoneCheckOptions>;
+        options?: Partial<PhoneCheckOptions> & { normalizeUs?: boolean };
+        defaultCountry?: CountryCode | "";
       } | null;
-      if (body?.options) options = { ...DEFAULT_PHONE_OPTIONS, ...body.options };
+      if (body?.options) options = normalizeOptions(body.options);
+      if (body?.defaultCountry != null) {
+        options = { ...options, defaultCountry: body.defaultCountry };
+      }
       if (body?.phone) phones = [body.phone];
       if (body?.phones?.length) phones = body.phones;
       if (body?.csv) {
@@ -56,7 +78,7 @@ export async function POST(req: Request) {
 
     if (!phones.length) {
       return NextResponse.json(
-        { error: "Provide a phone or CSV with a Phone Numbers column" },
+        { error: "Provide a phone or CSV with a Phone / Phone Numbers column" },
         { status: 400 }
       );
     }
@@ -72,6 +94,13 @@ export async function POST(req: Request) {
       unknown: results.filter((r) => r.status === "Unknown").length,
       collapsed: results.filter((r) => r.collapsed).length,
       tollFree: results.filter((r) => r.tollFree).length,
+      mobile: results.filter((r) => r.lineCategory === "mobile").length,
+      landline: results.filter((r) => r.lineCategory === "landline").length,
+      voip: results.filter((r) => r.lineCategory === "voip").length,
+      fixedOrMobile: results.filter((r) => r.lineCategory === "ambiguous").length,
+      typeUnknown: results.filter(
+        (r) => r.lineCategory === "unknown" || r.lineCategory === "other"
+      ).length,
     };
 
     return NextResponse.json({ ok: true, options, counts, results });

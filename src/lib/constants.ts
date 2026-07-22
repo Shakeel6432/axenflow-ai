@@ -284,6 +284,7 @@ export const footerLinks = {
     { label: "Leads", href: "/leads" },
     { label: "Email Validator", href: "/tools/email-validator" },
     { label: "Phone Validator", href: "/tools/phone-validator" },
+    { label: "AI Outreach", href: "/tools/ai-outreach" },
     { label: "BBB Scraper", href: "/bbb-scraper" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
