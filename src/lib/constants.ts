@@ -65,6 +65,7 @@ export const navLinks = [
   { label: "Home", href: "/" },
   { label: "Leads", href: "/leads" },
   { label: "Tools", href: "/tools" },
+  { label: "Blog", href: "/blog" },
   { label: "Services", href: "/services" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "About", href: "/about" },
@@ -282,6 +283,7 @@ export const footerLinks = {
   quick: [
     { label: "Home", href: "/" },
     { label: "Leads", href: "/leads" },
+    { label: "Blog", href: "/blog" },
     { label: "Email Validator", href: "/tools/email-validator" },
     { label: "Phone Validator", href: "/tools/phone-validator" },
     { label: "AI Outreach", href: "/tools/ai-outreach" },
