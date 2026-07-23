@@ -8,9 +8,20 @@ type PageHeroProps = {
   large?: boolean;
   /** Center title/description (auth pages) */
   align?: "left" | "center";
+  /** Use full container width instead of max-w-3xl */
+  wide?: boolean;
+  /** Keep title and description on one line from lg breakpoint up */
+  singleLine?: boolean;
 };
 
-export function PageHero({ title, description, large = false, align = "left" }: PageHeroProps) {
+export function PageHero({
+  title,
+  description,
+  large = false,
+  align = "left",
+  wide = false,
+  singleLine = false,
+}: PageHeroProps) {
   const centered = align === "center";
 
   return (
@@ -34,11 +45,18 @@ export function PageHero({ title, description, large = false, align = "left" }: 
         <span className="page-hero-horizon" />
       </div>
       <Container>
-        <div className={cn("relative max-w-3xl", centered && "mx-auto text-center")}>
+        <div
+          className={cn(
+            "relative",
+            wide ? "max-w-none" : "max-w-3xl",
+            centered && "mx-auto text-center"
+          )}
+        >
           <h1
             className={cn(
               "font-[var(--font-space)] font-bold tracking-tight",
-              large ? "text-3xl sm:text-4xl lg:text-5xl" : "text-2xl sm:text-3xl lg:text-4xl"
+              large ? "text-3xl sm:text-4xl lg:text-5xl" : "text-2xl sm:text-3xl lg:text-4xl",
+              singleLine && "lg:whitespace-nowrap"
             )}
             style={{ color: "var(--c-heading)" }}
           >
@@ -48,7 +66,8 @@ export function PageHero({ title, description, large = false, align = "left" }: 
             <p
               className={cn(
                 large ? "mt-4 text-lg" : "mt-2 text-base",
-                centered && "mx-auto max-w-md"
+                centered && !wide && "mx-auto max-w-md",
+                singleLine && "lg:whitespace-nowrap"
               )}
               style={{ color: "var(--c-text-dim)" }}
             >

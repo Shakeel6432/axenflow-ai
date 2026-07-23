@@ -36,6 +36,8 @@ export default function PhoneValidatorPage() {
   return (
     <>
       <PageHero
+        wide
+        singleLine
         title="Free Phone Number Validator for Every Country"
         description="Validate any country number locally: Mobile vs Landline vs VoIP, country, and likely operator. No third party API."
       />
