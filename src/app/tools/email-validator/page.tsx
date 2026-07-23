@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 import { EmailValidatorClient } from "@/components/tools/EmailValidatorClient";
+import { ToolHubLinks } from "@/components/tools/ToolHubLinks";
 
 export const metadata: Metadata = {
   title: "Email Validator",
@@ -22,14 +23,7 @@ export default function EmailValidatorPage() {
       />
       <Section tight>
         <Container>
-          <div className="mb-6 flex flex-wrap gap-4 text-sm font-semibold">
-            <Link href="/tools/phone-validator" className="text-indigo-500 hover:text-teal-500">
-              Phone Validator
-            </Link>
-            <Link href="/tools" className="text-indigo-500 hover:text-teal-500">
-              All tools
-            </Link>
-          </div>
+          <ToolHubLinks current="/tools/email-validator" />
           <EmailValidatorClient />
         </Container>
       </Section>

@@ -7,7 +7,7 @@ import { Section } from "@/components/ui/Section";
 export const metadata: Metadata = {
   title: "Tools",
   description:
-    "AxenFlow AI tools hub: lead finder, email validator, phone validator, AI outreach, desktop scrapers.",
+    "AxenFlow AI tools hub: lead finder, email validator, phone validator, AI outreach, desktop scrapers, and blog guides.",
 };
 
 const tools = [
@@ -64,9 +64,17 @@ export default function ToolsPage() {
     <>
       <PageHero
         title="Tools"
-        description="Lead Finder, Email Validator, Phone Validator, AI Outreach, and desktop scrapers."
+        description="Lead Finder, Email Validator, Phone Validator, AI Outreach, desktop scrapers, and guides on the blog."
       />
       <Section tight>
+        <div className="mx-auto mb-6 flex max-w-5xl flex-wrap gap-4 px-4 text-sm font-semibold sm:px-6">
+          <Link href="/blog" className="text-indigo-500 hover:text-teal-500">
+            Blog guides
+          </Link>
+          <Link href="/blog/bulk-phone-validation-csv-guide" className="text-indigo-500 hover:text-teal-500">
+            Bulk phone validation guide
+          </Link>
+        </div>
         <div className="mx-auto grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map(({ title, description, href, status, icon: Icon }) => (
             <div

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/constants";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
+import { getAllBlogSlugs } from "@/lib/blog/posts";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
@@ -10,6 +11,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/tools/email-validator",
     "/tools/phone-validator",
     "/tools/ai-outreach",
+    "/blog",
+    ...getAllBlogSlugs().map((slug) => `/blog/${slug}`),
     "/bbb-scraper",
     "/bbb-scraper/validate",
     "/bbb-scraper/outreach",

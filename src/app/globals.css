@@ -812,3 +812,30 @@ select.form-input optgroup {
 ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.4); }
 
+/* ─── Blog prose ─── */
+.blog-prose .blog-h2 {
+  margin-top: 2rem;
+  font-family: var(--font-space);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--c-heading);
+}
+.blog-prose .blog-h3 {
+  margin-top: 1.25rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--c-heading);
+}
+.blog-prose .blog-ul,
+.blog-prose .blog-ol {
+  margin-left: 1.25rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.blog-prose .blog-ul {
+  list-style: disc;
+}
+.blog-prose .blog-ol {
+  list-style: decimal;
+}
+

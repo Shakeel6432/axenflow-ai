@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { siteConfig } from "@/lib/constants";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 import { OutreachClient } from "@/components/bbb/OutreachClient";
+import { ToolHubLinks } from "@/components/tools/ToolHubLinks";
 
 export const metadata: Metadata = {
   title: "AI Outreach",
@@ -22,17 +22,7 @@ export default function AiOutreachPage() {
       />
       <Section tight>
         <Container>
-          <div className="mb-6 flex flex-wrap gap-4 text-sm font-semibold">
-            <Link href="/tools/email-validator" className="text-indigo-500 hover:text-teal-500">
-              Email Validator
-            </Link>
-            <Link href="/tools/phone-validator" className="text-indigo-500 hover:text-teal-500">
-              Phone Validator
-            </Link>
-            <Link href="/tools" className="text-indigo-500 hover:text-teal-500">
-              All tools
-            </Link>
-          </div>
+          <ToolHubLinks current="/tools/ai-outreach" />
           <OutreachClient />
         </Container>
       </Section>
