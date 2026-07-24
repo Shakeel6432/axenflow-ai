@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: "AxenFlow AI",
-  tagline: "AI Automation Agency | Bots, Scraping & Workflows",
+  tagline: "Lead Database, Live Tools & AI Automation",
   description:
-    "We build AI bots, web scrapers, AI WhatsApp agents, and workflow systems that run your business on autopilot. 86+ projects delivered worldwide.",
+    "Search our free business lead database, validate emails and phones, check WhatsApp numbers, generate AI outreach, download desktop scrapers, or hire us for custom bots and workflows.",
   email: "hello@axenflowai.com",
   fiverrUrl: "https://www.fiverr.com/shakeel644",
   url: "https://www.axenflowai.com",
@@ -76,42 +76,42 @@ export const services = [
   {
     title: "AI Automation",
     description:
-      "Connect your tools, cut out repetitive tasks, and let your operations run around the clock without manual effort.",
+      "Connect Lead Finder exports, validators, CRMs, and your apps so lead handling and follow-ups run without manual work.",
     icon: "/images/v1/icon-s1.svg",
     image: "/images/service/img1.png",
   },
   {
     title: "AI WhatsApp Agents",
     description:
-      "Deploy AI WhatsApp agents that handle leads, answer questions, book appointments, and follow up with customers automatically.",
+      "Build WhatsApp agents that qualify leads, answer FAQs, book appointments, and follow up. Pair with our WhatsApp Checker when you need clean number lists.",
     icon: "/images/v1/icon-s2.svg",
     image: "/images/service/img2.png",
   },
   {
     title: "AI Email Agents",
     description:
-      "Stop wasting hours on emails. Our AI reads, sorts, replies, and forwards messages so you don't have to.",
+      "AI that reads, sorts, replies, and forwards inbox mail. Works alongside Email Validator and AI Outreach for cleaner outbound and inbound flows.",
     icon: "/images/v1/icon-s3.svg",
     image: "/images/service/img3.png",
   },
   {
     title: "Web Scraping",
     description:
-      "Get the data you need like competitor prices, leads, and market trends, pulled automatically and delivered to your tools.",
+      "Custom scrapers for leads, prices, and market data. Use our desktop scrapers for fresh lists, or hire us for a scraper built around your sources.",
     icon: "/images/v1/icon-s4.svg",
     image: "/images/portfolio/img1.png",
   },
   {
     title: "Workflow Automation",
     description:
-      "We wire up your CRM, spreadsheets, Slack, and APIs using n8n or Make so everything talks to each other.",
+      "Wire Lead Finder, Google Sheets, Slack, Airtable, and CRMs with n8n or Make so validated leads and outreach stay in sync.",
     icon: "/images/v2/Icon1.svg",
     image: "/images/v2/Services.png",
   },
   {
     title: "Custom AI Solutions",
     description:
-      "Need something specific? We build custom chatbots, internal AI tools, and automated pipelines for your exact use case.",
+      "Internal tools, chatbots, enrichment pipelines, and automations that plug into our lead database and live tools stack.",
     icon: "/images/v3/icon1.svg",
     image: "/images/v3/about-us.png",
   },
@@ -129,71 +129,81 @@ export const industries = [
 ] as const;
 
 export const technologies = [
+  "Lead Finder",
+  "Email Validator",
+  "Phone Validator",
+  "WhatsApp Checker",
+  "AI Outreach",
+  "Desktop Scrapers",
   "OpenAI",
   "Claude",
   "n8n",
   "Make",
   "Python",
   "Node.js",
-  "WhatsApp API",
-  "Slack",
-  "Google Sheets",
-  "Airtable",
 ] as const;
 
 export const trustedPartners = [
-  { name: "OpenAI", abbr: "AI" },
-  { name: "Claude", abbr: "CL" },
-  { name: "n8n", abbr: "n8" },
-  { name: "Make", abbr: "Mk" },
-  { name: "Python", abbr: "Py" },
-  { name: "Node.js", abbr: "JS" },
+  { name: "Lead Finder", abbr: "LF" },
+  { name: "Email", abbr: "Em" },
+  { name: "Phone", abbr: "Ph" },
   { name: "WhatsApp", abbr: "WA" },
-  { name: "Slack", abbr: "Sl" },
+  { name: "Outreach", abbr: "AI" },
+  { name: "Scrapers", abbr: "Sc" },
+  { name: "OpenAI", abbr: "AI" },
+  { name: "n8n", abbr: "n8" },
 ] as const;
 
 export const processSteps = [
   {
     step: "01",
-    title: "Discovery",
-    description: "We jump on a call, understand your workflows, and figure out where automation will save you the most time.",
+    title: "Start with the platform",
+    description:
+      "Search Lead Finder, clean lists with validators and WhatsApp Checker, or try AI Outreach. Tell us what still needs custom work.",
   },
   {
     step: "02",
     title: "Strategy",
-    description: "You get a clear plan with what we'll build, which tools we'll use, and how long it'll take.",
+    description:
+      "You get a clear plan: which live tools to use, what we will build (scraper, bot, workflow), and how long it will take.",
   },
   {
     step: "03",
     title: "Build",
-    description: "We build and test everything, connect it to your existing tools, and make sure it works properly.",
+    description:
+      "We build and test scrapers, WhatsApp or email agents, and n8n/Make workflows, then connect them to your stack.",
   },
   {
     step: "04",
     title: "Launch & Support",
-    description: "We go live, keep an eye on things, and fix anything that comes up. You're never left hanging.",
+    description:
+      "We go live, watch the system, and fix issues. You keep using the lead database and tools on AxenFlow anytime.",
   },
 ] as const;
 
 export const whyChooseUs = [
   {
     title: "86+ Projects Done",
-    description: "Real businesses, real results. We've delivered automation for clients across 15+ countries.",
+    description:
+      "Real businesses, real results. Lead scrapers, validators, WhatsApp agents, and workflows delivered across 15+ countries.",
     icon: "/images/about-us/icon1.svg",
   },
   {
-    title: "Built to Last",
-    description: "No quick hacks or demos. We ship systems that actually work in production, day after day.",
+    title: "Platform + Custom Work",
+    description:
+      "Free lead database and live tools on the site, plus custom scrapers, bots, and automations when you need more.",
     icon: "/images/about-us/icon2.svg",
   },
   {
     title: "Quick Delivery",
-    description: "Most projects go live in under a week. Complex builds take 2–3 weeks max.",
+    description:
+      "Most bots and scrapers go live in under a week. Complex multi-tool builds usually take 2 to 3 weeks.",
     icon: "/images/about-us/icon3.svg",
   },
   {
     title: "One Team, Full Stack",
-    description: "Scraping, bots, email AI, workflows. You don't need to hire five different freelancers.",
+    description:
+      "Leads, validation, outreach, scraping, WhatsApp, email AI, and workflows. You do not need five freelancers.",
     icon: "/images/v3/icon2.svg",
   },
 ] as const;
@@ -202,71 +212,77 @@ export const portfolioItems = [
   {
     title: "B2B Lead Scraper",
     category: "Web Scraping",
-    description: "Built a scraper that pulls 500+ verified leads per week from LinkedIn and Google Maps for a sales team.",
+    description:
+      "Desktop scraper that pulls 500+ verified leads per week. Clients clean lists with our Phone and Email validators before outreach.",
     image: "/images/portfolio/img1.png",
   },
   {
     title: "WhatsApp Booking Bot",
     category: "AI WhatsApp Agents",
-    description: "A clinic in Dubai uses this AI WhatsApp agent to handle appointment bookings, reminders, and patient follow-ups.",
+    description:
+      "A clinic uses this AI WhatsApp agent for bookings and reminders. Number lists can be pre-checked with WhatsApp Checker.",
     image: "/images/portfolio/img2.png",
   },
   {
     title: "Smart Email Sorter",
     category: "AI Email Agents",
-    description: "An e-commerce brand gets 200+ emails/day. Our AI sorts, replies to common ones, and flags urgent issues.",
+    description:
+      "An e-commerce brand gets 200+ emails a day. Our AI sorts, replies to common ones, and flags urgent issues.",
     image: "/images/portfolio/img3.png",
   },
   {
     title: "CRM Sync System",
     category: "Workflow Automation",
-    description: "Connected HubSpot, Google Sheets, and Slack for a real estate agency so nothing falls through the cracks.",
+    description:
+      "Connected HubSpot, Google Sheets, and Slack so Lead Finder exports and validated contacts stay in sync.",
     image: "/images/portfolio/img4.png",
   },
   {
     title: "Price Tracker",
     category: "Web Scraping",
-    description: "Monitors competitor prices across 50+ product categories daily and alerts the team when prices change.",
+    description:
+      "Monitors competitor prices across 50+ product categories daily and alerts the team when prices change.",
     image: "/images/portfolio/img5.png",
   },
   {
-    title: "Internal AI Assistant",
+    title: "Outreach Pipeline",
     category: "Custom AI Solutions",
-    description: "A marketing agency uses this tool to generate reports, draft social posts, and summarize meeting notes.",
+    description:
+      "Lead list to validated contacts to AI Outreach scripts in one flow for a sales team running bulk campaigns.",
     image: "/images/portfolio/img6.png",
   },
 ] as const;
 
 export const faqs = [
   {
-    question: "What exactly do you automate?",
+    question: "What can I use on AxenFlow for free?",
     answer:
-      "Pretty much anything repetitive like WhatsApp replies, email handling, data scraping, CRM updates, report generation, and lead follow-ups. If it can be automated, we'll find a way.",
+      "Lead Finder (business lead database), Email Validator, Phone Validator, WhatsApp Checker, and AI Outreach. Sign in to run the tools. Desktop scrapers are available on the download page.",
+  },
+  {
+    question: "What do you build as custom services?",
+    answer:
+      "AI automation, WhatsApp agents, email agents, web scrapers, n8n/Make workflows, and custom AI tools. We often connect them to Lead Finder exports and your CRM.",
   },
   {
     question: "How fast can you deliver?",
     answer:
-      "Simple bots and scrapers are done in 2–5 days. Bigger projects with multiple integrations usually take 1–3 weeks. We'll give you a clear timeline before we start.",
+      "Simple bots and scrapers are done in 2 to 5 days. Bigger projects with multiple integrations usually take 1 to 3 weeks. We give a clear timeline before we start.",
   },
   {
     question: "Do you work with clients worldwide?",
     answer:
-      "Yes — most of our clients are international. We've worked with businesses in the US, UK, UAE, Australia, and across Europe. Everything is done remotely.",
-  },
-  {
-    question: "What tools do you work with?",
-    answer:
-      "OpenAI, Claude, n8n, Make.com, Python, Node.js, WhatsApp Business API, Slack, Google Sheets, Airtable, and more. We pick whatever fits your setup best.",
+      "Yes. Most of our clients are international. We have worked with businesses in the US, UK, UAE, Australia, and across Europe. Everything is remote.",
   },
   {
     question: "What if something breaks after launch?",
     answer:
-      "We don't disappear after delivery. Every project comes with post-launch support. If something breaks or needs a tweak, we handle it.",
+      "We do not disappear after delivery. Every custom project includes post-launch support. If something breaks or needs a tweak, we handle it.",
   },
   {
-    question: "How do I start a project?",
+    question: "How do I start?",
     answer:
-      "Just fill out the form on this page or drop us an email. Tell us what you need, and we'll get back to you within 24 hours with a plan and quote.",
+      "Try Lead Finder or any live tool today, or fill out the form on this page. Tell us what you need and we reply within 24 hours with a plan and quote.",
   },
 ] as const;
 
@@ -286,6 +302,7 @@ export const footerLinks = {
     { label: "Blog", href: "/blog" },
     { label: "Email Validator", href: "/tools/email-validator" },
     { label: "Phone Validator", href: "/tools/phone-validator" },
+    { label: "WhatsApp Checker", href: "/tools/whatsapp-checker" },
     { label: "AI Outreach", href: "/tools/ai-outreach" },
     { label: "BBB Scraper", href: "/bbb-scraper" },
     { label: "About", href: "/about" },

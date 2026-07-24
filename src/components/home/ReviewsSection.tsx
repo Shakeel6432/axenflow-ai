@@ -1,21 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Star, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { clientReviews, type ClientReview } from "@/lib/reviews";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { HomeReveal } from "@/components/home/HomeReveal";
 
-const AVATAR_COLORS = [
-  "#6366f1",
-  "#14b8a6",
-  "#f59e0b",
-  "#ec4899",
-  "#8b5cf6",
-  "#0ea5e9",
-];
+const AVATAR_COLORS = ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899", "#8b5cf6", "#0ea5e9"];
 
 const FEATURED_PREVIEW_CHARS = 180;
 const CARD_PREVIEW_CHARS = 110;
@@ -34,12 +27,7 @@ function Stars({ size = 16 }: { size?: number }) {
   return (
     <div className="flex items-center gap-0.5" aria-hidden>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          size={size}
-          className="fill-amber-400 text-amber-400"
-          strokeWidth={0}
-        />
+        <Star key={i} size={size} className="fill-amber-400 text-amber-400" strokeWidth={0} />
       ))}
     </div>
   );
@@ -60,6 +48,7 @@ function Avatar({ review, size = 56 }: { review: ClientReview; size?: number }) 
         className="rounded-full object-cover ring-2 ring-white/80 shadow-md"
         style={{ width: size, height: size, flexShrink: 0 }}
         loading="lazy"
+        decoding="async"
         onError={() => setBroken(true)}
       />
     );
@@ -82,17 +71,8 @@ function Avatar({ review, size = 56 }: { review: ClientReview; size?: number }) 
   );
 }
 
-function ReviewModal({
-  review,
-  onClose,
-}: {
-  review: ClientReview;
-  onClose: () => void;
-}) {
-  const [mounted, setMounted] = useState(false);
-
+function ReviewModal({ review, onClose }: { review: ClientReview; onClose: () => void }) {
   useEffect(() => {
-    setMounted(true);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
@@ -105,96 +85,77 @@ function ReviewModal({
     };
   }, [onClose]);
 
-  if (!mounted) return null;
-
   return createPortal(
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+      <button
+        type="button"
+        aria-label="Close review"
+        className="absolute inset-0 bg-black/55"
+        onClick={onClose}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="review-modal-title"
+        className="glass-card relative z-10 flex max-h-[min(88vh,640px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl p-6 sm:p-8"
+        onClick={(e) => e.stopPropagation()}
       >
-        <button
-          type="button"
-          aria-label="Close review"
-          className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
-          onClick={onClose}
-        />
-        <motion.div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="review-modal-title"
-          initial={{ opacity: 0, y: 16, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 12, scale: 0.97 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="glass-card relative z-10 flex max-h-[min(88vh,640px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl p-6 sm:p-8"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div
-            className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-30 blur-2xl"
-            style={{ background: "var(--c-accent, #6366f1)" }}
-          />
-
-          <div className="relative mb-5 flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <Avatar review={review} size={56} />
-              <div className="min-w-0">
-                <p
-                  id="review-modal-title"
-                  className="font-[var(--font-space)] text-base font-bold"
-                  style={{ color: "var(--c-heading)" }}
-                >
-                  {review.name}
-                </p>
-                <p className="text-sm" style={{ color: "var(--c-text-dim)" }}>
-                  {review.country}
-                </p>
-              </div>
+        <div className="mb-5 flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Avatar review={review} size={56} />
+            <div className="min-w-0">
+              <p
+                id="review-modal-title"
+                className="font-[var(--font-space)] text-base font-bold"
+                style={{ color: "var(--c-heading)" }}
+              >
+                {review.name}
+              </p>
+              <p className="text-sm" style={{ color: "var(--c-text-dim)" }}>
+                {review.country}
+              </p>
             </div>
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={onClose}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition hover:opacity-80"
+          </div>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition hover:opacity-80"
+            style={{
+              borderColor: "color-mix(in srgb, var(--c-heading) 12%, transparent)",
+              background: "var(--c-bg)",
+              color: "var(--c-heading)",
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="mb-4 flex items-center gap-2">
+          <Stars size={16} />
+          {review.repeat && (
+            <span
+              className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
               style={{
-                borderColor: "color-mix(in srgb, var(--c-heading) 12%, transparent)",
-                background: "var(--c-bg)",
-                color: "var(--c-heading)",
+                background: "color-mix(in srgb, var(--c-accent, #6366f1) 12%, transparent)",
+                color: "var(--c-accent, #6366f1)",
               }}
             >
-              <X size={16} />
-            </button>
-          </div>
+              Repeat client
+            </span>
+          )}
+        </div>
 
-          <div className="relative mb-4 flex items-center gap-2">
-            <Stars size={16} />
-            {review.repeat && (
-              <span
-                className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                style={{
-                  background: "color-mix(in srgb, var(--c-accent, #6366f1) 12%, transparent)",
-                  color: "var(--c-accent, #6366f1)",
-                }}
-              >
-                Repeat client
-              </span>
-            )}
-          </div>
-
-          <div className="relative min-h-0 flex-1 overflow-y-auto pr-1">
-            <p
-              className="font-[var(--font-space)] text-base leading-relaxed sm:text-lg"
-              style={{ color: "var(--c-heading)" }}
-            >
-              {review.text}
-            </p>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>,
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          <p
+            className="font-[var(--font-space)] text-base leading-relaxed sm:text-lg"
+            style={{ color: "var(--c-heading)" }}
+          >
+            {review.text}
+          </p>
+        </div>
+      </div>
+    </div>,
     document.body
   );
 }
@@ -228,15 +189,11 @@ function ReviewCard({
       aria-label={`Read full feedback from ${review.name}`}
       className={
         featured
-          ? "glass-card relative flex min-h-[280px] cursor-pointer flex-col overflow-hidden rounded-2xl p-7 transition hover:brightness-[1.02] sm:min-h-[300px] sm:p-9"
-          : "glass-card flex h-[260px] w-[280px] shrink-0 cursor-pointer flex-col rounded-2xl p-5 opacity-90 transition hover:opacity-100 hover:brightness-[1.02]"
+          ? "glass-card home-hover-lift flex min-h-[280px] cursor-pointer flex-col overflow-hidden rounded-2xl p-7 sm:min-h-[300px] sm:p-9"
+          : "glass-card home-hover-lift flex h-[260px] w-[280px] shrink-0 cursor-pointer flex-col rounded-2xl p-5 opacity-90 hover:opacity-100"
       }
     >
-      <div
-        className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-30 blur-2xl"
-        style={{ background: "var(--c-accent, #6366f1)" }}
-      />
-      <div className="relative flex min-h-0 flex-1 flex-col gap-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <div className="flex shrink-0 items-start justify-between gap-3">
           <Stars size={featured ? 18 : 14} />
           {review.repeat && (
@@ -252,13 +209,7 @@ function ReviewCard({
           )}
         </div>
 
-        <div
-          className={
-            featured
-              ? "flex min-h-[7.5rem] flex-1 flex-col sm:min-h-[8.25rem]"
-              : "flex min-h-[5.5rem] flex-1 flex-col"
-          }
-        >
+        <div className={featured ? "flex min-h-[7.5rem] flex-1 flex-col sm:min-h-[8.25rem]" : "flex min-h-[5.5rem] flex-1 flex-col"}>
           <p
             className={
               featured
@@ -293,7 +244,7 @@ function ReviewCard({
 function MarqueeRow({
   items,
   direction = "left",
-  duration = 55,
+  duration = 50,
   onOpen,
 }: {
   items: ClientReview[];
@@ -306,25 +257,20 @@ function MarqueeRow({
     <div className="relative overflow-hidden py-2">
       <div
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-24"
-        style={{
-          background: "linear-gradient(to right, var(--c-bg-alt), transparent)",
-        }}
+        style={{ background: "linear-gradient(to right, var(--c-bg-alt), transparent)" }}
       />
       <div
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-24"
-        style={{
-          background: "linear-gradient(to left, var(--c-bg-alt), transparent)",
-        }}
+        style={{ background: "linear-gradient(to left, var(--c-bg-alt), transparent)" }}
       />
-      <motion.div
-        className="flex w-max gap-4"
-        animate={{ x: direction === "left" ? ["0%", "-50%"] : ["-50%", "0%"] }}
-        transition={{ duration, ease: "linear", repeat: Infinity }}
+      <div
+        className={`marquee-track flex w-max gap-4 ${direction === "right" ? "marquee-track-reverse" : ""}`}
+        style={{ animationDuration: `${duration}s` }}
       >
         {doubled.map((r, i) => (
           <ReviewCard key={`${r.id}-m-${i}`} review={r} onOpen={onOpen} />
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -332,13 +278,11 @@ function MarqueeRow({
 export function ReviewsSection() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [dir, setDir] = useState(1);
   const [activeReview, setActiveReview] = useState<ClientReview | null>(null);
   const total = clientReviews.length;
 
   const go = useCallback(
-    (next: number, d: number) => {
-      setDir(d);
+    (next: number) => {
       setIndex(((next % total) + total) % total);
     },
     [total]
@@ -355,7 +299,7 @@ export function ReviewsSection() {
 
   useEffect(() => {
     if (paused || activeReview) return;
-    const t = setInterval(() => go(index + 1, 1), 5500);
+    const t = setInterval(() => go(index + 1), 5500);
     return () => clearInterval(t);
   }, [index, paused, activeReview, go]);
 
@@ -366,40 +310,30 @@ export function ReviewsSection() {
 
   return (
     <Section id="reviews" style={{ background: "var(--c-bg-alt)" }} divider>
-      <SectionHeading
-        title="What Clients Say"
-        description="Client testimonials on web scraping, data automation, lead generation, and custom software delivery with AxenFlow AI."
-        className="mb-10"
-      />
+      <HomeReveal>
+        <SectionHeading
+          title="What Clients Say"
+          description="Reviews from clients on lead scraping, data automation, bots, and delivery with AxenFlow AI."
+          className="mb-10"
+        />
+      </HomeReveal>
 
-      <div
-        className="relative mx-auto mb-12 max-w-2xl"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => {
-          if (!activeReview) setPaused(false);
-        }}
-      >
-        <div className="relative">
-          <AnimatePresence mode="wait" custom={dir}>
-            <motion.div
-              key={current.id}
-              custom={dir}
-              initial={{ opacity: 0, x: dir * 40, scale: 0.98 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: dir * -40, scale: 0.98 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <ReviewCard review={current} featured onOpen={openReview} />
-            </motion.div>
-          </AnimatePresence>
-        </div>
+      <HomeReveal>
+        <div
+          className="relative mx-auto mb-12 max-w-2xl"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => {
+            if (!activeReview) setPaused(false);
+          }}
+        >
+        <ReviewCard review={current} featured onOpen={openReview} />
 
         <div className="mt-5 flex items-center justify-center gap-3">
           <button
             type="button"
             aria-label="Previous review"
-            onClick={() => go(index - 1, -1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105"
+            onClick={() => go(index - 1)}
+            className="flex h-10 w-10 items-center justify-center rounded-full border transition"
             style={{
               borderColor: "color-mix(in srgb, var(--c-heading) 12%, transparent)",
               background: "var(--c-bg)",
@@ -414,7 +348,7 @@ export function ReviewsSection() {
                 key={r.id}
                 type="button"
                 aria-label={`Show client feedback ${i + 1}`}
-                onClick={() => go(i, i > index ? 1 : -1)}
+                onClick={() => go(i)}
                 className="h-1.5 rounded-full transition-all"
                 style={{
                   width: i === index ? 22 : 6,
@@ -429,8 +363,8 @@ export function ReviewsSection() {
           <button
             type="button"
             aria-label="Next review"
-            onClick={() => go(index + 1, 1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105"
+            onClick={() => go(index + 1)}
+            className="flex h-10 w-10 items-center justify-center rounded-full border transition"
             style={{
               borderColor: "color-mix(in srgb, var(--c-heading) 12%, transparent)",
               background: "var(--c-bg)",
@@ -440,16 +374,15 @@ export function ReviewsSection() {
             <ChevronRight size={18} />
           </button>
         </div>
-      </div>
+        </div>
+      </HomeReveal>
 
-      <div className="space-y-4">
+      <HomeReveal className="space-y-4">
         <MarqueeRow items={rowA} direction="left" duration={50} onOpen={openReview} />
         <MarqueeRow items={rowB} direction="right" duration={58} onOpen={openReview} />
-      </div>
+      </HomeReveal>
 
-      {activeReview && (
-        <ReviewModal review={activeReview} onClose={closeReview} />
-      )}
+      {activeReview && <ReviewModal review={activeReview} onClose={closeReview} />}
     </Section>
   );
 }

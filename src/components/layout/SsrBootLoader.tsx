@@ -8,7 +8,7 @@ function subscribe() {
 
 /**
  * Renders only in the server HTML / pre-hydration paint.
- * Hides as soon as the client hydrates — no timer, no SPA re-trigger.
+ * Hides as soon as the client hydrates.
  */
 export function SsrBootLoader() {
   const hydrated = useSyncExternalStore(subscribe, () => true, () => false);
@@ -25,7 +25,7 @@ export function SsrBootLoader() {
           <span className="ssr-boot__dot" />
         </div>
         <p className="ssr-boot__brand">AxenFlowAI</p>
-        <p className="ssr-boot__hint">Preparing…</p>
+        <p className="ssr-boot__hint">Preparing your workspace…</p>
         <div className="ssr-boot__bar" aria-hidden>
           <span className="ssr-boot__bar-fill" />
         </div>

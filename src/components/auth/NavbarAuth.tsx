@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { ArrowRight } from "lucide-react";
 
 function GuestActions({ mobile }: { mobile: boolean }) {
   if (mobile) {
@@ -9,17 +10,17 @@ function GuestActions({ mobile }: { mobile: boolean }) {
       <>
         <Link
           href="/signin"
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all"
           style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
         >
           Sign In
         </Link>
         <Link
           href="/signup"
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white"
-          style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}
+          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all"
+          style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5 55%, #0d9488)" }}
         >
-          Create Account
+          Create Account <ArrowRight size={14} />
         </Link>
       </>
     );
@@ -29,17 +30,18 @@ function GuestActions({ mobile }: { mobile: boolean }) {
     <>
       <Link
         href="/signin"
-        className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
+        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
         style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
       >
         Sign In
       </Link>
       <Link
         href="/signup"
-        className="inline-flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5"
-        style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%)" }}
+        className="group inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30"
+        style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #0f766e 100%)" }}
       >
         Sign Up
+        <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5" />
       </Link>
     </>
   );
@@ -51,7 +53,7 @@ function UserActions({ mobile }: { mobile: boolean }) {
       <>
         <Link
           href="/dashboard"
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold"
+          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all"
           style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
         >
           Dashboard
@@ -59,8 +61,8 @@ function UserActions({ mobile }: { mobile: boolean }) {
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white"
-          style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}
+          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20"
+          style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5 55%, #0d9488)" }}
         >
           Sign Out
         </button>
@@ -72,7 +74,7 @@ function UserActions({ mobile }: { mobile: boolean }) {
     <>
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
+        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
         style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
       >
         Dashboard
@@ -80,8 +82,8 @@ function UserActions({ mobile }: { mobile: boolean }) {
       <button
         type="button"
         onClick={() => signOut({ callbackUrl: "/" })}
-        className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5"
-        style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%)" }}
+        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/25"
+        style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #0f766e 100%)" }}
       >
         Sign Out
       </button>
@@ -92,7 +94,6 @@ function UserActions({ mobile }: { mobile: boolean }) {
 export function NavbarAuth({ mobile = false }: { mobile?: boolean }) {
   const { status } = useSession();
 
-  // Never show a spinner. While session resolves, keep guest buttons stable.
   if (status === "authenticated") {
     return <UserActions mobile={mobile} />;
   }

@@ -1,60 +1,101 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Bot, Brain, Zap, Link2, Code2, MessageCircle, Hash, Database, Cloud, Workflow } from "lucide-react";
+import Link from "next/link";
+import {
+  Database,
+  Mail,
+  Phone,
+  MessageCircle,
+  Sparkles,
+  Wrench,
+} from "lucide-react";
 import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { HomeReveal } from "@/components/home/HomeReveal";
 
-const tools = [
-  { name: "OpenAI", Icon: Bot, color: "#10b981" },
-  { name: "Claude", Icon: Brain, color: "#f97316" },
-  { name: "n8n", Icon: Zap, color: "#ef4444" },
-  { name: "Make", Icon: Link2, color: "#8b5cf6" },
-  { name: "Python", Icon: Code2, color: "#eab308" },
-  { name: "LangChain", Icon: MessageCircle, color: "#22c55e" },
-  { name: "Slack", Icon: Hash, color: "#38bdf8" },
-  { name: "Airtable", Icon: Database, color: "#6366f1" },
-  { name: "Zapier", Icon: Workflow, color: "#f59e0b" },
-  { name: "Supabase", Icon: Cloud, color: "#3ecf8e" },
-];
+const platformTools = [
+  {
+    name: "Lead Finder",
+    blurb: "Search and export our business lead database",
+    href: "/leads",
+    Icon: Database,
+    bg: "bg-indigo-500/10",
+    color: "#6366f1",
+  },
+  {
+    name: "Email Validator",
+    blurb: "Syntax, DNS, MX, and bulk CSV checks",
+    href: "/tools/email-validator",
+    Icon: Mail,
+    bg: "bg-teal-500/10",
+    color: "#14b8a6",
+  },
+  {
+    name: "Phone Validator",
+    blurb: "E.164 cleanup and country detection",
+    href: "/tools/phone-validator",
+    Icon: Phone,
+    bg: "bg-amber-500/10",
+    color: "#f59e0b",
+  },
+  {
+    name: "WhatsApp Checker",
+    blurb: "See which numbers are on WhatsApp",
+    href: "/tools/whatsapp-checker",
+    Icon: MessageCircle,
+    bg: "bg-indigo-500/10",
+    color: "#6366f1",
+  },
+  {
+    name: "AI Outreach",
+    blurb: "Cold emails, scripts, and follow-ups",
+    href: "/tools/ai-outreach",
+    Icon: Sparkles,
+    bg: "bg-teal-500/10",
+    color: "#14b8a6",
+  },
+  {
+    name: "Desktop Scrapers",
+    blurb: "Agency scrapers for fresh leads",
+    href: "/download",
+    Icon: Wrench,
+    bg: "bg-amber-500/10",
+    color: "#f59e0b",
+  },
+] as const;
 
 export function TrustedTechnologies() {
   return (
-    <Section className="!py-16 lg:!py-20" divider>
-      <div className="text-center mb-12">
-        <h2 className="font-[var(--font-space)] text-2xl font-bold sm:text-3xl" style={{ color: "var(--c-heading)" }}>
-          Tools We Work With
-        </h2>
-        <p className="mt-3 text-sm" style={{ color: "var(--c-text-muted)" }}>
-          We pick the best tool for your project, not the trendiest one.
-        </p>
-      </div>
+    <Section divider>
+      <HomeReveal>
+        <SectionHeading
+          title="Products & Live Tools"
+          description="Lead database, validators, WhatsApp checks, AI outreach, and desktop scrapers. Use them free on AxenFlow, or hire us to automate the rest."
+        />
+      </HomeReveal>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-        {tools.map((tool, i) => (
-          <motion.div
+      <HomeReveal stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {platformTools.map((tool) => (
+          <Link
             key={tool.name}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05, duration: 0.4 }}
-            className="group relative overflow-hidden rounded-2xl border px-4 py-6 text-center transition-all duration-300 hover:scale-[1.04]"
-            style={{
-              borderColor: `${tool.color}25`,
-              background: `linear-gradient(to bottom, ${tool.color}12, transparent)`,
-            }}
+            href={tool.href}
+            className="glass-card home-hover-lift flex flex-col items-center gap-3 px-4 py-7 text-center sm:px-5 sm:py-8"
           >
-            <div
-              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
-              style={{ background: `${tool.color}15`, border: `1px solid ${tool.color}30` }}
-            >
-              <tool.Icon size={22} style={{ color: tool.color }} strokeWidth={1.8} />
+            <div className={`flex h-14 w-14 items-center justify-center rounded-xl ${tool.bg}`}>
+              <tool.Icon size={24} style={{ color: tool.color }} strokeWidth={1.8} />
             </div>
-            <p className="font-[var(--font-space)] text-sm font-semibold" style={{ color: tool.color }}>
-              {tool.name}
-            </p>
-          </motion.div>
+            <div>
+              <span
+                className="font-[var(--font-space)] block text-sm font-semibold sm:text-base"
+                style={{ color: "var(--c-heading)" }}
+              >
+                {tool.name}
+              </span>
+              <p className="mt-1.5 text-xs leading-relaxed sm:text-[13px]" style={{ color: "var(--c-text-muted)" }}>
+                {tool.blurb}
+              </p>
+            </div>
+          </Link>
         ))}
-      </div>
+      </HomeReveal>
     </Section>
   );
 }
