@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireUser } from "@/lib/auth-guards";
 
 export const runtime = "nodejs";
 
@@ -69,6 +70,11 @@ function extractJson(text: string): {
 
 export async function POST(req: Request) {
   try {
+    const session = await requireUser();
+    if (!session) {
+      return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    }
+
     const apiKey = process.env.GROQ_API_KEY?.trim();
     if (!apiKey) {
       return NextResponse.json(

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dns from "node:dns/promises";
 import ExcelJS from "exceljs";
+import { requireUser } from "@/lib/auth-guards";
 import { normalizeHeader, parseCsv, scoreEmailSyntax, type LeadStatus } from "@/lib/bbb-validate";
 import {
   DEFAULT_EMAIL_OPTIONS,
@@ -257,6 +258,11 @@ async function mapPool<T, R>(items: T[], concurrency: number, fn: (item: T) => P
 
 export async function POST(req: Request) {
   try {
+    const session = await requireUser();
+    if (!session) {
+      return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    }
+
     const contentType = req.headers.get("content-type") || "";
     let options: EmailCheckOptions = { ...DEFAULT_EMAIL_OPTIONS };
     let emails: string[] = [];

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/constants";
+import { requireAuthPage } from "@/lib/require-auth-page";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -32,7 +33,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PhoneValidatorPage() {
+export default async function PhoneValidatorPage() {
+  await requireAuthPage("/tools/phone-validator");
+
   return (
     <>
       <PageHero

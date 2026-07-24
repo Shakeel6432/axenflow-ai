@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
+import { requireUser } from "@/lib/auth-guards";
 import { normalizeHeader, parseCsv, rowsToCsv } from "@/lib/bbb-validate";
 import {
   enrichRowsWithOutreach,
@@ -145,6 +146,11 @@ function buildXlsxBuffer(rows: Record<string, string>[]): Promise<ArrayBuffer> {
 
 export async function POST(req: Request) {
   try {
+    const session = await requireUser();
+    if (!session) {
+      return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    }
+
     const contentType = req.headers.get("content-type") || "";
     let rows: Record<string, string>[] = [];
     let kinds: OutreachKind[] = [];

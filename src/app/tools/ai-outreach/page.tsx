@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/constants";
+import { requireAuthPage } from "@/lib/require-auth-page";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
   alternates: { canonical: `${siteConfig.url}/tools/ai-outreach` },
 };
 
-export default function AiOutreachPage() {
+export default async function AiOutreachPage() {
+  await requireAuthPage("/tools/ai-outreach");
+
   return (
     <>
       <PageHero

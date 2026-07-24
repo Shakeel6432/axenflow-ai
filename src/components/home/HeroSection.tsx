@@ -1,202 +1,203 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle, TrendingUp, Users, Globe2, Play } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle,
+  Database,
+  Mail,
+  Phone,
+  Sparkles,
+  Wrench,
+  Play,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { useTheme } from "@/components/ThemeProvider";
 
-const stats = [
-  { icon: Users, value: "86+", label: "Projects Done", color: "#6366f1", bg: "rgba(99,102,241,0.1)" },
-  { icon: Globe2, value: "15+", label: "Countries", color: "#14b8a6", bg: "rgba(20,184,166,0.1)" },
-  { icon: TrendingUp, value: "24/7", label: "Always On", color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+const highlights = [
+  "Free business lead database you can search today",
+  "Email and phone validators online, bulk CSV ready",
+  "AI outreach plus desktop scrapers and custom builds",
 ];
 
-const highlights = ["Trusted by 86+ businesses", "Delivery in days, not months", "Post-launch support included"];
+const platformCards = [
+  {
+    href: "/leads",
+    icon: Database,
+    title: "Lead Finder",
+    label: "Free database",
+    color: "#6366f1",
+    bg: "rgba(99,102,241,0.12)",
+  },
+  {
+    href: "/tools",
+    icon: Sparkles,
+    title: "Live Tools",
+    label: "Validators + AI",
+    color: "#14b8a6",
+    bg: "rgba(20,184,166,0.12)",
+  },
+  {
+    href: "/download",
+    icon: Wrench,
+    title: "Scrapers",
+    label: "Desktop apps",
+    color: "#f59e0b",
+    bg: "rgba(245,158,11,0.12)",
+  },
+] as const;
+
+const toolChips = [
+  { href: "/leads", label: "Leads", icon: Database, color: "#818cf8" },
+  { href: "/tools/email-validator", label: "Email", icon: Mail, color: "#2dd4bf" },
+  { href: "/tools/phone-validator", label: "Phone", icon: Phone, color: "#a78bfa" },
+  { href: "/tools/ai-outreach", label: "Outreach", icon: Sparkles, color: "#fbbf24" },
+] as const;
+
+const sparkles = [
+  { top: "12%", left: "18%", delay: 0, size: 2.5 },
+  { top: "28%", left: "72%", delay: 0.6, size: 2 },
+  { top: "62%", left: "8%", delay: 1.2, size: 3 },
+  { top: "78%", left: "58%", delay: 1.8, size: 2 },
+  { top: "44%", left: "88%", delay: 0.9, size: 2.5 },
+  { top: "16%", left: "42%", delay: 1.4, size: 1.5 },
+  { top: "86%", left: "28%", delay: 0.3, size: 2 },
+  { top: "52%", left: "36%", delay: 2.1, size: 1.5 },
+] as const;
 
 export function HeroSection() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
   return (
-    <section className="relative overflow-hidden pt-20 pb-14 lg:pt-24 lg:pb-20">
-      {/* Background elements */}
+    <section className="relative overflow-hidden pt-20 pb-16 lg:pt-24 lg:pb-24">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Aurora gradient layers */}
         <motion.div
-          animate={{ x: [0, 30, -20, 0], y: [0, -20, 10, 0], scale: [1, 1.1, 0.95, 1] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[200px] left-1/2 h-[700px] w-[1100px] -translate-x-1/2 rounded-full bg-indigo-500/[0.07] blur-[160px]"
+          animate={{ x: [0, 40, -25, 0], y: [0, -28, 14, 0], scale: [1, 1.14, 0.94, 1] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-[220px] left-1/2 h-[780px] w-[1200px] -translate-x-1/2 rounded-full bg-indigo-500/[0.12] blur-[170px]"
         />
         <motion.div
-          animate={{ x: [0, -25, 15, 0], y: [0, 15, -25, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute -bottom-[150px] right-[-100px] h-[500px] w-[600px] rounded-full bg-teal-500/[0.08] blur-[120px]"
+          animate={{ x: [0, -30, 18, 0], y: [0, 20, -28, 0] }}
+          transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          className="absolute -bottom-[180px] right-[-120px] h-[560px] w-[680px] rounded-full bg-teal-500/[0.13] blur-[130px]"
         />
         <motion.div
-          animate={{ x: [0, 20, -10, 0], y: [0, -15, 20, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-          className="absolute top-[30%] left-[-100px] h-[450px] w-[450px] rounded-full bg-violet-500/[0.06] blur-[120px]"
+          animate={{ x: [0, 24, -14, 0], y: [0, -18, 22, 0] }}
+          transition={{ duration: 21, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          className="absolute top-[26%] left-[-120px] h-[500px] w-[500px] rounded-full bg-violet-500/[0.09] blur-[130px]"
         />
         <motion.div
-          animate={{ scale: [1, 1.2, 0.9, 1], opacity: [0.04, 0.07, 0.03, 0.04] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-[8%] right-[8%] h-[350px] w-[350px] rounded-full bg-amber-500/[0.04] blur-[100px]"
+          animate={{ scale: [1, 1.25, 0.88, 1], opacity: [0.05, 0.11, 0.04, 0.05] }}
+          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute top-[6%] right-[6%] h-[380px] w-[380px] rounded-full bg-amber-500/[0.07] blur-[110px]"
         />
 
-        {/* Mesh grid pattern */}
-        <svg className="absolute top-0 left-0 h-full w-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
+        <svg className="absolute inset-0 h-full w-full opacity-[0.05]" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="hero-mesh" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-              <circle cx="30" cy="30" r="0.8" fill="currentColor" />
-              <line x1="0" y1="30" x2="60" y2="30" stroke="currentColor" strokeWidth="0.15" />
-              <line x1="30" y1="0" x2="30" y2="60" stroke="currentColor" strokeWidth="0.15" />
+            <pattern id="hero-mesh" x="0" y="0" width="56" height="56" patternUnits="userSpaceOnUse">
+              <circle cx="28" cy="28" r="0.9" fill="currentColor" />
+              <line x1="0" y1="28" x2="56" y2="28" stroke="currentColor" strokeWidth="0.12" />
+              <line x1="28" y1="0" x2="28" y2="56" stroke="currentColor" strokeWidth="0.12" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#hero-mesh)" />
         </svg>
 
-        {/* Radial ring */}
-        <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[800px] opacity-[0.03]" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="400" cy="400" r="380" stroke="url(#ring-grad)" strokeWidth="0.5" />
-          <circle cx="400" cy="400" r="300" stroke="url(#ring-grad)" strokeWidth="0.4" />
-          <circle cx="400" cy="400" r="220" stroke="url(#ring-grad)" strokeWidth="0.3" />
-          <defs>
-            <linearGradient id="ring-grad" x1="0" y1="0" x2="800" y2="800">
-              <stop offset="0%" stopColor="#6366f1" />
-              <stop offset="50%" stopColor="#14b8a6" />
-              <stop offset="100%" stopColor="#f59e0b" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <motion.div
+          animate={{ opacity: [0.08, 0.18, 0.08] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent"
+        />
+        <motion.div
+          animate={{ opacity: [0.06, 0.14, 0.06] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute top-[68%] left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-400/35 to-transparent"
+        />
 
-        {/* Gradient crossing lines */}
-        <div className="absolute top-[18%] left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/[0.08] to-transparent" />
-        <div className="absolute top-[72%] left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/[0.06] to-transparent" />
-        <div className="absolute top-[45%] left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/[0.04] to-transparent" />
-        <div className="absolute left-[12%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-indigo-500/[0.05] to-transparent" />
-        <div className="absolute right-[18%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-teal-500/[0.04] to-transparent" />
-        <div className="absolute left-[50%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-violet-500/[0.03] to-transparent" />
+        {sparkles.map((dot, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              top: dot.top,
+              left: dot.left,
+              width: dot.size,
+              height: dot.size,
+              background:
+                i % 3 === 0 ? "rgba(129,140,248,0.7)" : i % 3 === 1 ? "rgba(45,212,191,0.7)" : "rgba(251,191,36,0.65)",
+              boxShadow:
+                i % 3 === 0
+                  ? "0 0 12px rgba(129,140,248,0.65)"
+                  : i % 3 === 1
+                    ? "0 0 12px rgba(45,212,191,0.55)"
+                    : "0 0 12px rgba(251,191,36,0.5)",
+            }}
+            animate={{ y: [0, -14, 0], opacity: [0.35, 1, 0.35], scale: [1, 1.35, 1] }}
+            transition={{ duration: 3.2 + i * 0.25, repeat: Infinity, ease: "easeInOut", delay: dot.delay }}
+          />
+        ))}
 
-        {/* Orbiting shapes */}
-        <motion.svg
-          animate={{ rotate: 360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="absolute right-[6%] top-[10%] h-24 w-24 text-indigo-500/[0.06]"
-          viewBox="0 0 96 96" fill="none" stroke="currentColor" strokeWidth="0.8"
-        >
-          <rect x="12" y="12" width="72" height="72" rx="20" />
-          <rect x="28" y="28" width="40" height="40" rx="10" />
-          <rect x="38" y="38" width="20" height="20" rx="5" />
-        </motion.svg>
-
-        <motion.svg
-          animate={{ rotate: -360 }}
-          transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-          className="absolute left-[4%] bottom-[15%] h-20 w-20 text-teal-500/[0.07]"
-          viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="0.8"
-        >
-          <circle cx="40" cy="40" r="36" />
-          <circle cx="40" cy="40" r="24" />
-          <circle cx="40" cy="40" r="12" />
-          <circle cx="40" cy="40" r="4" />
-        </motion.svg>
-
-        <motion.svg
-          animate={{ rotate: 360 }}
-          transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-          className="absolute right-[28%] bottom-[6%] h-14 w-14 text-amber-500/[0.06]"
-          viewBox="0 0 56 56" fill="none" stroke="currentColor" strokeWidth="0.8"
-        >
-          <polygon points="28,4 52,44 4,44" />
-          <polygon points="28,16 40,38 16,38" />
-        </motion.svg>
-
-        <motion.svg
-          animate={{ rotate: -360 }}
-          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          className="absolute left-[38%] top-[5%] h-12 w-12 text-violet-500/[0.05]"
-          viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="0.8"
-        >
-          <path d="M24 2 L46 24 L24 46 L2 24 Z" />
-          <path d="M24 12 L36 24 L24 36 L12 24 Z" />
-        </motion.svg>
-
-        <motion.svg
-          animate={{ rotate: 360 }}
-          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-          className="absolute left-[20%] top-[60%] h-10 w-10 text-indigo-400/[0.05]"
-          viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="0.8"
-        >
-          <path d="M20 2 L28 14 L38 14 L30 24 L34 38 L20 30 L6 38 L10 24 L2 14 L12 14 Z" />
-        </motion.svg>
-
-        {/* Floating particles with trail effect */}
-        <motion.div animate={{ y: [0, -18, 0], x: [0, 8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[22%] right-[6%]">
-          <div className="h-3 w-3 rounded-full bg-indigo-400/30 shadow-[0_0_12px_rgba(99,102,241,0.3)]" />
-        </motion.div>
-        <motion.div animate={{ y: [0, 14, 0], x: [0, -6, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute top-[55%] left-[10%]">
-          <div className="h-2.5 w-2.5 rounded-full bg-teal-400/35 shadow-[0_0_10px_rgba(20,184,166,0.3)]" />
-        </motion.div>
-        <motion.div animate={{ y: [0, -12, 0], x: [0, 5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute top-[38%] left-[48%]">
-          <div className="h-2 w-2 rounded-full bg-amber-400/30 shadow-[0_0_8px_rgba(245,158,11,0.25)]" />
-        </motion.div>
-        <motion.div animate={{ y: [0, 16, 0], x: [0, -8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 2 }} className="absolute bottom-[22%] right-[18%]">
-          <div className="h-2.5 w-2.5 rounded-full bg-violet-400/25 shadow-[0_0_10px_rgba(139,92,246,0.2)]" />
-        </motion.div>
-        <motion.div animate={{ y: [0, -14, 0], x: [0, 7, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }} className="absolute top-[65%] right-[40%]">
-          <div className="h-2 w-2 rounded-full bg-indigo-400/25 shadow-[0_0_8px_rgba(99,102,241,0.2)]" />
-        </motion.div>
-        <motion.div animate={{ y: [0, 12, 0], x: [0, -5, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} className="absolute top-[15%] left-[30%]">
-          <div className="h-2 w-2 rounded-full bg-teal-400/20 shadow-[0_0_8px_rgba(20,184,166,0.15)]" />
-        </motion.div>
-        <motion.div animate={{ y: [0, -10, 0], x: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 3 }} className="absolute top-[78%] left-[55%]">
-          <div className="h-1.5 w-1.5 rounded-full bg-violet-400/20 shadow-[0_0_6px_rgba(139,92,246,0.15)]" />
-        </motion.div>
-        <motion.div animate={{ y: [0, 8, 0], x: [0, 4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2.5 }} className="absolute top-[10%] right-[35%]">
-          <div className="h-1.5 w-1.5 rounded-full bg-amber-400/20 shadow-[0_0_6px_rgba(245,158,11,0.15)]" />
-        </motion.div>
-
-        {/* Corner vignettes */}
-        <div className="absolute top-0 left-0 h-[300px] w-[300px] bg-gradient-to-br from-indigo-500/[0.05] via-transparent to-transparent" />
-        <div className="absolute bottom-0 right-0 h-[300px] w-[300px] bg-gradient-to-tl from-teal-500/[0.04] via-transparent to-transparent" />
-        <div className="absolute top-0 right-0 h-[200px] w-[200px] bg-gradient-to-bl from-amber-500/[0.03] via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-0 h-[200px] w-[200px] bg-gradient-to-tr from-violet-500/[0.03] via-transparent to-transparent" />
+        <div className="absolute left-0 top-0 h-[360px] w-[360px] bg-gradient-to-br from-indigo-500/[0.08] via-transparent to-transparent" />
+        <div className="absolute bottom-0 right-0 h-[360px] w-[360px] bg-gradient-to-tl from-teal-500/[0.07] via-transparent to-transparent" />
       </div>
 
       <Container>
-        <div className="grid items-stretch gap-10 lg:grid-cols-12 lg:gap-10">
-          {/* Left Content */}
+        <div className="grid items-center gap-12 pt-2 lg:grid-cols-12 lg:gap-14 lg:pt-3">
           <motion.div
-            className="flex h-full flex-col lg:col-span-6"
-            initial={{ opacity: 0, y: 30 }}
+            className="relative flex h-full flex-col justify-center pt-3 sm:pt-4 lg:col-span-6 lg:pt-5"
+            initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-6 inline-flex w-fit max-w-full items-center gap-2 self-start rounded-full px-4 py-1.5 text-xs font-semibold"
-              style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.2)" }}
+              transition={{ delay: 0.12 }}
+              className="mb-5 inline-flex w-fit max-w-full items-center gap-2.5 self-start rounded-full px-4 py-1.5 text-xs font-semibold shadow-[0_0_32px_rgba(20,184,166,0.2)]"
+              style={{
+                background:
+                  "linear-gradient(105deg, rgba(20,184,166,0.18), rgba(99,102,241,0.14), rgba(245,158,11,0.08))",
+                color: "#5eead4",
+                border: "1px solid rgba(45,212,191,0.35)",
+              }}
             >
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400 animate-pulse" />
-              Available for new projects
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-teal-400" />
+              </span>
+              <Zap size={12} className="text-amber-300" />
+              Live free tools on AxenFlow
             </motion.div>
 
-            <h1 className="font-[var(--font-space)] text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.5rem]" style={{ color: "var(--c-heading)" }}>
-              We Build Systems
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.18 }}
+              className="font-[var(--font-space)] mb-3 text-sm font-bold tracking-[0.18em] uppercase sm:text-base"
+            >
+              <span className="hero-gradient-text">AxenFlow</span>
+            </motion.p>
+
+            <h1
+              className="font-[var(--font-space)] text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.4rem]"
+              style={{ color: "var(--c-heading)" }}
+            >
+              Free leads, live tools,
               <br />
-              That Run Your
+              and systems that
               <br />
-              <span className="relative inline-block mt-1">
-                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-indigo-400 to-teal-400">Business on Autopilot</span>
+              <span className="relative mt-1 inline-block">
+                <span className="hero-gradient-text relative z-10">run on autopilot</span>
                 <motion.span
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
-                  className="absolute bottom-0 left-0 h-[3px] w-full origin-left rounded-full bg-gradient-to-r from-indigo-500 to-teal-400 opacity-50"
+                  transition={{ delay: 0.7, duration: 0.7, ease: "easeOut" }}
+                  className="absolute -bottom-1 left-0 h-[3px] w-full origin-left rounded-full bg-gradient-to-r from-indigo-500 via-teal-400 to-amber-400 opacity-80 shadow-[0_0_16px_rgba(45,212,191,0.5)]"
                 />
               </span>
             </h1>
@@ -204,30 +205,61 @@ export function HeroSection() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="mt-7 max-w-md text-base leading-relaxed sm:text-[1.05rem]"
+              transition={{ delay: 0.3 }}
+              className="mt-6 max-w-lg text-base leading-relaxed sm:text-[1.07rem]"
               style={{ color: "var(--c-text-dim)" }}
             >
-              Tired of doing the same tasks over and over? We build bots, scrapers, and automated workflows that handle the boring stuff while you focus on growing your business.
+              Search our business lead database, validate emails and phones, generate AI outreach, or grab
+              desktop scrapers. Need custom bots and workflows? We build those too.
             </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.36 }}
+              className="mt-5 flex flex-wrap gap-2"
+            >
+              {toolChips.map((chip, i) => (
+                <motion.div
+                  key={chip.href}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + i * 0.05 }}
+                >
+                  <Link
+                    href={chip.href}
+                    className="hero-chip group inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5"
+                    style={{
+                      background: `linear-gradient(135deg, ${chip.color}14, transparent)`,
+                      border: `1px solid ${chip.color}44`,
+                      color: "var(--c-heading)",
+                      animationDelay: `${i * 0.4}s`,
+                    }}
+                  >
+                    <chip.icon size={12} style={{ color: chip.color }} />
+                    {chip.label}
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
 
             <motion.ul
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.48 }}
               className="mt-6 flex flex-col gap-2.5"
             >
               {highlights.map((item, i) => (
                 <motion.li
                   key={item}
-                  initial={{ opacity: 0, x: -15 }}
+                  initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + i * 0.1 }}
-                  className="flex items-center gap-2.5 text-sm"
+                  transition={{ delay: 0.52 + i * 0.08 }}
+                  className="group flex items-center gap-2.5 text-sm"
                   style={{ color: "var(--c-text)" }}
                 >
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-500/15">
-                    <CheckCircle size={13} className="text-teal-500" />
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-500/15 ring-1 ring-teal-400/25 shadow-[0_0_12px_rgba(45,212,191,0.2)] transition-transform group-hover:scale-110">
+                    <CheckCircle size={13} className="text-teal-400" />
                   </span>
                   {item}
                 </motion.li>
@@ -237,127 +269,230 @@ export function HeroSection() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="mt-9 flex flex-wrap items-center gap-4"
+              transition={{ delay: 0.62 }}
+              className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4"
             >
-              <Button href="/contact" size="lg">Get a Free Quote <ArrowRight size={16} /></Button>
-              <Button href="/portfolio" variant="outline" size="lg">
-                <Play size={14} className="text-indigo-500" /> See Our Work
+              <div className="hero-cta-glow">
+                <Button href="/leads" size="lg" className="shadow-[0_14px_44px_rgba(99,102,241,0.35)]">
+                  Open Lead Finder <ArrowRight size={16} />
+                </Button>
+              </div>
+              <Button href="/tools" variant="outline" size="lg">
+                <Play size={14} className="text-indigo-400" /> Explore Tools
               </Button>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-              className="mt-8 flex items-center gap-4 rounded-2xl px-5 py-3.5"
-              style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
-            >
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map((n) => (
-                  <div key={n} className="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white shadow-lg" style={{ background: ["#6366f1","#14b8a6","#f59e0b","#818cf8"][n-1], border: "2px solid var(--c-bg)" }}>
-                    {["S","A","M","K"][n-1]}
-                  </div>
-                ))}
-              </div>
-              <div className="h-8 w-px" style={{ background: "var(--c-border)" }} />
-              <div>
-                <div className="flex gap-0.5 text-amber-400">
-                  {[...Array(5)].map((_, i) => <span key={i} className="text-sm">&#9733;</span>)}
-                </div>
-                <p className="text-xs font-medium" style={{ color: "var(--c-text-muted)" }}>Rated 5/5 by our clients</p>
-              </div>
-            </motion.div>
-
-            <div className="mt-auto grid grid-cols-3 gap-3 pt-6">
-              {stats.map((s, i) => (
+            <div className="grid grid-cols-3 gap-2.5 pt-8 sm:gap-3">
+              {platformCards.map((card, i) => (
                 <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 20 }}
+                  key={card.title}
+                  initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 + i * 0.12 }}
-                  className="glass-card group rounded-xl px-4 py-5 text-center transition-all duration-300"
+                  transition={{ delay: 0.68 + i * 0.08 }}
+                  whileHover={{ y: -4 }}
                 >
-                  <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110" style={{ background: s.bg, border: `1px solid ${s.color}20` }}>
-                    <s.icon size={18} style={{ color: s.color }} />
-                  </div>
-                  <p className="font-[var(--font-space)] text-2xl font-bold" style={{ color: "var(--c-heading)" }}>{s.value}</p>
-                  <p className="mt-0.5 text-xs" style={{ color: "var(--c-text-muted)" }}>{s.label}</p>
+                  <Link
+                    href={card.href}
+                    className="glass-card group relative block overflow-hidden rounded-2xl px-2.5 py-4 text-center transition-all duration-300 sm:px-4 sm:py-5"
+                    style={{
+                      boxShadow: `0 0 0 1px ${card.color}18`,
+                    }}
+                  >
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{
+                        background: `linear-gradient(135deg, ${card.color}33, transparent 55%)`,
+                      }}
+                    />
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{
+                        background: `radial-gradient(circle at 50% 0%, ${card.color}28, transparent 70%)`,
+                      }}
+                    />
+                    <div
+                      className="relative mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                      style={{
+                        background: card.bg,
+                        border: `1px solid ${card.color}40`,
+                        boxShadow: `0 0 18px ${card.color}22`,
+                      }}
+                    >
+                      <card.icon size={18} style={{ color: card.color }} />
+                    </div>
+                    <p
+                      className="font-[var(--font-space)] relative text-sm font-bold sm:text-base"
+                      style={{ color: "var(--c-heading)" }}
+                    >
+                      {card.title}
+                    </p>
+                    <p className="relative mt-0.5 text-[11px] sm:text-xs" style={{ color: "var(--c-text-muted)" }}>
+                      {card.label}
+                    </p>
+                  </Link>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* Right Content */}
           <motion.div
-            className="lg:col-span-6 h-full"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            className="h-full lg:col-span-6"
+            initial={{ opacity: 0, x: 32, rotateY: -6 }}
+            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            transition={{ duration: 0.9, delay: 0.22 }}
+            style={{ perspective: 1200 }}
           >
-            <div className="relative h-full min-h-[340px] lg:min-h-full">
-              <div className="absolute -inset-6 z-0 rounded-3xl bg-gradient-to-br from-indigo-500/15 via-teal-500/10 to-violet-500/10 blur-2xl" />
+            <div className="relative h-full min-h-[380px] lg:min-h-full">
+              <div className="absolute -inset-10 z-0 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/25 via-teal-500/15 to-amber-500/12 blur-3xl" />
+              <motion.div
+                aria-hidden
+                animate={{ opacity: [0.35, 0.7, 0.35], scale: [1, 1.05, 1] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-8 z-0 rounded-full bg-indigo-500/20 blur-3xl"
+              />
+
+              <div className="hero-orbit-ring hidden sm:block">
+                <span className="hero-orbit-dot" />
+              </div>
+              <div className="hero-orbit-ring hero-orbit-ring-2 hidden sm:block">
+                <span className="hero-orbit-dot hero-orbit-dot-teal" />
+              </div>
 
               <motion.div
-                className="absolute -top-4 -right-4 z-20 glass-card rounded-xl px-4 py-3 shadow-xl"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.0 }}
+                className="hero-float-card absolute -right-2 -top-3 z-30 sm:-right-5 sm:-top-5"
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.85 }}
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/15">
-                    <TrendingUp size={14} className="text-teal-500" />
+                <Link
+                  href="/leads"
+                  className="glass-card flex items-center gap-2.5 rounded-2xl px-3.5 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-xl ring-1 ring-teal-400/20 transition-transform hover:-translate-y-1 sm:px-4"
+                >
+                  <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/15 ring-1 ring-teal-400/30">
+                    <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.9)]" />
+                    <Database size={15} className="text-teal-400" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold" style={{ color: "var(--c-heading)" }}>Response Time</p>
-                    <p className="text-xs" style={{ color: "var(--c-text-muted)" }}>Under 24 hours</p>
+                    <p className="text-xs font-bold" style={{ color: "var(--c-heading)" }}>
+                      Free Lead Database
+                    </p>
+                    <p className="text-[11px]" style={{ color: "var(--c-text-muted)" }}>
+                      Search and export live
+                    </p>
                   </div>
-                </div>
+                </Link>
               </motion.div>
 
               <motion.div
-                className="absolute -bottom-3 -left-4 z-20 glass-card rounded-xl px-4 py-3 shadow-xl"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.2 }}
+                className="hero-float-card hero-float-card-delay absolute -left-2 top-[40%] z-30 sm:-left-5"
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1 }}
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15">
-                    <CheckCircle size={14} className="text-indigo-500" />
+                <Link
+                  href="/tools/phone-validator"
+                  className="glass-card flex items-center gap-2.5 rounded-2xl px-3.5 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-xl ring-1 ring-indigo-400/20 transition-transform hover:-translate-y-1 sm:px-4"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/15 ring-1 ring-indigo-400/30">
+                    <Phone size={15} className="text-indigo-400" />
                   </div>
                   <div>
-                    <a href="https://www.fiverr.com/shakeel644" target="_blank" rel="noopener noreferrer" className="text-xs font-bold hover:text-indigo-500 transition" style={{ color: "var(--c-heading)" }}>Client Rating</a>
-                    <p className="text-[11px]" style={{ color: "var(--c-text-muted)" }}>5.0 ★ on Fiverr</p>
+                    <p className="text-xs font-bold" style={{ color: "var(--c-heading)" }}>
+                      Phone Validator
+                    </p>
+                    <p className="text-[11px]" style={{ color: "var(--c-text-muted)" }}>
+                      Free bulk checks
+                    </p>
                   </div>
-                </div>
+                </Link>
               </motion.div>
 
-              <div
-                className="relative z-10 h-full min-h-[340px] overflow-hidden rounded-2xl lg:min-h-[500px]"
-                style={{
-                  background: isDark
-                    ? "linear-gradient(145deg, #1a1040 0%, #0c2a3a 40%, #0a1628 100%)"
-                    : "linear-gradient(145deg, #e8e0f0 0%, #d4eef5 40%, #eef2f7 100%)"
-                }}
+              <motion.div
+                className="hero-float-card hero-float-card-delay-2 absolute -bottom-2 -right-2 z-30 sm:-bottom-4 sm:-right-5"
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.15 }}
+              >
+                <Link
+                  href="/tools/ai-outreach"
+                  className="glass-card flex items-center gap-2.5 rounded-2xl px-3.5 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-xl ring-1 ring-amber-400/20 transition-transform hover:-translate-y-1 sm:px-4"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15 ring-1 ring-amber-400/30">
+                    <Sparkles size={15} className="text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: "var(--c-heading)" }}>
+                      AI Outreach
+                    </p>
+                    <p className="text-[11px]" style={{ color: "var(--c-text-muted)" }}>
+                      Scripts in seconds
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                className="hero-media-shell relative z-10 h-full min-h-[380px] overflow-hidden rounded-2xl lg:min-h-full"
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
               >
                 <div
-                  className="absolute inset-0 z-0"
+                  className="hero-media-inner relative h-full min-h-[380px] lg:min-h-full"
                   style={{
-                    opacity: isDark ? 0.3 : 0.4,
                     background: isDark
-                      ? "radial-gradient(circle at 30% 20%, rgba(99,102,241,0.4), transparent 60%), radial-gradient(circle at 70% 80%, rgba(20,184,166,0.3), transparent 50%)"
-                      : "radial-gradient(circle at 30% 20%, rgba(99,102,241,0.15), transparent 60%), radial-gradient(circle at 70% 80%, rgba(20,184,166,0.12), transparent 50%)"
+                      ? "linear-gradient(145deg, #1a1040 0%, #0c2a3a 40%, #0a1628 100%)"
+                      : "linear-gradient(145deg, #e8e0f0 0%, #d4eef5 40%, #eef2f7 100%)",
                   }}
-                />
-                <Image
-                  src="/images/hero/Img.png"
-                  alt="AxenFlow AI automation dashboard"
-                  width={680}
-                  height={560}
-                  className="relative z-10 h-full min-h-[340px] w-full object-cover object-center lg:min-h-[500px]"
-                  priority
-                />
-              </div>
+                >
+                  <motion.div
+                    aria-hidden
+                    animate={{ opacity: [0.35, 0.65, 0.35], scale: [1, 1.08, 1] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute inset-0 z-0"
+                    style={{
+                      background: isDark
+                        ? "radial-gradient(circle at 26% 16%, rgba(99,102,241,0.55), transparent 55%), radial-gradient(circle at 80% 84%, rgba(20,184,166,0.42), transparent 50%), radial-gradient(circle at 50% 50%, rgba(245,158,11,0.12), transparent 60%)"
+                        : "radial-gradient(circle at 26% 16%, rgba(99,102,241,0.22), transparent 55%), radial-gradient(circle at 80% 84%, rgba(20,184,166,0.18), transparent 50%)",
+                    }}
+                  />
+
+                  <Image
+                    src="/images/hero/Img.png"
+                    alt="AxenFlow AI automation dashboard"
+                    width={680}
+                    height={560}
+                    className="relative z-10 h-full min-h-[380px] w-full object-cover object-center lg:min-h-full"
+                    priority
+                  />
+
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 z-[11]"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(8,12,24,0.12) 0%, transparent 28%, transparent 55%, rgba(8,12,24,0.55) 100%)",
+                    }}
+                  />
+
+                  <div className="hero-shine" />
+                  <div className="hero-scan-line" />
+
+                  <div className="absolute left-4 top-4 z-20 hidden sm:block">
+                    <div
+                      className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-md"
+                      style={{
+                        background: "rgba(8,12,24,0.45)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                      }}
+                    >
+                      <Sparkles size={10} className="text-amber-300" />
+                      Automation hub
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -365,4 +500,3 @@ export function HeroSection() {
     </section>
   );
 }
-

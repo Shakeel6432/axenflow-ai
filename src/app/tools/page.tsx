@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare } from "lucide-react";
+import { requireAuthPage } from "@/lib/require-auth-page";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 
@@ -59,7 +60,9 @@ const tools = [
   },
 ] as const;
 
-export default function ToolsPage() {
+export default async function ToolsPage() {
+  await requireAuthPage("/tools");
+
   return (
     <>
       <PageHero

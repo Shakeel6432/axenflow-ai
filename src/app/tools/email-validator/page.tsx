@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { siteConfig } from "@/lib/constants";
+import { requireAuthPage } from "@/lib/require-auth-page";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -14,7 +14,9 @@ export const metadata: Metadata = {
   alternates: { canonical: `${siteConfig.url}/tools/email-validator` },
 };
 
-export default function EmailValidatorPage() {
+export default async function EmailValidatorPage() {
+  await requireAuthPage("/tools/email-validator");
+
   return (
     <>
       <PageHero

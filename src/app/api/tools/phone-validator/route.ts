@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireUser } from "@/lib/auth-guards";
 import { parseCsv } from "@/lib/bbb-validate";
 import {
   DEFAULT_PHONE_OPTIONS,
@@ -28,6 +29,11 @@ function normalizeOptions(raw: Partial<PhoneCheckOptions> | null | undefined): P
 
 export async function POST(req: Request) {
   try {
+    const session = await requireUser();
+    if (!session) {
+      return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    }
+
     const contentType = req.headers.get("content-type") || "";
     let options: PhoneCheckOptions = { ...DEFAULT_PHONE_OPTIONS };
     let phones: string[] = [];
