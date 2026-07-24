@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare } from "lucide-react";
-import { requireAuthPage } from "@/lib/require-auth-page";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 
@@ -60,14 +59,12 @@ const tools = [
   },
 ] as const;
 
-export default async function ToolsPage() {
-  await requireAuthPage("/tools");
-
+export default function ToolsPage() {
   return (
     <>
       <PageHero
         title="Tools"
-        description="Lead Finder, Email Validator, Phone Validator, AI Outreach, desktop scrapers, and guides on the blog."
+        description="Lead Finder, Email Validator, Phone Validator, AI Outreach, desktop scrapers, and guides on the blog. Sign in to run each tool."
       />
       <Section tight>
         <div className="mx-auto mb-6 flex max-w-5xl flex-wrap gap-4 px-4 text-sm font-semibold sm:px-6">

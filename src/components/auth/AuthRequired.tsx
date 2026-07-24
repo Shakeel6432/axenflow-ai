@@ -10,10 +10,11 @@ type AuthRequiredProps = {
 
 export function AuthRequired({
   title = "Account required",
-  message = "You need an account to use this tool",
+  message = "Sign in to use this tool.",
   callbackUrl = "/tools",
 }: AuthRequiredProps) {
   const signInHref = `/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+  const signUpHref = `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`;
 
   return (
     <Section tight>
@@ -28,7 +29,7 @@ export function AuthRequired({
         <p className="mt-2 text-sm" style={{ color: "var(--c-text-muted)" }}>{message}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/signup"
+            href={signUpHref}
             className="btn-main inline-flex rounded-xl px-5 py-2.5 text-sm font-semibold"
           >
             Create Account

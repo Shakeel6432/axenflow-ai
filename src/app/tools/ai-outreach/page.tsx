@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/constants";
-import { requireAuthPage } from "@/lib/require-auth-page";
+import { getSessionUser } from "@/lib/auth-guards";
+import { AuthRequired } from "@/components/auth/AuthRequired";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -15,18 +16,30 @@ export const metadata: Metadata = {
 };
 
 export default async function AiOutreachPage() {
-  await requireAuthPage("/tools/ai-outreach");
+  const session = await getSessionUser();
+  const isAuthed = Boolean(session);
 
   return (
     <>
       <PageHero
         title="AI Outreach"
-        description="Chat to create a template, then add it to your CSV or Excel sheet."
+        description={
+          isAuthed
+            ? "Chat to create a template, then add it to your CSV or Excel sheet."
+            : "Browse the tool here. Sign in to generate outreach templates and export files."
+        }
       />
       <Section tight>
         <Container>
           <ToolHubLinks current="/tools/ai-outreach" />
-          <OutreachClient />
+          {isAuthed ? (
+            <OutreachClient />
+          ) : (
+            <AuthRequired
+              callbackUrl="/tools/ai-outreach"
+              message="Sign in to generate AI outreach and export CSV or Excel."
+            />
+          )}
         </Container>
       </Section>
     </>

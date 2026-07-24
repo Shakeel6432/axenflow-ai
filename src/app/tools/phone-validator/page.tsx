@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/constants";
-import { requireAuthPage } from "@/lib/require-auth-page";
+import { getSessionUser } from "@/lib/auth-guards";
+import { AuthRequired } from "@/components/auth/AuthRequired";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -34,7 +35,8 @@ export const metadata: Metadata = {
 };
 
 export default async function PhoneValidatorPage() {
-  await requireAuthPage("/tools/phone-validator");
+  const session = await getSessionUser();
+  const isAuthed = Boolean(session);
 
   return (
     <>
@@ -42,7 +44,11 @@ export default async function PhoneValidatorPage() {
         wide
         singleLine
         title="Free Phone Number Validator for Every Country"
-        description="Validate any country number locally: Mobile vs Landline vs VoIP, country, and likely operator. No third party API."
+        description={
+          isAuthed
+            ? "Validate any country number locally: Mobile vs Landline vs VoIP, country, and likely operator. No third party API."
+            : "Browse the tool here. Sign in to validate numbers and upload CSV files."
+        }
       />
       <Section tight>
         <Container>
@@ -83,7 +89,14 @@ export default async function PhoneValidatorPage() {
           </div>
 
           <div id="validator">
-            <PhoneValidatorClient />
+            {isAuthed ? (
+              <PhoneValidatorClient />
+            ) : (
+              <AuthRequired
+                callbackUrl="/tools/phone-validator"
+                message="Sign in to validate phone numbers and upload CSV files."
+              />
+            )}
           </div>
 
           <div className="mt-12">
