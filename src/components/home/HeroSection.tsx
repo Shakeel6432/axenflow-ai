@@ -8,7 +8,6 @@ import {
   Phone,
   Sparkles,
   Wrench,
-  MessageCircle,
   Play,
   Zap,
 } from "lucide-react";
@@ -17,7 +16,7 @@ import { Container } from "@/components/ui/Container";
 
 const highlights = [
   "Free Lead Finder database: search, filter, and export",
-  "Email, phone, and WhatsApp validators with bulk CSV",
+  "Email and phone validators with bulk CSV",
   "AI Outreach plus desktop scrapers and custom automation",
 ];
 
@@ -52,7 +51,6 @@ const toolChips = [
   { href: "/leads", label: "Leads", icon: Database, color: "#818cf8" },
   { href: "/tools/email-validator", label: "Email", icon: Mail, color: "#2dd4bf" },
   { href: "/tools/phone-validator", label: "Phone", icon: Phone, color: "#a78bfa" },
-  { href: "/tools/whatsapp-checker", label: "WhatsApp", icon: MessageCircle, color: "#25D366" },
   { href: "/tools/ai-outreach", label: "Outreach", icon: Sparkles, color: "#fbbf24" },
 ] as const;
 
@@ -103,8 +101,8 @@ export function HeroSection() {
               className="home-rise home-rise-3 mt-6 max-w-lg text-base leading-relaxed sm:text-[1.07rem]"
               style={{ color: "var(--c-text-dim)" }}
             >
-              Search our business lead database, validate emails and phones, check WhatsApp numbers, generate AI
-              outreach, or download desktop scrapers. Need custom bots and workflows? We build those too.
+              Search our business lead database, validate emails and phones, generate AI outreach, or download
+              desktop scrapers. Need custom bots and workflows? We build those too.
             </p>
 
             <div className="home-rise home-rise-4 mt-5 flex flex-wrap gap-2">

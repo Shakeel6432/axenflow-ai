@@ -5,7 +5,6 @@ const LINKS = [
   { href: "/tools/email-validator", label: "Email Validator" },
   { href: "/tools/ai-outreach", label: "AI Outreach" },
   { href: "/tools/phone-validator", label: "Phone Validator" },
-  { href: "/tools/whatsapp-checker", label: "WhatsApp Checker" },
   { href: "/blog", label: "Blog" },
   { href: "/tools", label: "All tools" },
 ] as const;

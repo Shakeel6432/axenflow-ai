@@ -1,12 +1,5 @@
 import Link from "next/link";
-import {
-  Database,
-  Mail,
-  Phone,
-  MessageCircle,
-  Sparkles,
-  Wrench,
-} from "lucide-react";
+import { Database, Mail, Phone, Sparkles, Wrench } from "lucide-react";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { HomeReveal } from "@/components/home/HomeReveal";
@@ -37,14 +30,6 @@ const platformTools = [
     color: "#f59e0b",
   },
   {
-    name: "WhatsApp Checker",
-    blurb: "See which numbers are on WhatsApp",
-    href: "/tools/whatsapp-checker",
-    Icon: MessageCircle,
-    bg: "bg-indigo-500/10",
-    color: "#6366f1",
-  },
-  {
     name: "AI Outreach",
     blurb: "Cold emails, scripts, and follow-ups",
     href: "/tools/ai-outreach",
@@ -68,11 +53,11 @@ export function TrustedTechnologies() {
       <HomeReveal>
         <SectionHeading
           title="Products & Live Tools"
-          description="Lead database, validators, WhatsApp checks, AI outreach, and desktop scrapers. Use them free on AxenFlow, or hire us to automate the rest."
+          description="Lead database, email and phone validators, AI outreach, and desktop scrapers. Use them free on AxenFlow, or hire us to automate the rest."
         />
       </HomeReveal>
 
-      <HomeReveal stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <HomeReveal stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {platformTools.map((tool) => (
           <Link
             key={tool.name}

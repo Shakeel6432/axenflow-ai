@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "AxenFlow AI",
   tagline: "Lead Database, Live Tools & AI Automation",
   description:
-    "Search our free business lead database, validate emails and phones, check WhatsApp numbers, generate AI outreach, download desktop scrapers, or hire us for custom bots and workflows.",
+    "Search our free business lead database, validate emails and phones, generate AI outreach, download desktop scrapers, or hire us for custom bots and workflows.",
   email: "hello@axenflowai.com",
   fiverrUrl: "https://www.fiverr.com/shakeel644",
   url: "https://www.axenflowai.com",
@@ -83,7 +83,7 @@ export const services = [
   {
     title: "AI WhatsApp Agents",
     description:
-      "Build WhatsApp agents that qualify leads, answer FAQs, book appointments, and follow up. Pair with our WhatsApp Checker when you need clean number lists.",
+      "Build WhatsApp agents that qualify leads, answer FAQs, book appointments, and follow up automatically.",
     icon: "/images/v1/icon-s2.svg",
     image: "/images/service/img2.png",
   },
@@ -132,7 +132,6 @@ export const technologies = [
   "Lead Finder",
   "Email Validator",
   "Phone Validator",
-  "WhatsApp Checker",
   "AI Outreach",
   "Desktop Scrapers",
   "OpenAI",
@@ -147,11 +146,11 @@ export const trustedPartners = [
   { name: "Lead Finder", abbr: "LF" },
   { name: "Email", abbr: "Em" },
   { name: "Phone", abbr: "Ph" },
-  { name: "WhatsApp", abbr: "WA" },
   { name: "Outreach", abbr: "AI" },
   { name: "Scrapers", abbr: "Sc" },
   { name: "OpenAI", abbr: "AI" },
   { name: "n8n", abbr: "n8" },
+  { name: "Make", abbr: "Mk" },
 ] as const;
 
 export const processSteps = [
@@ -159,7 +158,7 @@ export const processSteps = [
     step: "01",
     title: "Start with the platform",
     description:
-      "Search Lead Finder, clean lists with validators and WhatsApp Checker, or try AI Outreach. Tell us what still needs custom work.",
+      "Search Lead Finder, clean lists with email and phone validators, or try AI Outreach. Tell us what still needs custom work.",
   },
   {
     step: "02",
@@ -220,7 +219,7 @@ export const portfolioItems = [
     title: "WhatsApp Booking Bot",
     category: "AI WhatsApp Agents",
     description:
-      "A clinic uses this AI WhatsApp agent for bookings and reminders. Number lists can be pre-checked with WhatsApp Checker.",
+      "A clinic uses this AI WhatsApp agent for bookings and reminders.",
     image: "/images/portfolio/img2.png",
   },
   {
@@ -257,7 +256,7 @@ export const faqs = [
   {
     question: "What can I use on AxenFlow for free?",
     answer:
-      "Lead Finder (business lead database), Email Validator, Phone Validator, WhatsApp Checker, and AI Outreach. Sign in to run the tools. Desktop scrapers are available on the download page.",
+      "Lead Finder (business lead database), Email Validator, Phone Validator, and AI Outreach. Sign in to run the tools. Desktop scrapers are available on the download page.",
   },
   {
     question: "What do you build as custom services?",
@@ -302,7 +301,6 @@ export const footerLinks = {
     { label: "Blog", href: "/blog" },
     { label: "Email Validator", href: "/tools/email-validator" },
     { label: "Phone Validator", href: "/tools/phone-validator" },
-    { label: "WhatsApp Checker", href: "/tools/whatsapp-checker" },
     { label: "AI Outreach", href: "/tools/ai-outreach" },
     { label: "BBB Scraper", href: "/bbb-scraper" },
     { label: "About", href: "/about" },

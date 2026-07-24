@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare, MessageCircle } from "lucide-react";
+import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 
@@ -35,14 +35,6 @@ const tools = [
     icon: Phone,
   },
   {
-    title: "WhatsApp Checker",
-    description:
-      "Check if numbers are registered on WhatsApp. Single number or bulk CSV with export.",
-    href: "/tools/whatsapp-checker",
-    status: "Live",
-    icon: MessageCircle,
-  },
-  {
     title: "AI Outreach",
     description:
       "Cold emails, phone scripts, follow-ups. Single lead or CSV/Excel with templates beside each business.",
@@ -72,7 +64,7 @@ export default function ToolsPage() {
     <>
       <PageHero
         title="Tools"
-        description="Lead Finder, Email Validator, Phone Validator, WhatsApp Checker, AI Outreach, desktop scrapers, and guides on the blog. Sign in to run each tool."
+        description="Lead Finder, Email Validator, Phone Validator, AI Outreach, desktop scrapers, and guides on the blog. Sign in to run each tool."
       />
       <Section tight>
         <div className="mx-auto mb-6 flex max-w-5xl flex-wrap gap-4 px-4 text-sm font-semibold sm:px-6">

@@ -10,7 +10,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/tools",
     "/tools/email-validator",
     "/tools/phone-validator",
-    "/tools/whatsapp-checker",
     "/tools/ai-outreach",
     "/blog",
     ...getAllBlogSlugs().map((slug) => `/blog/${slug}`),
