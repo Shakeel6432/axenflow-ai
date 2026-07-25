@@ -303,6 +303,7 @@ export const footerLinks = {
     { label: "Phone Validator", href: "/tools/phone-validator" },
     { label: "AI Outreach", href: "/tools/ai-outreach" },
     { label: "BBB Scraper", href: "/bbb-scraper" },
+    { label: "Yellow Pages Scraper", href: "/yellow-pages-scraper" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],

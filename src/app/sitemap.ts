@@ -16,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/bbb-scraper",
     "/bbb-scraper/validate",
     "/bbb-scraper/outreach",
+    "/yellow-pages-scraper",
     "/services",
     "/portfolio",
     "/about",
