@@ -22,13 +22,19 @@ export default async function DownloadPage() {
     <>
       <PageHero
         title="Desktop Scrapers"
-        description="Download AxenFlow AI scrapers. Always use them with a VPN. Unpack the RAR, then run the app."
+        description="Download AxenFlow AI BBB Scraper and Yellow Pages Scraper for Windows. Always use with a VPN. Unpack, then run the app."
       />
       <Section tight>
         <div className="mx-auto w-full max-w-3xl">
-          <div className="mb-4">
+          <div className="mb-4 flex flex-wrap items-center gap-4">
             <Link href="/tools" className="text-sm text-indigo-500 hover:text-teal-500">
               ← Back to Tools
+            </Link>
+            <Link href="/blog/bbbscraper" className="text-sm text-indigo-500 hover:text-teal-500">
+              BBB Scraper guide
+            </Link>
+            <Link href="/bbb-scraper" className="text-sm text-indigo-500 hover:text-teal-500">
+              BBB Scraper page
             </Link>
           </div>
           <div className="grid gap-4">

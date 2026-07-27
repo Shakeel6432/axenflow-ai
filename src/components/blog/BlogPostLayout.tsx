@@ -9,18 +9,43 @@ type BlogPostLayoutProps = {
   children: React.ReactNode;
 };
 
+const DEFAULT_CTA = {
+  title: "Explore AxenFlowAI tools",
+  description: "Lead database, validators, AI outreach, and desktop scrapers. Free to start.",
+  primary: { href: "/tools", label: "Browse Tools" },
+  secondary: [
+    { href: "/leads", label: "Lead Finder" },
+    { href: "/download", label: "Desktop Scrapers" },
+  ],
+};
+
 export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
+  const cta = post.cta ?? DEFAULT_CTA;
+
   return (
     <>
       <Section tight className="pt-24 sm:pt-28">
         <Container>
           <div className="mx-auto max-w-3xl">
-            <Link
-              href="/blog"
-              className="text-sm font-semibold text-indigo-500 hover:text-teal-500"
-            >
-              ← Back to Blog
-            </Link>
+            <nav aria-label="Breadcrumb" className="text-sm" style={{ color: "var(--c-text-muted)" }}>
+              <ol className="flex flex-wrap items-center gap-1.5">
+                <li>
+                  <Link href="/" className="font-semibold text-indigo-500 hover:text-teal-500">
+                    Home
+                  </Link>
+                </li>
+                <li aria-hidden="true">/</li>
+                <li>
+                  <Link href="/blog" className="font-semibold text-indigo-500 hover:text-teal-500">
+                    Blog
+                  </Link>
+                </li>
+                <li aria-hidden="true">/</li>
+                <li className="truncate" style={{ color: "var(--c-text-dim)" }}>
+                  {post.category || "Guide"}
+                </li>
+              </ol>
+            </nav>
             <p className="mt-4 text-sm" style={{ color: "var(--c-text-muted)" }}>
               {new Date(post.publishedAt).toLocaleDateString("en-US", {
                 year: "numeric",
@@ -29,6 +54,7 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
               })}
               {" · "}
               {post.readingMinutes} min read
+              {post.category ? ` · ${post.category}` : ""}
             </p>
             <h1
               className="mt-3 font-[var(--font-space)] text-3xl font-bold tracking-tight sm:text-4xl"
@@ -39,6 +65,20 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
             <p className="mt-4 text-lg leading-relaxed" style={{ color: "var(--c-text-dim)" }}>
               {post.description}
             </p>
+            {post.coverImage ? (
+              <figure className="blog-figure mt-8">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={post.coverImage}
+                  alt={post.coverAlt || post.title}
+                  width={1200}
+                  height={675}
+                  className="h-auto w-full rounded-2xl"
+                  loading="eager"
+                  decoding="async"
+                />
+              </figure>
+            ) : null}
           </div>
         </Container>
       </Section>
@@ -48,7 +88,12 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
           <article
             className="blog-prose mx-auto max-w-3xl space-y-6 text-base leading-relaxed"
             style={{ color: "var(--c-text-dim)" }}
+            itemScope
+            itemType="https://schema.org/BlogPosting"
           >
+            <meta itemProp="headline" content={post.title} />
+            <meta itemProp="description" content={post.description} />
+            <meta itemProp="datePublished" content={post.publishedAt} />
             {children}
           </article>
 
@@ -57,22 +102,20 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
             style={{ border: "1px solid var(--c-border)", background: "var(--c-hover-bg)" }}
           >
             <h2 className="text-lg font-semibold" style={{ color: "var(--c-heading)" }}>
-              Validate your phone list free
+              {cta.title}
             </h2>
             <p className="mt-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
-              Upload CSV, detect Mobile vs Landline vs VoIP, and export clean E.164 numbers on
-              AxenFlowAI Phone Validator.
+              {cta.description}
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button href="/tools/phone-validator" variant="green">
-                Open Phone Validator
+              <Button href={cta.primary.href} variant="green">
+                {cta.primary.label}
               </Button>
-              <Button href="/tools/email-validator" variant="outline">
-                Email Validator
-              </Button>
-              <Button href="/tools/ai-outreach" variant="outline">
-                AI Outreach
-              </Button>
+              {(cta.secondary ?? []).map((item) => (
+                <Button key={item.href} href={item.href} variant="outline">
+                  {item.label}
+                </Button>
+              ))}
             </div>
           </div>
         </Container>

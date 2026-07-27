@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { siteConfig } from "@/lib/constants";
 import { getSessionUser } from "@/lib/auth-guards";
 import { AuthRequired } from "@/components/auth/AuthRequired";
@@ -9,9 +10,16 @@ import { EmailValidatorClient } from "@/components/tools/EmailValidatorClient";
 import { ToolHubLinks } from "@/components/tools/ToolHubLinks";
 
 export const metadata: Metadata = {
-  title: "Email Validator",
+  title: "Email Validator | Bulk Email Validation CSV",
   description:
-    "Validate emails with syntax, DNS, MX, disposable, and hard-bounce estimates. Upload CSV or check a single address.",
+    "Validate emails with syntax, DNS, MX, disposable, role, and hard bounce estimates. Upload CSV or check a single address on AxenFlowAI.",
+  keywords: [
+    "email validator",
+    "bulk email validation",
+    "validate emails CSV",
+    "MX record check",
+    "disposable email filter",
+  ],
   alternates: { canonical: `${siteConfig.url}/tools/email-validator` },
 };
 
@@ -32,6 +40,13 @@ export default async function EmailValidatorPage() {
       <Section tight>
         <Container>
           <ToolHubLinks current="/tools/email-validator" />
+          <p className="mb-6 text-sm" style={{ color: "var(--c-text-muted)" }}>
+            New to list cleaning? Read the{" "}
+            <Link href="/blog/bulkemailvalidation" className="text-indigo-500 hover:text-teal-500">
+              bulk email validation guide
+            </Link>{" "}
+            for CSV prep, check meanings, and export tips.
+          </p>
           {isAuthed ? (
             <EmailValidatorClient />
           ) : (

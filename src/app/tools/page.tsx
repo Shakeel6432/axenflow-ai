@@ -45,7 +45,7 @@ const tools = [
   {
     title: "Desktop Scrapers",
     description:
-      "Agency products from AxenFlow AI for fresh leads. Use with a VPN, unpack the RAR, then run the app.",
+      "AxenFlow AI BBB Scraper and Yellow Pages Scraper for Windows. Use with a VPN, unpack, then run the app.",
     href: "/download",
     status: "Live",
     icon: Wrench,
@@ -71,8 +71,20 @@ export default function ToolsPage() {
           <Link href="/blog" className="text-indigo-500 hover:text-teal-500">
             Blog guides
           </Link>
-          <Link href="/blog/bulk-phone-validation-csv-guide" className="text-indigo-500 hover:text-teal-500">
+          <Link href="/blog/businessleaddatabase" className="text-indigo-500 hover:text-teal-500">
+            Lead database guide
+          </Link>
+          <Link href="/blog/bulkemailvalidation" className="text-indigo-500 hover:text-teal-500">
+            Bulk email validation guide
+          </Link>
+          <Link href="/blog/bulkphonevalidation" className="text-indigo-500 hover:text-teal-500">
             Bulk phone validation guide
+          </Link>
+          <Link href="/blog/aioutreach" className="text-indigo-500 hover:text-teal-500">
+            AI Outreach guide
+          </Link>
+          <Link href="/blog/bbbscraper" className="text-indigo-500 hover:text-teal-500">
+            BBB Scraper guide
           </Link>
         </div>
         <div className="mx-auto grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">

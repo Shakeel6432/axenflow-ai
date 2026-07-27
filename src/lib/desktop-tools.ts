@@ -9,10 +9,10 @@ export type DesktopTool = {
 
 export const DESKTOP_TOOLS: DesktopTool[] = [
   {
-    id: "axenflowai-desktop-scraper-windows",
-    name: "AxenFlow AI Desktop Scraper",
+    id: "axenflowai-bbb-scraper-windows",
+    name: "AxenFlow AI BBB Scraper",
     description:
-      "Fresh-lead Windows scraper from AxenFlow AI. Always use this tool with a VPN. Download the RAR, unpack it, then run the app.",
+      "Better Business Bureau (BBB) lead scraper for Windows. Search by keyword and US state, export CSV/Excel. Always use with a VPN. Download the RAR, unpack it, then run the app.",
     platform: "Windows",
     downloadUrl:
       "https://github.com/Shakeel6432/axenflow-ai/releases/download/scraper-windows/axenflowai-desktop-scraper-windows.rar",

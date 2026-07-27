@@ -35,6 +35,20 @@ const nextConfig: NextConfig = {
   outputFileTracingExcludes: {
     "*": ["./public/downloads/**", "./scripts/**", "./axenflow-ai.zip", "./java_v3.zip"],
   },
+  async redirects() {
+    return [
+      {
+        source: "/blog/bulk-phone-validation-csv-guide",
+        destination: "/blog/bulkphonevalidation",
+        permanent: true,
+      },
+      {
+        source: "/blog/lead-database-search-export-guide",
+        destination: "/blog/businessleaddatabase",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

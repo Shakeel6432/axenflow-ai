@@ -6,32 +6,21 @@ import { AuthRequired } from "@/components/auth/AuthRequired";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
-import { Button } from "@/components/ui/Button";
-import { Accordion } from "@/components/ui/Accordion";
 import { PhoneValidatorClient } from "@/components/tools/PhoneValidatorClient";
 import { ToolHubLinks } from "@/components/tools/ToolHubLinks";
-import { PHONE_VALIDATOR_FAQS, phoneValidatorFaqSchema } from "@/lib/phone-validator-faq";
 
 export const metadata: Metadata = {
-  title: {
-    absolute: "Phone Number Validator | Free International Check | AxenFlowAI",
-  },
+  title: "Phone Validator | Bulk Phone Validation CSV",
   description:
-    "Validate phone numbers for any country. Detect Mobile, Landline, or VoIP, clean CSV lists, and export results. Free online phone validator by AxenFlowAI.",
+    "Validate phone numbers for any country. Detect Mobile, Landline, or VoIP, normalize to E.164, and export clean CSV results on AxenFlowAI.",
   keywords: [
-    "phone number validator",
-    "phone validator online",
+    "phone validator",
     "bulk phone validation",
+    "validate phone numbers CSV",
     "E.164 phone validation",
     "international phone validator",
   ],
   alternates: { canonical: `${siteConfig.url}/tools/phone-validator` },
-  openGraph: {
-    title: "Phone Number Validator | Free International Check",
-    description:
-      "Validate phone numbers for any country. Detect Mobile, Landline, or VoIP and export clean CSV results.",
-    url: `${siteConfig.url}/tools/phone-validator`,
-  },
 };
 
 export default async function PhoneValidatorPage() {
@@ -41,80 +30,33 @@ export default async function PhoneValidatorPage() {
   return (
     <>
       <PageHero
-        wide
-        singleLine
-        title="Free Phone Number Validator for Every Country"
+        title="Phone Validator"
         description={
           isAuthed
-            ? "Validate any country number locally: Mobile vs Landline vs VoIP, country, and likely operator. No third party API."
-            : "Browse the tool here. Sign in to validate numbers and upload CSV files."
+            ? "Validate any country number: Mobile vs Landline vs VoIP, country, and likely operator. Upload CSV or check a single number."
+            : "Browse the tool here. Sign in to validate numbers or upload CSV files."
         }
       />
       <Section tight>
         <Container>
           <ToolHubLinks current="/tools/phone-validator" />
-
-          <div
-            className="mb-8 rounded-2xl p-5 text-sm leading-relaxed sm:p-6"
-            style={{ border: "1px solid var(--c-border)", background: "var(--c-hover-bg)" }}
-          >
-            <p style={{ color: "var(--c-text-dim)" }}>
-              Bad phone data wastes dialer budget and slows sales teams. Validate international
-              formats, detect line type, normalize to E.164, and export clean CSV results. Pair with{" "}
-              <Link href="/tools/email-validator" className="text-indigo-400 hover:text-teal-400">
-                Email Validator
-              </Link>
-              ,{" "}
-              <Link href="/leads" className="text-indigo-400 hover:text-teal-400">
-                Lead Finder
-              </Link>
-              , or{" "}
-              <Link href="/tools/ai-outreach" className="text-indigo-400 hover:text-teal-400">
-                AI Outreach
-              </Link>
-              . Read our{" "}
-              <Link
-                href="/blog/bulk-phone-validation-csv-guide"
-                className="text-indigo-400 hover:text-teal-400"
-              >
-                bulk CSV validation guide
-              </Link>
-              .
-            </p>
-            <div className="mt-4">
-              <Button href="/tools/phone-validator#validator" variant="green" size="sm">
-                Jump to validator
-              </Button>
-            </div>
-          </div>
-
-          <div id="validator">
-            {isAuthed ? (
-              <PhoneValidatorClient />
-            ) : (
-              <AuthRequired
-                callbackUrl="/tools/phone-validator"
-                message="Sign in to validate phone numbers and upload CSV files."
-              />
-            )}
-          </div>
-
-          <div className="mt-12">
-            <h2
-              className="mb-4 font-[var(--font-space)] text-xl font-bold sm:text-2xl"
-              style={{ color: "var(--c-heading)" }}
-            >
-              Phone Validator FAQ
-            </h2>
-            <Accordion items={PHONE_VALIDATOR_FAQS} />
-          </div>
+          <p className="mb-6 text-sm" style={{ color: "var(--c-text-muted)" }}>
+            New to list cleaning? Read the{" "}
+            <Link href="/blog/bulkphonevalidation" className="text-indigo-500 hover:text-teal-500">
+              bulk phone validation guide
+            </Link>{" "}
+            for CSV prep, result fields, and export tips.
+          </p>
+          {isAuthed ? (
+            <PhoneValidatorClient />
+          ) : (
+            <AuthRequired
+              callbackUrl="/tools/phone-validator"
+              message="Sign in to validate phone numbers and upload CSV files."
+            />
+          )}
         </Container>
       </Section>
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(phoneValidatorFaqSchema()) }}
-      />
     </>
   );
 }

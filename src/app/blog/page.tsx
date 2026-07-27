@@ -8,14 +8,26 @@ import { Container } from "@/components/ui/Container";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "AxenFlowAI Blog | Lead Generation, Validation & Automation Guides",
+    absolute: "AxenFlowAI Blog | Business Lead Database, Validation & Outreach Guides",
   },
   description:
-    "Practical guides on phone validation, email hygiene, AI outreach, scraping, and automation from the AxenFlowAI team.",
+    "SEO guides on business lead database search, bulk phone validation, email hygiene, AI outreach, and lead export workflows from AxenFlowAI.",
+  keywords: [
+    "business lead database",
+    "bulk phone validation",
+    "lead finder guide",
+    "export business leads",
+    "AxenFlowAI blog",
+  ],
   alternates: { canonical: `${siteConfig.url}/blog` },
+  robots: { index: true, follow: true },
 };
 
 export default function BlogIndexPage() {
+  const posts = [...BLOG_POSTS].sort(
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
+
   return (
     <>
       <PageHero
@@ -25,28 +37,42 @@ export default function BlogIndexPage() {
       <Section tight>
         <Container>
           <div className="mx-auto grid max-w-3xl gap-4">
-            {BLOG_POSTS.map((post) => (
+            {posts.map((post) => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="glass-card block rounded-2xl p-6 transition hover:border-indigo-500/30"
+                className="glass-card block overflow-hidden rounded-2xl transition hover:border-indigo-500/30"
                 style={{ border: "1px solid var(--c-border)" }}
               >
-                <p className="text-xs uppercase tracking-wide" style={{ color: "var(--c-text-muted)" }}>
-                  {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                  {" · "}
-                  {post.readingMinutes} min read
-                </p>
-                <h2 className="mt-2 text-lg font-semibold" style={{ color: "var(--c-heading)" }}>
-                  {post.title}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--c-text-dim)" }}>
-                  {post.description}
-                </p>
+                {post.coverImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={post.coverImage}
+                    alt={post.coverAlt || post.title}
+                    width={1200}
+                    height={420}
+                    className="h-40 w-full object-cover sm:h-48"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : null}
+                <div className="p-6">
+                  <p className="text-xs uppercase tracking-wide" style={{ color: "var(--c-text-muted)" }}>
+                    {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                    {" · "}
+                    {post.readingMinutes} min read
+                  </p>
+                  <h2 className="mt-2 text-lg font-semibold" style={{ color: "var(--c-heading)" }}>
+                    {post.title}
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--c-text-dim)" }}>
+                    {post.description}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>

@@ -1133,4 +1133,22 @@ select.form-input optgroup {
 .blog-prose .blog-ol {
   list-style: decimal;
 }
+.blog-figure {
+  margin: 1.75rem 0;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--c-border);
+  background: var(--c-hover-bg);
+}
+.blog-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.blog-caption {
+  padding: 0.75rem 1rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--c-text-muted);
+}
 

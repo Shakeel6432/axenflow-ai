@@ -15,7 +15,8 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 
-const tool = DESKTOP_TOOLS[0];
+const tool =
+  DESKTOP_TOOLS.find((t) => t.id === "axenflowai-bbb-scraper-windows") ?? DESKTOP_TOOLS[0];
 
 export const metadata: Metadata = {
   title: "BBB Scraper | Find & Validate Business Leads",
@@ -116,6 +117,9 @@ export default function BbbScraperPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Button href="/download" size="lg" variant="green">
               Download desktop app <Download size={16} />
+            </Button>
+            <Button href="/blog/bbbscraper" size="lg" variant="outline">
+              BBB Scraper guide
             </Button>
             <Button href="/tools/email-validator" size="lg" variant="outline">
               Email Validator
