@@ -110,7 +110,7 @@ export function SavedLeadsClient() {
         <div className="mt-6 flex items-center justify-center gap-3">
           <button
             type="button"
-            className="rounded-lg px-4 py-2 text-sm"
+            className="cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 hover:border-indigo-500/60 hover:bg-[var(--c-hover-bg)] hover:text-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
             style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
             disabled={page <= 1 || loading}
             onClick={() => load(page - 1)}
@@ -122,7 +122,7 @@ export function SavedLeadsClient() {
           </span>
           <button
             type="button"
-            className="rounded-lg px-4 py-2 text-sm"
+            className="cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 hover:border-indigo-500/60 hover:bg-[var(--c-hover-bg)] hover:text-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
             style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
             disabled={page >= data.totalPages || loading}
             onClick={() => load(page + 1)}

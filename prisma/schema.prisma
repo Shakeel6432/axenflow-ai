@@ -164,6 +164,7 @@ model Business {
   @@index([reviewsCount])
   @@index([createdAt])
   @@index([status])
+  @@index([status, createdAt])
   @@index([city, categoryName])
   @@index([state, categoryName])
   @@map("businesses")

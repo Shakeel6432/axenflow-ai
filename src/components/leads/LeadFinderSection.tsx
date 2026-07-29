@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   BookmarkPlus,
@@ -44,6 +44,9 @@ const emptyResult: PaginatedSearchResult = {
   totalPages: 0,
 };
 
+const pagerBtnClass =
+  "cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 hover:border-indigo-500/60 hover:bg-[var(--c-hover-bg)] hover:text-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-[var(--c-border)] disabled:hover:bg-transparent disabled:hover:text-[var(--c-heading)]";
+
 function asOptions(value: unknown): Option[] {
   return Array.isArray(value) ? (value as Option[]) : [];
 }
@@ -73,9 +76,11 @@ export function LeadFinderSection({
   const [data, setData] = useState<PaginatedSearchResult>(emptyResult);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [actionMsg, setActionMsg] = useState("");
+  const abortRef = useRef<AbortController | null>(null);
+  const totalRef = useRef(0);
 
   const visibleResults = isPreview ? data.results.slice(0, 3) : data.results;
   const selectedLeads = useMemo(
@@ -166,7 +171,7 @@ export function LeadFinderSection({
       .catch(() => setCities([]));
   }, [state, states]);
 
-  const buildParams = (nextPage: number) => {
+  const buildParams = (nextPage: number, opts?: { paginate?: boolean }) => {
     const params = new URLSearchParams();
     if (keyword.trim()) params.set("keyword", keyword.trim());
     if (mainCategory) params.set("mainCategory", mainCategory);
@@ -179,32 +184,46 @@ export function LeadFinderSection({
     if (sort) params.set("sort", sort);
     params.set("page", String(nextPage));
     params.set("pageSize", isPreview ? "3" : "20");
+    if (opts?.paginate && totalRef.current > 0) {
+      params.set("skipTotal", "true");
+      params.set("knownTotal", String(totalRef.current));
+    }
     return params;
   };
 
-  const runSearch = (nextPage = 1) => {
+  const runSearch = async (nextPage = 1, opts?: { paginate?: boolean }) => {
     setPage(nextPage);
     setError("");
     setSearched(true);
-    const params = buildParams(nextPage);
-    startTransition(async () => {
-      try {
-        const res = await fetch(`/api/search?${params.toString()}`);
-        const json = await res.json();
-        if (!res.ok) {
-          setError(json.error || "Search failed");
-          setData(emptyResult);
-          setSelectedIds(new Set());
-          return;
-        }
-        setData(json);
-        setSelectedIds(new Set());
-      } catch {
-        setError("Network error while searching leads");
+    setPending(true);
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const params = buildParams(nextPage, opts);
+    try {
+      const res = await fetch(`/api/search?${params.toString()}`, { signal: controller.signal });
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.error || "Search failed");
         setData(emptyResult);
+        totalRef.current = 0;
         setSelectedIds(new Set());
+        return;
       }
-    });
+      setData(json);
+      totalRef.current = typeof json.total === "number" ? json.total : 0;
+      setSelectedIds(new Set());
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      setError("Network error while searching leads");
+      setData(emptyResult);
+      totalRef.current = 0;
+      setSelectedIds(new Set());
+    } finally {
+      if (abortRef.current === controller) setPending(false);
+    }
   };
 
   useEffect(() => {
@@ -379,7 +398,7 @@ export function LeadFinderSection({
               <p className="mb-3 text-xs text-teal-500">{actionMsg}</p>
             )}
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className={`grid gap-4 md:grid-cols-2 ${pending ? "opacity-60 pointer-events-none" : ""}`}>
               {visibleResults.map((item) => (
                 <BusinessResultCard
                   key={item.id}
@@ -422,22 +441,23 @@ export function LeadFinderSection({
               <div className="mt-6 flex items-center justify-center gap-3">
                 <button
                   type="button"
-                  className="rounded-lg px-4 py-2 text-sm"
+                  className={pagerBtnClass}
                   style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
                   disabled={page <= 1 || pending}
-                  onClick={() => runSearch(page - 1)}
+                  onClick={() => void runSearch(page - 1, { paginate: true })}
                 >
                   Previous
                 </button>
-                <span className="text-sm" style={{ color: "var(--c-text-muted)" }}>
+                <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--c-text-muted)" }}>
+                  {pending ? <Loader2 size={14} className="animate-spin text-indigo-500" /> : null}
                   Page {data.page} of {data.totalPages}
                 </span>
                 <button
                   type="button"
-                  className="rounded-lg px-4 py-2 text-sm"
+                  className={pagerBtnClass}
                   style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
                   disabled={page >= data.totalPages || pending}
-                  onClick={() => runSearch(page + 1)}
+                  onClick={() => void runSearch(page + 1, { paginate: true })}
                 >
                   Next
                 </button>

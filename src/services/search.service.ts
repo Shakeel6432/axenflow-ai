@@ -113,20 +113,14 @@ export function buildBusinessWhere(params: SearchParams): Prisma.BusinessWhereIn
     mainCategory: params.mainCategory,
     category: params.category,
   });
+  // Match on denormalized categoryName only (indexed) — avoid category-table joins.
   if (categoryNames?.length === 1) {
-    const name = categoryNames[0];
-    and.push({
-      OR: [
-        { categoryName: { equals: name, mode: "insensitive" } },
-        { category: { slug: { equals: name.toLowerCase().replace(/\s+/g, "-") } } },
-      ],
-    });
+    and.push({ categoryName: { equals: categoryNames[0], mode: "insensitive" } });
   } else if (categoryNames && categoryNames.length > 1) {
     and.push({
-      OR: categoryNames.flatMap((name) => [
-        { categoryName: { equals: name, mode: "insensitive" as const } },
-        { category: { slug: { equals: name.toLowerCase().replace(/\s+/g, "-") } } },
-      ]),
+      OR: categoryNames.map((name) => ({
+        categoryName: { equals: name, mode: "insensitive" as const },
+      })),
     });
   }
 
@@ -171,45 +165,55 @@ export async function searchBusinesses(params: SearchParams): Promise<PaginatedS
     const pageSize = Math.min(MAX_PAGE_SIZE, Math.max(1, params.pageSize ?? DEFAULT_PAGE_SIZE));
     const where = buildBusinessWhere(params);
     const orderBy = buildOrderBy(params.sort ?? "newest");
+    const reuseTotal =
+      params.skipTotal === true &&
+      typeof params.knownTotal === "number" &&
+      params.knownTotal >= 0;
 
-    const [total, rows] = await Promise.all([
-      prisma.business.count({ where }),
-      prisma.business.findMany({
-        where,
-        orderBy,
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        select: {
-          id: true,
-          slug: true,
-          businessName: true,
-          owner: true,
-          categoryName: true,
-          address: true,
-          city: true,
-          state: true,
-          country: true,
-          phone: true,
-          website: true,
-          email: true,
-          rating: true,
-          reviewsCount: true,
-          googleMapsUrl: true,
-        },
-      }),
-    ]);
+    const select = {
+      id: true,
+      slug: true,
+      businessName: true,
+      owner: true,
+      categoryName: true,
+      address: true,
+      city: true,
+      state: true,
+      country: true,
+      phone: true,
+      website: true,
+      email: true,
+      rating: true,
+      reviewsCount: true,
+      googleMapsUrl: true,
+    } as const;
 
-    void prisma.searchHistory
-      .create({
-        data: {
-          userId: params.userId ?? null,
-          keyword: params.keyword ?? null,
-          city: params.city ?? params.state ?? null,
-          category: params.category ?? params.mainCategory ?? null,
-          totalResults: total,
-        },
-      })
-      .catch(() => undefined);
+    const rowsPromise = prisma.business.findMany({
+      where,
+      orderBy,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      select,
+    });
+
+    const [total, rows] = reuseTotal
+      ? [params.knownTotal as number, await rowsPromise]
+      : await Promise.all([prisma.business.count({ where }), rowsPromise]);
+
+    // Log first-page searches only — pagination should stay fast.
+    if (page === 1 && !reuseTotal) {
+      void prisma.searchHistory
+        .create({
+          data: {
+            userId: params.userId ?? null,
+            keyword: params.keyword ?? null,
+            city: params.city ?? params.state ?? null,
+            category: params.category ?? params.mainCategory ?? null,
+            totalResults: total,
+          },
+        })
+        .catch(() => undefined);
+    }
 
     return {
       results: rows.map(toCard),

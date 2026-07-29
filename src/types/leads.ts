@@ -16,6 +16,9 @@ export type SearchParams = {
   sort?: SearchSort;
   page?: number;
   pageSize?: number;
+  /** Skip COUNT(*) on pagination — reuse knownTotal from the first search. */
+  skipTotal?: boolean;
+  knownTotal?: number;
   /** When set, search is attributed to this user in search_history */
   userId?: string;
 };

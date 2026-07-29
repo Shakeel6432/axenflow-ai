@@ -30,6 +30,8 @@ const schema = z.object({
   sort: z.enum(["newest", "rating", "reviews", "alphabetical"]).optional(),
   page: z.coerce.number().int().min(1).optional(),
   pageSize: z.coerce.number().int().min(1).max(50).optional(),
+  skipTotal: queryBoolean,
+  knownTotal: z.coerce.number().int().min(0).optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -71,6 +73,8 @@ export async function GET(req: NextRequest) {
       ...parsed.data,
       page,
       pageSize,
+      skipTotal: Boolean(userId && parsed.data.skipTotal && parsed.data.knownTotal != null),
+      knownTotal: parsed.data.knownTotal,
       userId: userId || undefined,
     });
 

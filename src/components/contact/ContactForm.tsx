@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2, Loader2, Paperclip, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { caseStudyRequestMessage } from "@/lib/portfolio";
 
 const MAX_FILES = 3;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -14,7 +16,16 @@ function formatBytes(n: number) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function ContactForm() {
+function messageFromParams(searchParams: URLSearchParams): string {
+  const direct = searchParams.get("message")?.trim();
+  if (direct) return direct.slice(0, 4000);
+  const project = searchParams.get("project")?.trim();
+  if (project) return caseStudyRequestMessage(project);
+  return "";
+}
+
+function ContactFormInner() {
+  const searchParams = useSearchParams();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -23,6 +34,14 @@ export function ContactForm() {
   const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [prefilled, setPrefilled] = useState(false);
+
+  useEffect(() => {
+    const next = messageFromParams(searchParams);
+    if (!next) return;
+    setMessage(next);
+    setPrefilled(true);
+  }, [searchParams]);
 
   const fileLabel =
     files.length ? `${files.length} file${files.length > 1 ? "s" : ""} selected` : "Add PDF, DOC, PNG, JPG, or ZIP";
@@ -58,6 +77,7 @@ export function ContactForm() {
     setFiles([]);
     setHoneypot("");
     setErrorMsg("");
+    setPrefilled(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -199,10 +219,18 @@ export function ContactForm() {
           required
           rows={3}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            setPrefilled(false);
+          }}
           disabled={busy}
           placeholder="Tell us about your project..."
         />
+        {prefilled ? (
+          <p className="mt-1.5 text-[11px]" style={{ color: "var(--c-text-muted)" }}>
+            Prefilled from a portfolio case-study request — edit before sending if needed.
+          </p>
+        ) : null}
       </div>
 
       <div>
@@ -276,5 +304,23 @@ export function ContactForm() {
         )}
       </Button>
     </form>
+  );
+}
+
+function ContactFormFallback() {
+  return (
+    <div
+      className="glass-card min-h-[360px] w-full animate-pulse rounded-2xl p-5 sm:p-6"
+      style={{ background: "var(--c-surface)" }}
+      aria-hidden
+    />
+  );
+}
+
+export function ContactForm() {
+  return (
+    <Suspense fallback={<ContactFormFallback />}>
+      <ContactFormInner />
+    </Suspense>
   );
 }

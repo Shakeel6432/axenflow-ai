@@ -207,51 +207,6 @@ export const whyChooseUs = [
   },
 ] as const;
 
-export const portfolioItems = [
-  {
-    title: "B2B Lead Scraper",
-    category: "Web Scraping",
-    description:
-      "Desktop scraper that pulls 500+ verified leads per week. Clients clean lists with our Phone and Email validators before outreach.",
-    image: "/images/portfolio/img1.png",
-  },
-  {
-    title: "WhatsApp Booking Bot",
-    category: "AI WhatsApp Agents",
-    description:
-      "A clinic uses this AI WhatsApp agent for bookings and reminders.",
-    image: "/images/portfolio/img2.png",
-  },
-  {
-    title: "Smart Email Sorter",
-    category: "AI Email Agents",
-    description:
-      "An e-commerce brand gets 200+ emails a day. Our AI sorts, replies to common ones, and flags urgent issues.",
-    image: "/images/portfolio/img3.png",
-  },
-  {
-    title: "CRM Sync System",
-    category: "Workflow Automation",
-    description:
-      "Connected HubSpot, Google Sheets, and Slack so Lead Finder exports and validated contacts stay in sync.",
-    image: "/images/portfolio/img4.png",
-  },
-  {
-    title: "Price Tracker",
-    category: "Web Scraping",
-    description:
-      "Monitors competitor prices across 50+ product categories daily and alerts the team when prices change.",
-    image: "/images/portfolio/img5.png",
-  },
-  {
-    title: "Outreach Pipeline",
-    category: "Custom AI Solutions",
-    description:
-      "Lead list to validated contacts to AI Outreach scripts in one flow for a sales team running bulk campaigns.",
-    image: "/images/portfolio/img6.png",
-  },
-] as const;
-
 export const faqs = [
   {
     question: "What can I use on AxenFlow for free?",
