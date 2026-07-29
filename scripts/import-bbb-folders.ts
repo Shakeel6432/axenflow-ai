@@ -13,7 +13,10 @@ import { firstContactValue, formatDisplayAddress, parseUsAddress, US_STATE_NAMES
 import { normalizeEmail, normalizePhone } from "../src/lib/normalize";
 import { buildBusinessSlug, slugify, businessNameSortKey } from "../src/lib/slug";
 
-const prisma = new PrismaClient();
+const dbUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
+const prisma = new PrismaClient(
+  dbUrl ? { datasources: { db: { url: dbUrl } } } : undefined
+);
 const BATCH = 500;
 
 type Row = Record<string, string>;
