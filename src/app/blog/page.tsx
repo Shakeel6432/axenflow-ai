@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { siteConfig } from "@/lib/constants";
 import { BLOG_POSTS } from "@/lib/blog/posts";
 import { PageHero } from "@/components/ui/PageHero";

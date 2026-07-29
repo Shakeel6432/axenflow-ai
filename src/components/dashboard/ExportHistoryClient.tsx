@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { Loader2 } from "lucide-react";
 
 type ExportRow = {

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { Mail, MessageSquare, CheckCircle2, ExternalLink, Clock } from "lucide-react";
 import { contactGuidelines, getProjectInquiryMailtoLink, siteConfig } from "@/lib/constants";
 import { EmailInquiryButton } from "@/components/contact/EmailInquiryButton";

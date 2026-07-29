@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { ArrowUpRight, Bot, MessageCircle, Mail, Globe, Workflow, Cpu } from "lucide-react";
 import { services } from "@/lib/constants";
 import { Section } from "@/components/ui/Section";

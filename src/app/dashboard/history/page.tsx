@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { redirect } from "next/navigation";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 import { requireUser, userIdFromSession } from "@/lib/auth-guards";

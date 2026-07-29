@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { Lock } from "lucide-react";
 import { Section } from "@/components/ui/Section";
 

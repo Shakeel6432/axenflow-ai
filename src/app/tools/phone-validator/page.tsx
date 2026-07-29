@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { siteConfig } from "@/lib/constants";
 import { getSessionUser } from "@/lib/auth-guards";
 import { AuthRequired } from "@/components/auth/AuthRequired";

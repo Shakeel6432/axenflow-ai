@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { Clock3, ExternalLink, ImageIcon, Video } from "lucide-react";
 import type { PortfolioProject } from "@/lib/portfolio";
 import { caseStudyRequestHref } from "@/lib/portfolio";

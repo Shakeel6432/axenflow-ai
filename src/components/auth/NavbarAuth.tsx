@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { signOut, useSession } from "next-auth/react";
 import { ArrowRight } from "lucide-react";
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { siteConfig } from "@/lib/constants";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";

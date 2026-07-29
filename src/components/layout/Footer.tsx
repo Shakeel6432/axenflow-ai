@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/AppLink";
 import { Mail } from "lucide-react";
 import { footerLinks, siteConfig } from "@/lib/constants";
 import { Logo } from "@/components/ui/Logo";
