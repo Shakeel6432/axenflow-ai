@@ -312,7 +312,7 @@ export const BLOG_POSTS: BlogPostMeta[] = [
       {
         question: "What filters does the Lead Finder support?",
         answer:
-          "Keyword, main category, sub category, country, state, city, Has Phone, Has Email, and sort options including newest, highest rating, most reviews, and alphabetical.",
+          "Keyword, main category, sub category, country, state, city, Has Phone, Has Email, and sort options including newest first, oldest first, A–Z, and Z–A.",
       },
       {
         question: "What columns are included when I export leads?",

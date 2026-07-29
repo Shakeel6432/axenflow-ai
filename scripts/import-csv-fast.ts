@@ -4,7 +4,7 @@ import { parse } from "csv-parse/sync";
 import { PrismaClient } from "@prisma/client";
 import { firstContactValue, formatDisplayAddress, parseUsAddress, US_STATE_NAMES } from "../src/lib/address";
 import { normalizeEmail, normalizePhone } from "../src/lib/normalize";
-import { buildBusinessSlug, slugify } from "../src/lib/slug";
+import { buildBusinessSlug, slugify, businessNameSortKey } from "../src/lib/slug";
 
 const prisma = new PrismaClient();
 const BATCH = 50;
@@ -140,6 +140,7 @@ async function main() {
     batch.push({
       slug,
       businessName,
+      nameSort: businessNameSortKey(businessName),
       owner: (row.Owner || "").trim() || null,
       categoryId: category.id,
       categoryName: category.name,
@@ -168,7 +169,7 @@ async function main() {
   const total = await prisma.business.count();
   console.log(
     JSON.stringify(
-      { totalRows: rows.length, imported, skippedDuplicates, skippedInvalid, businessesInDb: total },
+      { totalRows: rows.length, imported, skippedDuplicates, skippedInvalid, skippedNoContact, businessesInDb: total },
       null,
       2
     )

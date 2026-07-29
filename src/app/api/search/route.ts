@@ -27,7 +27,7 @@ const schema = z.object({
   hasWebsite: queryBoolean,
   hasPhone: queryBoolean,
   hasEmail: queryBoolean,
-  sort: z.enum(["newest", "rating", "reviews", "alphabetical"]).optional(),
+  sort: z.enum(["newest", "oldest", "alphabetical", "alphabetical_desc"]).optional(),
   page: z.coerce.number().int().min(1).optional(),
   pageSize: z.coerce.number().int().min(1).max(50).optional(),
   skipTotal: queryBoolean,

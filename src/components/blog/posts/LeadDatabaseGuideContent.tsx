@@ -54,7 +54,7 @@ export function LeadDatabaseGuideContent() {
           <strong>Has Phone / Has Email:</strong> Contact ready subsets for calling or mailing
         </li>
         <li>
-          <strong>Sort:</strong> Newest, highest rating, most reviews, alphabetical
+          <strong>Sort:</strong> Newest first, oldest first, A–Z, Z–A
         </li>
       </ul>
 
@@ -83,7 +83,7 @@ export function LeadDatabaseGuideContent() {
         <li>Pick a main category, or type a keyword if you know the niche term.</li>
         <li>Set country, then state, then city when you need geo focus.</li>
         <li>Enable Has Phone for calling, Has Email for mail sequences, or both.</li>
-        <li>Sort by rating or reviews when you want higher signal local businesses.</li>
+        <li>Use A–Z / Z–A when you want a stable name order for dialing or CRM import.</li>
         <li>Click Search Leads and review the result cards.</li>
       </ol>
       <p>
@@ -196,8 +196,8 @@ export function LeadDatabaseGuideContent() {
               ],
               [
                 "High intent locals",
-                "Ignoring rating/reviews sort",
-                "Sort by rating or reviews after niche + city",
+                "Exporting without contact filters",
+                "Require Has Phone / Has Email, then sort A–Z for dialing lists",
               ],
             ].map(([goal, mistake, better]) => (
               <tr key={goal} style={{ borderTop: "1px solid var(--c-border)" }}>
@@ -285,8 +285,8 @@ export function LeadDatabaseGuideContent() {
       </p>
       <p>
         <strong>What filters does the Lead Finder support?</strong> Keyword, main category, sub
-        category, country, state, city, Has Phone, Has Email, and sort options including newest,
-        highest rating, most reviews, and alphabetical.
+        category, country, state, city, Has Phone, Has Email, and sort options including newest
+        first, oldest first, A–Z, and Z–A.
       </p>
       <p>
         <strong>What columns are included when I export leads?</strong> Exports include Business

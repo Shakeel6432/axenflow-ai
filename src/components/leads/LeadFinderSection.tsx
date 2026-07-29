@@ -330,10 +330,10 @@ export function LeadFinderSection({
               value={sort}
               onChange={(v) => setSort(v as SearchSort)}
               options={[
-                { value: "newest", label: "Newest" },
-                { value: "rating", label: "Highest Rating" },
-                { value: "reviews", label: "Most Reviews" },
-                { value: "alphabetical", label: "Alphabetical" },
+                { value: "newest", label: "Newest First" },
+                { value: "oldest", label: "Oldest First" },
+                { value: "alphabetical", label: "A–Z" },
+                { value: "alphabetical_desc", label: "Z–A" },
               ]}
             />
           </Field>

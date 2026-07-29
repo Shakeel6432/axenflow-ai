@@ -81,13 +81,12 @@ function toCard(row: {
 
 function buildOrderBy(sort: SearchSort = "newest"): Prisma.BusinessOrderByWithRelationInput[] {
   switch (sort) {
-    case "rating":
-      // Put rated leads first; null ratings sink to the bottom.
-      return [{ rating: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }];
-    case "reviews":
-      return [{ reviewsCount: "desc" }, { rating: { sort: "desc", nulls: "last" } }];
     case "alphabetical":
-      return [{ businessName: "asc" }];
+      return [{ nameSort: { sort: "asc", nulls: "last" } }, { businessName: "asc" }];
+    case "alphabetical_desc":
+      return [{ nameSort: { sort: "desc", nulls: "last" } }, { businessName: "desc" }];
+    case "oldest":
+      return [{ createdAt: "asc" }];
     case "newest":
     default:
       return [{ createdAt: "desc" }];

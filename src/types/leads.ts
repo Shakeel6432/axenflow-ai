@@ -1,4 +1,4 @@
-export type SearchSort = "newest" | "rating" | "reviews" | "alphabetical";
+export type SearchSort = "newest" | "oldest" | "alphabetical" | "alphabetical_desc";
 
 export type SearchParams = {
   keyword?: string;

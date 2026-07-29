@@ -90,7 +90,7 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
     state: stateName,
     page,
     pageSize: 20,
-    sort: "rating",
+    sort: "newest",
   });
 
   const results = isAuthed ? data.results : redactBusinessList(data.results);

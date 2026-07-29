@@ -130,6 +130,7 @@ model Business {
   id            String         @id @default(cuid())
   slug          String         @unique
   businessName  String         @map("business_name")
+  nameSort      String?        @map("name_sort")
   owner         String?
   categoryId    String?        @map("category_id")
   categoryName  String         @map("category")
@@ -154,6 +155,7 @@ model Business {
   savedBy       SavedLead[]
 
   @@index([businessName])
+  @@index([nameSort])
   @@index([categoryName])
   @@index([city])
   @@index([state])

@@ -14,3 +14,11 @@ export function buildBusinessSlug(businessName: string, city?: string | null, id
   if (!base) return `business-${idHint ?? Date.now()}`;
   return base.slice(0, 180);
 }
+
+/** Sort key for A–Z: strip leading punctuation, case-insensitive. */
+export function businessNameSortKey(name: string): string {
+  return name
+    .trim()
+    .replace(/^[^a-zA-Z0-9]+/, "")
+    .toLowerCase();
+}

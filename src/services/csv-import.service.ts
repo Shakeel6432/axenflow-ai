@@ -1,7 +1,7 @@
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 import { firstContactValue, formatDisplayAddress, parseUsAddress, US_STATE_NAMES } from "@/lib/address";
 import { normalizeEmail, normalizePhone, normalizeWebsite } from "@/lib/normalize";
-import { buildBusinessSlug, slugify } from "@/lib/slug";
+import { buildBusinessSlug, slugify, businessNameSortKey } from "@/lib/slug";
 
 export type CsvBusinessRow = {
   business_name?: string;
@@ -224,6 +224,7 @@ export async function importBusinessRows(
         data: {
           slug,
           businessName: normalized.businessName,
+          nameSort: businessNameSortKey(normalized.businessName),
           owner: normalized.owner,
           categoryId: category.id,
           categoryName: category.name,

@@ -11,7 +11,7 @@ import { parse } from "csv-parse/sync";
 import { PrismaClient } from "@prisma/client";
 import { firstContactValue, formatDisplayAddress, parseUsAddress, US_STATE_NAMES } from "../src/lib/address";
 import { normalizeEmail, normalizePhone } from "../src/lib/normalize";
-import { buildBusinessSlug, slugify } from "../src/lib/slug";
+import { buildBusinessSlug, slugify, businessNameSortKey } from "../src/lib/slug";
 
 const prisma = new PrismaClient();
 const BATCH = 500;
@@ -178,6 +178,7 @@ async function importFile(
     const data = slice.map((p) => ({
       slug: `${buildBusinessSlug(p.businessName, p.city)}-${stamp}-${(p.index + 1).toString(36)}`,
       businessName: p.businessName,
+      nameSort: businessNameSortKey(p.businessName),
       owner: p.owner,
       categoryId: category.id,
       categoryName: category.name,
