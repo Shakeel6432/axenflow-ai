@@ -58,6 +58,7 @@ async function main() {
   let imported = 0;
   let skippedDuplicates = 0;
   let skippedInvalid = 0;
+  let skippedNoContact = 0;
   let batch: Parameters<typeof prisma.business.createMany>[0]["data"] = [];
 
   async function flush() {
@@ -108,6 +109,10 @@ async function main() {
     const parsed = parseUsAddress(row.Address || row.address || "");
     const phone = normalizePhone(firstContactValue(row["Phone Numbers"] || row.phone));
     const email = normalizeEmail(firstContactValue(row.Emails || row.email));
+    if (!phone && !email) {
+      skippedNoContact += 1;
+      continue;
+    }
     const city = parsed.city;
     const state =
       parsed.state ||

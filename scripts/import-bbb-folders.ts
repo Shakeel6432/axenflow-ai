@@ -116,6 +116,7 @@ async function importFile(
   const locations = new Map<string, { stateName: string; cityName: string | null }>();
   let skippedDuplicates = 0;
   let skippedInvalid = 0;
+  let skippedNoContact = 0;
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -128,6 +129,10 @@ async function importFile(
     const parsedAddr = parseUsAddress(row.Address || row.address || "");
     const phone = normalizePhone(firstContactValue(row["Phone Numbers"] || row.phone));
     const email = normalizeEmail(firstContactValue(row.Emails || row.email));
+    if (!phone && !email) {
+      skippedNoContact += 1;
+      continue;
+    }
     const city = parsedAddr.city;
     const state =
       parsedAddr.state ||
@@ -202,9 +207,10 @@ async function importFile(
       imported,
       skippedDuplicates,
       skippedInvalid,
+      skippedNoContact,
     })
   );
-  return { imported, skippedDuplicates, skippedInvalid, totalRows: rows.length };
+  return { imported, skippedDuplicates, skippedInvalid, skippedNoContact, totalRows: rows.length };
 }
 
 async function main() {
@@ -243,7 +249,7 @@ async function main() {
   }
   console.log(`Existing fingerprint keys: ${caches.seenBusiness.size}`);
 
-  const totals = { files: 0, totalRows: 0, imported: 0, skippedDuplicates: 0, skippedInvalid: 0 };
+  const totals = { files: 0, totalRows: 0, imported: 0, skippedDuplicates: 0, skippedInvalid: 0, skippedNoContact: 0 };
 
   for (const folder of folders) {
     const files = listCsvFiles(folder);
@@ -259,6 +265,7 @@ async function main() {
       totals.imported += r.imported;
       totals.skippedDuplicates += r.skippedDuplicates;
       totals.skippedInvalid += r.skippedInvalid;
+      totals.skippedNoContact += r.skippedNoContact;
     }
   }
 

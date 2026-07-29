@@ -4,6 +4,7 @@ import { prisma, isDatabaseConfigured } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
 import { assertApiBotGuard, antiScrapeHeaders, getClientIpFromHeaders } from "@/lib/bot-guard";
 import { redactBusinessList } from "@/lib/redact-business";
+import { buildBusinessWhere } from "@/services/search.service";
 
 export async function GET(req: NextRequest) {
   const bot = assertApiBotGuard(req, { strict: true });
@@ -51,10 +52,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(business, { headers: antiScrapeHeaders() });
     }
 
+    const where = buildBusinessWhere({});
+
     const [total, results] = await Promise.all([
-      prisma.business.count({ where: { status: "APPROVED" } }),
+      prisma.business.count({ where }),
       prisma.business.findMany({
-        where: { status: "APPROVED" },
+        where,
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,

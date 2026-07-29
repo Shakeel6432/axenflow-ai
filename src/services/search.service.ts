@@ -38,6 +38,11 @@ function hasNonEmpty(field: "website" | "phone" | "email"): Prisma.BusinessWhere
   };
 }
 
+/** At least one outreach channel — hide address-only rows from Lead Finder. */
+function hasPhoneOrEmail(): Prisma.BusinessWhereInput {
+  return { OR: [hasNonEmpty("phone"), hasNonEmpty("email")] };
+}
+
 function toCard(row: {
   id: string;
   slug: string;
@@ -90,7 +95,7 @@ function buildOrderBy(sort: SearchSort = "newest"): Prisma.BusinessOrderByWithRe
 }
 
 export function buildBusinessWhere(params: SearchParams): Prisma.BusinessWhereInput {
-  const and: Prisma.BusinessWhereInput[] = [{ status: "APPROVED" }];
+  const and: Prisma.BusinessWhereInput[] = [{ status: "APPROVED" }, hasPhoneOrEmail()];
 
   if (params.keyword?.trim()) {
     const q = params.keyword.trim();
