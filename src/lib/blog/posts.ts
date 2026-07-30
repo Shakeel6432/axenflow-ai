@@ -27,6 +27,85 @@ export type BlogPostMeta = {
 
 export const BLOG_POSTS: BlogPostMeta[] = [
   {
+    slug: "csvexcelconverter",
+    title: "CSV to Excel Converter Guide: Convert, Format & Export Spreadsheets Free",
+    description:
+      "Step by step guide to converting CSV to Excel and Excel to CSV. Auto-format columns, handle multiple sheets, and export clean files free with AxenFlowAI.",
+    publishedAt: "2026-07-30",
+    updatedAt: "2026-07-30",
+    keywords: [
+      "csv to excel converter",
+      "convert csv to excel free",
+      "excel to csv converter",
+      "csv to xlsx online",
+      "bulk csv to excel conversion",
+      "csv file won't open in excel correctly",
+      "csv encoding issues excel",
+      "how to convert excel to csv without losing data",
+      "AxenFlowAI CSV Excel converter",
+    ],
+    readingMinutes: 9,
+    category: "Data Tools",
+    coverImage: "/images/blog/csvexcelconverter-cover.png",
+    coverAlt:
+      "AxenFlowAI CSV to Excel Converter showing file upload, sheet preview, and formatted spreadsheet export",
+    cta: {
+      title: "Convert CSV ⇄ Excel free",
+      description:
+        "Upload CSV or Excel, preview, auto-format, and download polished XLSX or clean CSV — 100% in your browser on AxenFlowAI.",
+      primary: {
+        href: "/tools/csv-excel-converter",
+        label: "Open CSV Excel Converter",
+      },
+      secondary: [
+        { href: "/tools/email-validator", label: "Email Validator" },
+        { href: "/tools/phone-validator", label: "Phone Validator" },
+      ],
+    },
+    faqs: [
+      {
+        question: "Why does my phone number lose the leading zero when I open a CSV in Excel?",
+        answer:
+          "Excel treats the value as a number and drops leading zeros. Convert with Phone or ZIP forced to Text, or prefix with an apostrophe in Excel. AxenFlowAI can mark those columns as text on export.",
+      },
+      {
+        question: "Can I convert multiple CSV files to one Excel workbook?",
+        answer:
+          "Yes. Upload several CSVs and keep combine-into-one-workbook enabled so each file becomes its own sheet.",
+      },
+      {
+        question: "Does converting CSV to Excel keep my formulas?",
+        answer:
+          "No. CSV stores values only, not formulas. Excel to CSV exports calculated values, not formula strings.",
+      },
+      {
+        question: "What's the maximum file size I can convert?",
+        answer:
+          "Up to 50MB per file. Larger files may take longer; keep the tab open during progress stages.",
+      },
+      {
+        question: "Is this CSV to Excel converter really free?",
+        answer:
+          "Yes. The converter page does not require signup to convert files in the browser.",
+      },
+      {
+        question: "Does this tool work on mobile?",
+        answer:
+          "Yes. The upload zone and preview table are responsive; use horizontal scroll on the preview on small screens.",
+      },
+      {
+        question: "Is my data uploaded to a server or processed locally?",
+        answer:
+          "Processed locally in your browser. Nothing is uploaded to AxenFlowAI servers for conversion.",
+      },
+      {
+        question: "What's the difference between .xls and .xlsx?",
+        answer:
+          ".xlsx is the modern Office Open XML format. .xls is the older binary format. The converter reads both; new Excel downloads use .xlsx.",
+      },
+    ],
+  },
+  {
     slug: "bulkphonevalidation",
     title: "Bulk Phone Validation Guide: Clean CSV Lists Before You Dial",
     description:

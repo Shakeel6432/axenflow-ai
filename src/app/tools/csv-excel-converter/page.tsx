@@ -79,7 +79,11 @@ export default function CsvExcelConverterPage() {
         <Container>
           <ToolHubLinks current="/tools/csv-excel-converter" />
           <p className="mb-6 text-sm" style={{ color: "var(--c-text-muted)" }}>
-            Pair with{" "}
+            Read the{" "}
+            <Link href="/blog/csvexcelconverter" className="text-indigo-500 hover:text-teal-500">
+              CSV to Excel Converter Guide
+            </Link>
+            , then pair with{" "}
             <Link href="/tools/email-validator" className="text-indigo-500 hover:text-teal-500">
               Email Validator
             </Link>{" "}

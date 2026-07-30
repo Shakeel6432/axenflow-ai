@@ -11,12 +11,13 @@ export const metadata: Metadata = {
     absolute: "AxenFlowAI Blog | Business Lead Database, Validation & Outreach Guides",
   },
   description:
-    "SEO guides on business lead database search, bulk phone validation, email hygiene, AI outreach, and lead export workflows from AxenFlowAI.",
+    "SEO guides on business lead database search, bulk phone validation, email hygiene, AI outreach, CSV to Excel conversion, and lead export workflows from AxenFlowAI.",
   keywords: [
     "business lead database",
     "bulk phone validation",
     "lead finder guide",
     "export business leads",
+    "csv to excel converter",
     "AxenFlowAI blog",
   ],
   alternates: { canonical: `${siteConfig.url}/blog` },

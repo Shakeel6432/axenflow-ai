@@ -94,6 +94,9 @@ export default function ToolsPage() {
           <Link href="/blog/bbbscraper" className="text-indigo-500 hover:text-teal-500">
             BBB Scraper guide
           </Link>
+          <Link href="/blog/csvexcelconverter" className="text-indigo-500 hover:text-teal-500">
+            CSV to Excel Converter guide
+          </Link>
         </div>
         <div className="mx-auto grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map(({ title, description, href, status, icon: Icon }) => (

@@ -13,12 +13,14 @@ import { BulkEmailValidationGuideContent } from "@/components/blog/posts/BulkEma
 import { AiOutreachGuideContent } from "@/components/blog/posts/AiOutreachGuideContent";
 import { BbbScraperGuideContent } from "@/components/blog/posts/BbbScraperGuideContent";
 import { LeadDatabaseGuideContent } from "@/components/blog/posts/LeadDatabaseGuideContent";
+import { CsvExcelConverterGuideContent } from "@/components/blog/posts/CsvExcelConverterGuideContent";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 const CONTENT: Record<string, ComponentType> = {
+  csvexcelconverter: CsvExcelConverterGuideContent,
   bulkphonevalidation: BulkPhoneValidationGuideContent,
   bulkemailvalidation: BulkEmailValidationGuideContent,
   aioutreach: AiOutreachGuideContent,
