@@ -257,6 +257,7 @@ export const footerLinks = {
     { label: "Email Validator", href: "/tools/email-validator" },
     { label: "Phone Validator", href: "/tools/phone-validator" },
     { label: "AI Outreach", href: "/tools/ai-outreach" },
+    { label: "CSV ⇄ Excel Converter", href: "/tools/csv-excel-converter" },
     { label: "BBB Scraper", href: "/bbb-scraper" },
     { label: "Yellow Pages Scraper", href: "/yellow-pages-scraper" },
     { label: "About", href: "/about" },

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "@/components/ui/AppLink";
-import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare } from "lucide-react";
+import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare, FileSpreadsheet } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 
 export const metadata: Metadata = {
   title: "Tools",
   description:
-    "AxenFlow AI tools hub: lead finder, email validator, phone validator, AI outreach, desktop scrapers, and blog guides.",
+    "AxenFlow AI tools hub: lead finder, email validator, phone validator, AI outreach, CSV Excel converter, desktop scrapers, and blog guides.",
 };
 
 const tools = [
@@ -43,6 +43,14 @@ const tools = [
     icon: MessageSquare,
   },
   {
+    title: "CSV ⇄ Excel Converter",
+    description:
+      "Browser-only CSV ↔ Excel conversion with auto-detect, multi-sheet export, and styled XLSX no uploads.",
+    href: "/tools/csv-excel-converter",
+    status: "Live",
+    icon: FileSpreadsheet,
+  },
+  {
     title: "Desktop Scrapers",
     description:
       "AxenFlow AI BBB Scraper and Yellow Pages Scraper for Windows. Use with a VPN, unpack, then run the app.",
@@ -64,7 +72,7 @@ export default function ToolsPage() {
     <>
       <PageHero
         title="Tools"
-        description="Lead Finder, Email Validator, Phone Validator, AI Outreach, desktop scrapers, and guides on the blog. Sign in to run each tool."
+        description="Lead Finder, validators, AI Outreach, CSV⇄Excel converter, desktop scrapers, and guides on the blog."
       />
       <Section tight>
         <div className="mx-auto mb-6 flex max-w-5xl flex-wrap gap-4 px-4 text-sm font-semibold sm:px-6">

@@ -1,5 +1,5 @@
 import Link from "@/components/ui/AppLink";
-import { Database, Mail, Phone, Sparkles, Wrench } from "lucide-react";
+import { Database, Mail, Phone, Sparkles, Wrench, FileSpreadsheet } from "lucide-react";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { HomeReveal } from "@/components/home/HomeReveal";
@@ -38,6 +38,14 @@ const platformTools = [
     color: "#14b8a6",
   },
   {
+    name: "CSV ⇄ Excel",
+    blurb: "Private browser-only file conversion",
+    href: "/tools/csv-excel-converter",
+    Icon: FileSpreadsheet,
+    bg: "bg-indigo-500/10",
+    color: "#818cf8",
+  },
+  {
     name: "Desktop Scrapers",
     blurb: "Agency scrapers for fresh leads",
     href: "/download",
@@ -57,7 +65,7 @@ export function TrustedTechnologies() {
         />
       </HomeReveal>
 
-      <HomeReveal stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <HomeReveal stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6">
         {platformTools.map((tool) => (
           <Link
             key={tool.name}

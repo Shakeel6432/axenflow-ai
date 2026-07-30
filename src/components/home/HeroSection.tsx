@@ -10,6 +10,7 @@ import {
   Wrench,
   Play,
   Zap,
+  FileSpreadsheet,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -52,6 +53,7 @@ const toolChips = [
   { href: "/tools/email-validator", label: "Email", icon: Mail, color: "#2dd4bf" },
   { href: "/tools/phone-validator", label: "Phone", icon: Phone, color: "#a78bfa" },
   { href: "/tools/ai-outreach", label: "Outreach", icon: Sparkles, color: "#fbbf24" },
+  { href: "/tools/csv-excel-converter", label: "CSV⇄Excel", icon: FileSpreadsheet, color: "#34d399" },
 ] as const;
 
 export function HeroSection() {

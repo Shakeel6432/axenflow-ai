@@ -3,8 +3,9 @@ import Link from "@/components/ui/AppLink";
 const LINKS = [
   { href: "/leads", label: "Lead Finder" },
   { href: "/tools/email-validator", label: "Email Validator" },
-  { href: "/tools/ai-outreach", label: "AI Outreach" },
   { href: "/tools/phone-validator", label: "Phone Validator" },
+  { href: "/tools/ai-outreach", label: "AI Outreach" },
+  { href: "/tools/csv-excel-converter", label: "CSV ⇄ Excel" },
   { href: "/blog", label: "Blog" },
   { href: "/tools", label: "All tools" },
 ] as const;
