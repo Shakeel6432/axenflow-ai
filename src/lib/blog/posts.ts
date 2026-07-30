@@ -168,9 +168,9 @@ export const BLOG_POSTS: BlogPostMeta[] = [
     slug: "bulkemailvalidation",
     title: "Bulk Email Validation Guide: Clean CSV Lists Before You Send",
     description:
-      "Step by step guide to bulk email validation with syntax, DNS, MX, disposable, and role checks. Upload CSV, export valid emails, and protect deliverability with AxenFlowAI.",
+      "Step by step bulk email validation guide: free single email check, syntax DNS MX disposable role checks, CSV upload limits, and Valid-only export on AxenFlowAI.",
     publishedAt: "2026-07-28",
-    updatedAt: "2026-07-28",
+    updatedAt: "2026-07-31",
     keywords: [
       "bulk email validation",
       "email validator",
@@ -179,18 +179,19 @@ export const BLOG_POSTS: BlogPostMeta[] = [
       "MX record check",
       "disposable email filter",
       "hard bounce estimate",
+      "free email checker",
       "AxenFlowAI email validator",
       "email deliverability",
     ],
-    readingMinutes: 9,
+    readingMinutes: 10,
     category: "Lead Validation",
     coverImage: "/images/blog/emailvalidator-cover.png",
     coverAlt:
-      "AxenFlowAI Email Validator showing bulk email validation summary for valid invalid and disposable emails",
+      "AxenFlowAI Email Validator free single email check with Valid status badge and checklist",
     cta: {
-      title: "Validate your email list free",
+      title: "Try the free email check, then clean your CSV",
       description:
-        "Run syntax, DNS, MX, disposable, and role checks. Upload CSV and download clean Valid emails on AxenFlowAI.",
+        "No signup for a single check. Sign in for bulk CSV validation with syntax, DNS, MX, disposable, and role flags.",
       primary: { href: "/tools/email-validator", label: "Open Email Validator" },
       secondary: [
         { href: "/tools/phone-validator", label: "Phone Validator" },
@@ -199,24 +200,29 @@ export const BLOG_POSTS: BlogPostMeta[] = [
     },
     faqs: [
       {
-        question: "Is AxenFlowAI Email Validator free to use?",
+        question: "Is there a free email check without signup?",
         answer:
-          "Yes after you sign in. Run single checks or upload CSV, Excel, or JSON and download cleaned results.",
+          "Yes. The Email Validator page includes a rate-limited free single-email check with a status badge and checklist. Bulk CSV upload requires an account.",
       },
       {
         question: "Does this confirm the mailbox exists with a live SMTP check?",
         answer:
-          "No. It validates format, DNS, MX, disposable domains, role flags, and a hard bounce estimate. Live mailbox probing is a separate paid layer for custom projects.",
+          "No. It validates format, DNS, MX, disposable domains, role flags, and a bounce risk estimate. We do not SMTP-probe, so catch-all domains and individual inboxes are not confirmed.",
       },
       {
-        question: "What file formats are supported for bulk email validation?",
+        question: "What's the difference between Invalid and Risky?",
         answer:
-          "CSV, Excel (XLSX), and JSON. CSV and Excel need an Email column. JSON can be an emails array or objects with email fields.",
+          "Invalid means syntax, domain/MX, or disposable failed. Risky on the free check badge usually means a role account or uncertain bounce risk that still looks deliverable at the domain layer.",
       },
       {
-        question: "Can I download only valid emails?",
+        question: "What file formats and limits apply to bulk email validation?",
         answer:
-          "Yes. After validation, download Valid only as CSV, Excel, or JSON for CRM import or outreach.",
+          "CSV, Excel (XLSX), and JSON. Up to 5,000 emails per request and max 8MB. CSV and Excel need an Email column.",
+      },
+      {
+        question: "Do you store or sell the emails I upload?",
+        answer:
+          "Validation is request-scoped for the tool response. Lists are not saved into a marketing database, and we do not sell email lists. See the Privacy Policy for general practices.",
       },
       {
         question: "Should I validate phones too?",
