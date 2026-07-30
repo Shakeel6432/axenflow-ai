@@ -26,7 +26,7 @@ export function BulkEmailValidationGuideContent() {
         <Link href="/tools/email-validator" className="text-indigo-400 hover:text-teal-400">
           free single-email checker
         </Link>{" "}
-        — no signup required. You get a color-coded Valid / Invalid / Risky / Unknown badge plus a
+        (no signup required). You get a color-coded Valid / Invalid / Risky / Unknown badge plus a
         checklist for syntax, DNS, MX, disposable, role, and bounce risk (rate-limited to prevent
         abuse).
       </p>
@@ -34,7 +34,7 @@ export function BulkEmailValidationGuideContent() {
       <BlogFigure
         src="/images/blog/emailvalidator-cover.png"
         alt="AxenFlowAI Email Validator free single email check with Valid status badge and checklist"
-        caption="Free single check above the fold — then unlock bulk CSV upload after you create an account."
+        caption="Free single check above the fold, then unlock bulk CSV upload after you create an account."
         priority
       />
 
@@ -89,7 +89,7 @@ export function BulkEmailValidationGuideContent() {
           mailbox guarantee.
         </li>
         <li>
-          <strong>Bounce risk estimate:</strong> Combines signals into Low / Medium / High — not a
+          <strong>Bounce risk estimate:</strong> Combines signals into Low / Medium / High (not a
           real send
         </li>
       </ul>
@@ -113,7 +113,7 @@ export function BulkEmailValidationGuideContent() {
         <li>A short animated checking sequence (syntax → DNS → MX → flags → bounce risk)</li>
         <li>
           A result card with a status badge: <strong>Valid</strong> (green),{" "}
-          <strong>Invalid</strong> (red), <strong>Risky</strong> (amber — often role accounts), or{" "}
+          <strong>Invalid</strong> (red), <strong>Risky</strong> (amber, often role accounts), or{" "}
           <strong>Unknown</strong> (gray)
         </li>
         <li>
@@ -188,7 +188,7 @@ export function BulkEmailValidationGuideContent() {
       <h2 className="blog-h2">How to run bulk email validation on AxenFlowAI</h2>
       <p>
         Bulk CSV upload is account-gated (that is the list-cleaning product). Guests still see an
-        informative gate with limits and a sample output table — not a blank login wall.
+        informative gate with limits and a sample output table, not a blank login wall.
       </p>
       <ol className="blog-ol">
         <li>
@@ -205,7 +205,7 @@ export function BulkEmailValidationGuideContent() {
         </li>
         <li>
           After sign-in, choose checks (syntax, DNS, MX, disposable, role, bounce estimate, keep
-          one email) and upload CSV / Excel / JSON — or paste a single address in the signed-in
+          one email) and upload CSV / Excel / JSON, or paste a single address in the signed-in
           panel.
         </li>
         <li>Review summary counts: total, valid, invalid, disposable, hard bounce likely.</li>
@@ -264,7 +264,7 @@ export function BulkEmailValidationGuideContent() {
         <Link href="/privacy" className="text-indigo-400 hover:text-teal-400">
           Privacy Policy
         </Link>
-        . We do not invent an overall “99% accuracy” number — DNS/MX layers use live lookups;
+        . We do not invent an overall “99% accuracy” number. DNS/MX layers use live lookups;
         mailbox existence is not SMTP-confirmed.
       </p>
 
@@ -321,7 +321,7 @@ export function BulkEmailValidationGuideContent() {
       <p>
         <strong>What&apos;s the difference between Invalid and Risky?</strong> Invalid means syntax,
         domain/MX, or disposable failed. Risky on the free badge usually means a role account (or
-        uncertain bounce risk) that still looks deliverable at the domain layer — review before
+        uncertain bounce risk) that still looks deliverable at the domain layer. Review before
         cold email.
       </p>
       <p>
@@ -354,7 +354,7 @@ export function BulkEmailValidationGuideContent() {
       <p>
         Start with a free single check to see the badge and checklist, then clean full lists with
         bulk email validation after sign-in. Clean CSV in, Valid emails out, disposable and role
-        flags attached — then send with more confidence. Open the{" "}
+        flags attached, then send with more confidence. Open the{" "}
         <Link href="/tools/email-validator" className="text-indigo-400 hover:text-teal-400">
           Email Validator
         </Link>{" "}

@@ -30,11 +30,11 @@ const LS_KEY = "axenflow_email_free_checks_v1";
 const LS_DAILY_LIMIT = 5;
 
 const STAGES = [
-  "Checking syntax…",
-  "Checking DNS…",
-  "Checking MX records…",
-  "Scanning disposable & role flags…",
-  "Estimating bounce risk…",
+  "Checking syntax...",
+  "Checking DNS...",
+  "Checking MX records...",
+  "Scanning disposable and role flags...",
+  "Estimating bounce risk...",
 ] as const;
 
 function readLocalUsage(): { day: string; count: number } {
@@ -177,7 +177,7 @@ export function EmailSingleCheck() {
             className="font-[var(--font-space)] text-xl font-bold sm:text-2xl"
             style={{ color: "var(--c-heading)" }}
           >
-            Free email check — no signup
+            Free email check (no signup)
           </h2>
           <p className="mt-1 text-sm" style={{ color: "var(--c-text-muted)" }}>
             Test one address with syntax, DNS, MX record check, disposable filter, and bounce
@@ -265,7 +265,7 @@ export function EmailSingleCheck() {
                 warn={result.dns === "Skipped" || result.dns === "Unknown"}
               />
               <span>
-                Domain resolves (DNS) — {result.dns === "Valid" ? "yes" : result.dns.toLowerCase()}
+                Domain resolves (DNS): {result.dns === "Valid" ? "yes" : result.dns.toLowerCase()}
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -275,7 +275,7 @@ export function EmailSingleCheck() {
                 warn={result.mx === "Skipped" || result.mx === "Unknown"}
               />
               <span>
-                Domain has MX records — {result.mx === "Valid" ? "yes" : result.mx.toLowerCase()}
+                Domain has MX records: {result.mx === "Valid" ? "yes" : result.mx.toLowerCase()}
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -304,7 +304,7 @@ export function EmailSingleCheck() {
             <li className="flex items-start gap-2">
               <RowIcon warn />
               <span>
-                Catch-all / mailbox existence — not probed (no live SMTP). Valid MX does not prove
+                Catch-all / mailbox existence: not probed (no live SMTP). Valid MX does not prove
                 the inbox exists.
               </span>
             </li>

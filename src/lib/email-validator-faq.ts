@@ -12,7 +12,7 @@ export const EMAIL_VALIDATOR_FAQS = [
   {
     question: "How accurate is this email validator?",
     answer:
-      "Syntax, DNS, and MX checks use live DNS lookups and are highly reliable for those layers. We do not invent a fake overall accuracy percentage. Without SMTP probing we cannot claim inbox-level certainty — treat Valid as “domain can receive mail,” not “mailbox guaranteed.”",
+      "Syntax, DNS, and MX checks use live DNS lookups and are highly reliable for those layers. We do not invent a fake overall accuracy percentage. Without SMTP probing we cannot claim inbox-level certainty. Treat Valid as domain can receive mail, not mailbox guaranteed.",
   },
   {
     question: "Will validating emails hurt my sender reputation, or help it?",
@@ -22,7 +22,7 @@ export const EMAIL_VALIDATOR_FAQS = [
   {
     question: 'What\'s the difference between "Invalid" and "Risky"?',
     answer:
-      "Invalid means syntax failed, the domain/MX looks broken, or a disposable domain was detected. Risky (on the free check badge) usually means the address looks deliverable at the domain level but is a role account (info@, sales@) or bounce risk is uncertain — review before cold email.",
+      "Invalid means syntax failed, the domain/MX looks broken, or a disposable domain was detected. Risky (on the free check badge) usually means the address looks deliverable at the domain level but is a role account (info@, sales@) or bounce risk is uncertain. Review before cold email.",
   },
   {
     question: "How many emails can I validate for free / how does the CSV upload work?",

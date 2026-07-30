@@ -43,7 +43,7 @@ const CHECKS = [
   },
   {
     title: "Bounce risk estimate",
-    text: "Combines syntax, DNS, and MX signals into a Low / Medium / High estimate — not a real send.",
+    text: "Combines syntax, DNS, and MX signals into a Low / Medium / High estimate (not a real send).",
   },
 ] as const;
 
@@ -168,7 +168,7 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
                   Upload a CSV, Excel, or JSON file with up to <strong>5,000</strong> email addresses
                   (max <strong>8MB</strong>). We check each one for syntax, MX, DNS, disposable,
                   role, and bounce risk, then you download a report with status columns. Bulk upload
-                  is free with an account — no credit system on this tool today.
+                  is free with an account (no credit system on this tool today).
                 </p>
                 <p className="mt-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
                   Processing is request-scoped: uploaded lists are not saved into a marketing
@@ -208,7 +208,7 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
               </table>
             </div>
             <p className="mt-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
-              Sample preview — your signed-in export includes the same style of columns plus DNS/MX
+              Sample preview: your signed-in export includes the same style of columns plus DNS/MX
               detail fields.
             </p>
 
