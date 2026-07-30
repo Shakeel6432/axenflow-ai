@@ -88,18 +88,19 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
     category: category.name,
     city: cityName,
     state: stateName,
-    page,
-    pageSize: 20,
+    page: isAuthed ? page : 1,
+    pageSize: isAuthed ? 20 : 3,
     sort: "newest",
   });
 
-  const results = isAuthed ? data.results : redactBusinessList(data.results);
+  // Teaser-only in HTML for everyone — contacts via /leads reveal flow
+  const results = redactBusinessList(data.results);
 
   const heading = locationSlug
     ? `${category.name} in ${titleCase(locationSlug)}`
     : category.name;
 
-  // Public JSON-LD: name + place + rating only (no phone/email/street for guests)
+  // Public JSON-LD: name + place + rating only (never phone/email/street)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -110,11 +111,8 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
       item: {
         "@type": "LocalBusiness",
         name: item.businessName,
-        ...(isAuthed && item.phone ? { telephone: item.phone } : {}),
-        ...(isAuthed && item.website ? { url: item.website } : {}),
         address: {
           "@type": "PostalAddress",
-          ...(isAuthed && item.address ? { streetAddress: item.address } : {}),
           addressLocality: item.city || undefined,
           addressRegion: item.state || undefined,
           addressCountry: item.country || undefined,
@@ -135,12 +133,12 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageHero
         title={heading}
-        description={`Explore ${data.total} verified ${category.name.toLowerCase()} leads${cityName || stateName ? ` in ${cityName || stateName}` : ""}${isAuthed ? "." : ". Sign in to unlock contact details."}`}
+        description={`Explore ${data.total} verified ${category.name.toLowerCase()} leads${cityName || stateName ? ` in ${cityName || stateName}` : ""}. Open Lead Finder to reveal contacts after sign-in.`}
       />
       <Section tight>
         <div className="grid gap-4 md:grid-cols-2">
           {results.map((business) => (
-            <BusinessResultCard key={business.id} business={business} preview={!isAuthed} />
+            <BusinessResultCard key={business.id} business={business} preview />
           ))}
         </div>
         {!results.length && (

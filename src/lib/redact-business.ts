@@ -1,9 +1,9 @@
-/** Fields guests must not see until they sign in. */
-const CONTACT_KEYS = ["phone", "email", "website", "address", "googleMapsUrl"] as const;
+/** Sensitive fields never included in public list HTML / teaser payloads. */
+const CONTACT_KEYS = ["phone", "email", "website", "address", "googleMapsUrl", "owner"] as const;
 
 type ContactFields = Partial<Record<(typeof CONTACT_KEYS)[number], string | null | undefined>>;
 
-/** Strip phone/email/website/address for unauthenticated responses. */
+/** Strip phone/email/website/address/owner for list/teaser responses. */
 export function redactBusinessContact<T extends ContactFields>(business: T): T {
   const next = { ...business };
   for (const key of CONTACT_KEYS) {

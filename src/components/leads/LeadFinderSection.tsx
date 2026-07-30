@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "@/components/ui/AppLink";
 import {
   BookmarkPlus,
   Copy,
   ExternalLink,
+  Eye,
   Globe,
   MapPin,
   Phone,
@@ -22,6 +23,12 @@ import { GlassSelect } from "@/components/ui/GlassSelect";
 import { LeadBulkToolbar } from "@/components/leads/LeadBulkToolbar";
 import { formatDisplayAddress } from "@/lib/address";
 import { MAIN_CATEGORIES, getMainCategoryName, getSubcategoriesForMain } from "@/lib/category-taxonomy";
+import { buildLeadsQuery, type LeadSearchFilters } from "@/lib/leads-access";
+import {
+  revealLeadContact,
+  revealLeadContacts,
+  saveLeadAction,
+} from "@/app/leads/actions";
 import type { BusinessCard, PaginatedSearchResult, SearchSort } from "@/types/leads";
 
 type Option = { id: string; name: string; slug?: string; code?: string; countryId?: string; stateId?: string };
@@ -29,19 +36,15 @@ type Option = { id: string; name: string; slug?: string; code?: string; countryI
 type LeadFinderProps = {
   initialCategories?: Option[];
   initialCountries?: Option[];
-  /** preview = public teaser (limited results); full = authenticated tools */
   mode?: "preview" | "full";
-  /** Hide inner section title when page already has PageHero */
   hideHeading?: boolean;
   className?: string;
-};
-
-const emptyResult: PaginatedSearchResult = {
-  results: [],
-  page: 1,
-  pageSize: 20,
-  total: 0,
-  totalPages: 0,
+  filters?: LeadSearchFilters;
+  result?: PaginatedSearchResult | null;
+  searched?: boolean;
+  error?: string;
+  authRequiredForPage?: boolean;
+  rateLimitRemaining?: number;
 };
 
 const pagerBtnClass =
@@ -51,41 +54,55 @@ function asOptions(value: unknown): Option[] {
   return Array.isArray(value) ? (value as Option[]) : [];
 }
 
+function hasContact(b: BusinessCard) {
+  return Boolean(b.phone || b.email || b.website || b.address || b.owner);
+}
+
 export function LeadFinderSection({
   initialCategories = [],
   initialCountries = [],
   mode = "preview",
   hideHeading = false,
   className,
+  filters: filtersProp,
+  result = null,
+  searched = false,
+  error = "",
+  authRequiredForPage = false,
 }: LeadFinderProps) {
   const isPreview = mode === "preview";
-  const [keyword, setKeyword] = useState("");
-  const [mainCategory, setMainCategory] = useState("");
-  const [category, setCategory] = useState("");
-  const [country, setCountry] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [hasPhone, setHasPhone] = useState(false);
-  const [hasEmail, setHasEmail] = useState(false);
-  const [sort, setSort] = useState<SearchSort>("newest");
-  const [page, setPage] = useState(1);
-  const [categories, setCategories] = useState(() => asOptions(initialCategories));
-  const [countries, setCountries] = useState(() => asOptions(initialCountries));
+  const [pending, startTransition] = useTransition();
+
+  const [keyword, setKeyword] = useState(filtersProp?.keyword ?? "");
+  const [mainCategory, setMainCategory] = useState(filtersProp?.mainCategory ?? "");
+  const [category, setCategory] = useState(filtersProp?.category ?? "");
+  const [country, setCountry] = useState(filtersProp?.country ?? "");
+  const [state, setState] = useState(filtersProp?.state ?? "");
+  const [city, setCity] = useState(filtersProp?.city ?? "");
+  const [hasPhone, setHasPhone] = useState(filtersProp?.hasPhone ?? false);
+  const [hasEmail, setHasEmail] = useState(filtersProp?.hasEmail ?? false);
+  const [sort, setSort] = useState<SearchSort>(filtersProp?.sort ?? "newest");
+
+  const [categories] = useState(() => asOptions(initialCategories));
+  const [countries] = useState(() => asOptions(initialCountries));
   const [states, setStates] = useState<Option[]>([]);
   const [cities, setCities] = useState<Option[]>([]);
-  const [data, setData] = useState<PaginatedSearchResult>(emptyResult);
-  const [error, setError] = useState("");
-  const [searched, setSearched] = useState(false);
-  const [pending, setPending] = useState(false);
+
+  /** Merge revealed contacts into teaser rows (client memory only). */
+  const [revealedById, setRevealedById] = useState<Record<string, BusinessCard>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [actionMsg, setActionMsg] = useState("");
-  const abortRef = useRef<AbortController | null>(null);
-  const totalRef = useRef(0);
+  const [revealError, setRevealError] = useState("");
 
-  const visibleResults = isPreview ? data.results.slice(0, 3) : data.results;
+  const pageResults = useMemo(() => {
+    const rows = result?.results ?? [];
+    return rows.map((row) => revealedById[row.id] ?? row);
+  }, [result, revealedById]);
+
+  const visibleResults = isPreview ? pageResults.slice(0, 3) : pageResults;
   const selectedLeads = useMemo(
-    () => data.results.filter((r) => selectedIds.has(r.id)),
-    [data.results, selectedIds]
+    () => pageResults.filter((r) => selectedIds.has(r.id)),
+    [pageResults, selectedIds]
   );
   const allPageSelected =
     !isPreview && visibleResults.length > 0 && visibleResults.every((r) => selectedIds.has(r.id));
@@ -128,25 +145,10 @@ export function LeadFinderSection({
     return categories.map((c) => c.name);
   }, [mainCategory, categories]);
 
-  useEffect(() => {
-    if (!categories.length) {
-      fetch("/api/categories")
-        .then((r) => r.json())
-        .then((json) => setCategories(asOptions(json)))
-        .catch(() => undefined);
-    }
-    if (!countries.length) {
-      fetch("/api/countries")
-        .then((r) => r.json())
-        .then((json) => setCountries(asOptions(json)))
-        .catch(() => undefined);
-    }
-  }, [categories.length, countries.length]);
-
+  // Location cascade — metadata only (no lead contacts)
   useEffect(() => {
     if (!country) {
       setStates([]);
-      setState("");
       return;
     }
     const selected = countries.find((c) => c.name === country || c.code === country);
@@ -160,7 +162,6 @@ export function LeadFinderSection({
   useEffect(() => {
     if (!state) {
       setCities([]);
-      setCity("");
       return;
     }
     const selected = states.find((s) => s.name === state || s.slug === state);
@@ -171,67 +172,64 @@ export function LeadFinderSection({
       .catch(() => setCities([]));
   }, [state, states]);
 
-  const buildParams = (nextPage: number, opts?: { paginate?: boolean }) => {
-    const params = new URLSearchParams();
-    if (keyword.trim()) params.set("keyword", keyword.trim());
-    if (mainCategory) params.set("mainCategory", mainCategory);
-    if (category) params.set("category", category);
-    if (country) params.set("country", country);
-    if (state) params.set("state", state);
-    if (city) params.set("city", city);
-    if (hasPhone) params.set("hasPhone", "true");
-    if (hasEmail) params.set("hasEmail", "true");
-    if (sort) params.set("sort", sort);
-    params.set("page", String(nextPage));
-    params.set("pageSize", isPreview ? "3" : "20");
-    if (opts?.paginate && totalRef.current > 0) {
-      params.set("skipTotal", "true");
-      params.set("knownTotal", String(totalRef.current));
-    }
-    return params;
-  };
-
-  const runSearch = async (nextPage = 1, opts?: { paginate?: boolean }) => {
-    setPage(nextPage);
-    setError("");
-    setSearched(true);
-    setPending(true);
-
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    const params = buildParams(nextPage, opts);
-    try {
-      const res = await fetch(`/api/search?${params.toString()}`, { signal: controller.signal });
-      const json = await res.json();
-      if (!res.ok) {
-        setError(json.error || "Search failed");
-        setData(emptyResult);
-        totalRef.current = 0;
-        setSelectedIds(new Set());
-        return;
-      }
-      setData(json);
-      totalRef.current = typeof json.total === "number" ? json.total : 0;
-      setSelectedIds(new Set());
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      setError("Network error while searching leads");
-      setData(emptyResult);
-      totalRef.current = 0;
-      setSelectedIds(new Set());
-    } finally {
-      if (abortRef.current === controller) setPending(false);
-    }
-  };
-
+  // Reset selection when server result page changes
   useEffect(() => {
-    if (!searched) return;
-    const timer = window.setTimeout(() => runSearch(1), 250);
-    return () => window.clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyword, mainCategory, category, country, state, city, hasPhone, hasEmail, sort]);
+    setSelectedIds(new Set());
+    setRevealError("");
+  }, [result?.page, result?.total]);
+
+  const currentFilters = (): LeadSearchFilters => ({
+    keyword,
+    mainCategory,
+    category,
+    country,
+    state,
+    city,
+    hasPhone,
+    hasEmail,
+    sort,
+    page: 1,
+  });
+
+  const navigateSearch = (next: LeadSearchFilters) => {
+    // Full document navigation — appears as Document in DevTools, not /api/search XHR
+    const href = `/leads?${buildLeadsQuery(next)}`;
+    startTransition(() => {
+      window.location.assign(href);
+    });
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigateSearch(currentFilters());
+  };
+
+  const pageHref = (page: number) =>
+    `/leads?${buildLeadsQuery({ ...currentFilters(), page, ...filtersProp, keyword, mainCategory, category, country, state, city, hasPhone, hasEmail, sort })}`;
+
+  const handleReveal = async (id: string) => {
+    setRevealError("");
+    const res = await revealLeadContact(id);
+    if (!res.ok) {
+      setRevealError(res.error);
+      return;
+    }
+    setRevealedById((prev) => ({ ...prev, [id]: res.lead }));
+    setActionMsg(`Contact revealed · ${res.remaining} reveals left today`);
+  };
+
+  const ensureRevealedForExport = async (leads: BusinessCard[]) => {
+    const need = leads.filter((l) => !hasContact(l)).map((l) => l.id);
+    if (!need.length) return leads;
+    const res = await revealLeadContacts(need);
+    if (!res.ok) {
+      setRevealError(res.error);
+      return leads;
+    }
+    const map = Object.fromEntries(res.leads.map((l) => [l.id, l]));
+    setRevealedById((prev) => ({ ...prev, ...map }));
+    return leads.map((l) => map[l.id] ?? revealedById[l.id] ?? l);
+  };
 
   return (
     <Section id="leads" tight={hideHeading} className={className}>
@@ -241,138 +239,180 @@ export function LeadFinderSection({
           description={
             isPreview
               ? "Preview sample leads below. Create a free account for full search, filters, and download access."
-              : "Search business leads, select results, export CSV/Excel/JSON, and save lists to your dashboard."
+              : "Search business leads, reveal contacts with your daily quota, export CSV/Excel/JSON, and save lists."
           }
         />
       )}
 
       <div className="glass-card mx-auto w-full max-w-5xl rounded-2xl p-4 sm:p-6 lg:p-8">
-        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
-          <Field label="Search Keyword">
-            <input
-              className="form-input"
-              placeholder="Business name, owner, phone..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-            />
-          </Field>
-          <Field label="Main Category">
-            <GlassSelect
-              aria-label="Main Category"
-              value={mainCategory}
-              onChange={(v) => {
-                setMainCategory(v);
-                setCategory("");
-              }}
-              options={[
-                { value: "", label: "All main categories" },
-                ...MAIN_CATEGORIES.map((m) => ({ value: m.name, label: m.name })),
-              ]}
-            />
-          </Field>
-          <Field label="Sub Category">
-            <GlassSelect
-              aria-label="Sub Category"
-              value={category}
-              onChange={setCategory}
-              disabled={!subcategoryOptions.length}
-              options={[
-                { value: "", label: "All sub categories" },
-                ...subcategoryOptions.map((name) => ({ value: name, label: name })),
-              ]}
-            />
-          </Field>
-          <Field label="Country">
-            <GlassSelect
-              aria-label="Country"
-              value={country}
-              onChange={(v) => {
-                setCountry(v);
-                setState("");
-                setCity("");
-              }}
-              options={[
-                { value: "", label: "All countries" },
-                ...countries.map((c) => ({ value: c.name, label: c.name })),
-              ]}
-            />
-          </Field>
-          <Field label="State">
-            <GlassSelect
-              aria-label="State"
-              value={state}
-              onChange={(v) => {
-                setState(v);
-                setCity("");
-              }}
-              disabled={!country && !states.length}
-              options={[
-                { value: "", label: "All states" },
-                ...states.map((s) => ({ value: s.name, label: s.name })),
-              ]}
-            />
-          </Field>
-          <Field label="City">
-            <GlassSelect
-              aria-label="City"
-              value={city}
-              onChange={setCity}
-              disabled={!state && !cities.length}
-              options={[
-                { value: "", label: "All cities" },
-                ...cities.map((c) => ({ value: c.name, label: c.name })),
-              ]}
-            />
-          </Field>
-          <Field label="Sort By">
-            <GlassSelect
-              aria-label="Sort By"
-              value={sort}
-              onChange={(v) => setSort(v as SearchSort)}
-              options={[
-                { value: "newest", label: "Newest First" },
-                { value: "oldest", label: "Oldest First" },
-                { value: "alphabetical", label: "A–Z" },
-                { value: "alphabetical_desc", label: "Z–A" },
-              ]}
-            />
-          </Field>
-        </div>
+        <form method="GET" action="/leads" onSubmit={onSubmit} className="contents">
+          <input type="hidden" name="search" value="1" />
+          <input type="hidden" name="mainCategory" value={mainCategory} />
+          <input type="hidden" name="category" value={category} />
+          <input type="hidden" name="country" value={country} />
+          <input type="hidden" name="state" value={state} />
+          <input type="hidden" name="city" value={city} />
+          <input type="hidden" name="sort" value={sort} />
+          <input type="hidden" name="page" value="1" />
+          {hasPhone ? <input type="hidden" name="hasPhone" value="true" /> : null}
+          {hasEmail ? <input type="hidden" name="hasEmail" value="true" /> : null}
 
-        <div className="mt-4 flex flex-wrap items-center gap-4">
-          <label className="flex items-center gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
-            <input type="checkbox" checked={hasPhone} onChange={(e) => setHasPhone(e.target.checked)} className="accent-indigo-500" />
-            Has Phone
-          </label>
-          <label className="flex items-center gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
-            <input type="checkbox" checked={hasEmail} onChange={(e) => setHasEmail(e.target.checked)} className="accent-indigo-500" />
-            Has Email
-          </label>
-        </div>
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
+            <Field label="Search Keyword">
+              <input
+                className="form-input"
+                name="keyword"
+                placeholder="Business name, category, city..."
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+              />
+            </Field>
+            <Field label="Main Category">
+              <GlassSelect
+                aria-label="Main Category"
+                value={mainCategory}
+                onChange={(v) => {
+                  setMainCategory(v);
+                  setCategory("");
+                }}
+                options={[
+                  { value: "", label: "All main categories" },
+                  ...MAIN_CATEGORIES.map((m) => ({ value: m.name, label: m.name })),
+                ]}
+              />
+            </Field>
+            <Field label="Sub Category">
+              <GlassSelect
+                aria-label="Sub Category"
+                value={category}
+                onChange={setCategory}
+                disabled={!subcategoryOptions.length}
+                options={[
+                  { value: "", label: "All sub categories" },
+                  ...subcategoryOptions.map((name) => ({ value: name, label: name })),
+                ]}
+              />
+            </Field>
+            <Field label="Country">
+              <GlassSelect
+                aria-label="Country"
+                value={country}
+                onChange={(v) => {
+                  setCountry(v);
+                  setState("");
+                  setCity("");
+                }}
+                options={[
+                  { value: "", label: "All countries" },
+                  ...countries.map((c) => ({ value: c.name, label: c.name })),
+                ]}
+              />
+            </Field>
+            <Field label="State">
+              <GlassSelect
+                aria-label="State"
+                value={state}
+                onChange={(v) => {
+                  setState(v);
+                  setCity("");
+                }}
+                disabled={!country && !states.length}
+                options={[
+                  { value: "", label: "All states" },
+                  ...states.map((s) => ({ value: s.name, label: s.name })),
+                ]}
+              />
+            </Field>
+            <Field label="City">
+              <GlassSelect
+                aria-label="City"
+                value={city}
+                onChange={setCity}
+                disabled={!state && !cities.length}
+                options={[
+                  { value: "", label: "All cities" },
+                  ...cities.map((c) => ({ value: c.name, label: c.name })),
+                ]}
+              />
+            </Field>
+            <Field label="Sort By">
+              <GlassSelect
+                aria-label="Sort By"
+                value={sort}
+                onChange={(v) => setSort(v as SearchSort)}
+                options={[
+                  { value: "newest", label: "Newest First" },
+                  { value: "oldest", label: "Oldest First" },
+                  { value: "alphabetical", label: "A–Z" },
+                  { value: "alphabetical_desc", label: "Z–A" },
+                ]}
+              />
+            </Field>
+          </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Button type="button" onClick={() => runSearch(1)} disabled={pending}>
-            {pending ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-            Search Leads
-          </Button>
-          {isPreview ? (
-            <Button href="/signup" variant="outline">Unlock Full Access</Button>
-          ) : (
-            <Button href="/dashboard" variant="outline">Back to Dashboard</Button>
-          )}
-        </div>
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <label className="flex items-center gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
+              <input
+                type="checkbox"
+                checked={hasPhone}
+                onChange={(e) => setHasPhone(e.target.checked)}
+                className="accent-indigo-500"
+              />
+              Has Phone
+            </label>
+            <label className="flex items-center gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
+              <input
+                type="checkbox"
+                checked={hasEmail}
+                onChange={(e) => setHasEmail(e.target.checked)}
+                className="accent-indigo-500"
+              />
+              Has Email
+            </label>
+          </div>
 
-        {error && (
-          <p className="mt-4 text-sm text-red-500">{error}</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button type="submit" disabled={pending}>
+              {pending ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+              Search Leads
+            </Button>
+            {isPreview ? (
+              <Button href="/signup" variant="outline">
+                Unlock Full Access
+              </Button>
+            ) : (
+              <Button href="/dashboard" variant="outline">
+                Back to Dashboard
+              </Button>
+            )}
+          </div>
+        </form>
+
+        {(error || revealError) && (
+          <p className="mt-4 text-sm text-red-500">{revealError || error}</p>
+        )}
+        {authRequiredForPage && (
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/signup" className="btn-main rounded-xl px-5 py-2.5 text-sm font-semibold">
+              Create Account
+            </Link>
+            <Link
+              href={`/signin?callbackUrl=${encodeURIComponent("/leads")}`}
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold"
+              style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
+            >
+              Login
+            </Link>
+          </div>
         )}
 
-        {searched && !error && (
+        {searched && !error && result && (
           <div className="mt-8">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm" style={{ color: "var(--c-text-muted)" }}>
                 {isPreview
-                  ? `Previewing ${Math.min(data.results.length, 3)} of ${data.total} matches`
-                  : `${data.total} results found`}
+                  ? `Previewing ${Math.min(result.results.length, 3)} of ${result.total} matches`
+                  : `${result.total} results found · contacts hidden until revealed`}
               </p>
               {!isPreview && visibleResults.length > 0 && (
                 <label className="flex items-center gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
@@ -392,11 +432,10 @@ export function LeadFinderSection({
                 selected={selectedLeads}
                 onClear={() => setSelectedIds(new Set())}
                 onSaved={() => setActionMsg("Leads saved. View them under Dashboard → Saved Leads.")}
+                ensureRevealed={ensureRevealedForExport}
               />
             )}
-            {actionMsg && (
-              <p className="mb-3 text-xs text-teal-500">{actionMsg}</p>
-            )}
+            {actionMsg && <p className="mb-3 text-xs text-teal-500">{actionMsg}</p>}
 
             <div className={`grid gap-4 md:grid-cols-2 ${pending ? "opacity-60 pointer-events-none" : ""}`}>
               {visibleResults.map((item) => (
@@ -407,15 +446,17 @@ export function LeadFinderSection({
                   selectable={!isPreview}
                   selected={selectedIds.has(item.id)}
                   onToggleSelect={() => toggleSelect(item.id)}
+                  revealed={hasContact(item)}
+                  onReveal={!isPreview ? () => handleReveal(item.id) : undefined}
                 />
               ))}
             </div>
-            {!data.results.length && (
+            {!result.results.length && (
               <p className="text-sm" style={{ color: "var(--c-text-dim)" }}>
                 No businesses matched your filters.
               </p>
             )}
-            {isPreview && data.total > 0 && (
+            {isPreview && result.total > 0 && (
               <div
                 className="mt-6 rounded-xl p-5 text-center"
                 style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
@@ -437,30 +478,49 @@ export function LeadFinderSection({
                 </div>
               </div>
             )}
-            {!isPreview && data.totalPages > 1 && (
+            {!isPreview && result.totalPages > 1 && (
               <div className="mt-6 flex items-center justify-center gap-3">
-                <button
-                  type="button"
-                  className={pagerBtnClass}
-                  style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
-                  disabled={page <= 1 || pending}
-                  onClick={() => void runSearch(page - 1, { paginate: true })}
-                >
-                  Previous
-                </button>
+                {/* Plain anchors → Document navigations (SSR), not /api/search XHR */}
+                {result.page > 1 ? (
+                  <a
+                    href={pageHref(result.page - 1)}
+                    className={pagerBtnClass}
+                    style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
+                  >
+                    Previous
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className={pagerBtnClass}
+                    style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
+                    disabled
+                  >
+                    Previous
+                  </button>
+                )}
                 <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--c-text-muted)" }}>
                   {pending ? <Loader2 size={14} className="animate-spin text-indigo-500" /> : null}
-                  Page {data.page} of {data.totalPages}
+                  Page {result.page} of {result.totalPages}
                 </span>
-                <button
-                  type="button"
-                  className={pagerBtnClass}
-                  style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
-                  disabled={page >= data.totalPages || pending}
-                  onClick={() => void runSearch(page + 1, { paginate: true })}
-                >
-                  Next
-                </button>
+                {result.page < result.totalPages ? (
+                  <a
+                    href={pageHref(result.page + 1)}
+                    className={pagerBtnClass}
+                    style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
+                  >
+                    Next
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className={pagerBtnClass}
+                    style={{ border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
+                    disabled
+                  >
+                    Next
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -473,7 +533,9 @@ export function LeadFinderSection({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--c-text-dim)" }}>{label}</label>
+      <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--c-text-dim)" }}>
+        {label}
+      </label>
       {children}
     </div>
   );
@@ -487,6 +549,8 @@ export function BusinessResultCard({
   onToggleSelect,
   onUnsave,
   savedId,
+  revealed = false,
+  onReveal,
 }: {
   business: BusinessCard;
   preview?: boolean;
@@ -495,13 +559,17 @@ export function BusinessResultCard({
   onToggleSelect?: () => void;
   onUnsave?: () => void;
   savedId?: string;
+  revealed?: boolean;
+  onReveal?: () => void | Promise<void>;
 }) {
   const [copied, setCopied] = useState<"phone" | "email" | "">("");
   const [saving, setSaving] = useState(false);
+  const [revealing, setRevealing] = useState(false);
 
-  const locationLine =
-    formatDisplayAddress(business.address) ||
-    [business.city, business.state, business.country].filter(Boolean).join(", ");
+  const locationLine = revealed
+    ? formatDisplayAddress(business.address) ||
+      [business.city, business.state, business.country].filter(Boolean).join(", ")
+    : [business.city, business.state].filter(Boolean).join(", ");
   const mainName = getMainCategoryName(business.category);
 
   const copyText = async (value: string, kind: "phone" | "email") => {
@@ -517,13 +585,19 @@ export function BusinessResultCard({
   const saveOne = async () => {
     setSaving(true);
     try {
-      await fetch("/api/saved-leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessIds: [business.id] }),
-      });
+      await saveLeadAction(business.id);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const reveal = async () => {
+    if (!onReveal) return;
+    setRevealing(true);
+    try {
+      await onReveal();
+    } finally {
+      setRevealing(false);
     }
   };
 
@@ -548,21 +622,26 @@ export function BusinessResultCard({
               />
             )}
             <div className="min-w-0">
-              <h3 className="font-semibold" style={{ color: "var(--c-heading)" }}>{business.businessName}</h3>
+              <h3 className="font-semibold" style={{ color: "var(--c-heading)" }}>
+                {business.businessName}
+              </h3>
               <p className="mt-1 text-xs uppercase tracking-wide text-indigo-500">
                 {mainName ? `${mainName} · ${business.category}` : business.category}
               </p>
             </div>
           </div>
-          {business.owner && (
+          {revealed && business.owner ? (
             <p className="mt-2 flex items-center gap-2 text-sm" style={{ color: "var(--c-text-muted)" }}>
               <User size={14} className="shrink-0" />
               {business.owner}
             </p>
-          )}
+          ) : null}
         </div>
         {business.rating != null && (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs" style={{ background: "rgba(245,158,11,0.12)", color: "#f59e0b" }}>
+          <span
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs"
+            style={{ background: "rgba(245,158,11,0.12)", color: "#f59e0b" }}
+          >
             <Star size={12} /> {business.rating.toFixed(1)} ({business.reviewsCount})
           </span>
         )}
@@ -570,14 +649,17 @@ export function BusinessResultCard({
       {locationLine && (
         <p className="mt-3 flex items-start gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
           <MapPin size={14} className="mt-0.5 shrink-0" />
-          {preview ? [business.city, business.state].filter(Boolean).join(", ") || locationLine : locationLine}
+          {locationLine}
         </p>
       )}
-      {!preview && (
+      {!preview && revealed && (
         <div className="mt-3 flex flex-col gap-2 text-sm">
           {business.phone && (
             <div className="flex flex-wrap items-center gap-2">
-              <a href={`tel:${business.phone}`} className="inline-flex items-center gap-2 text-indigo-500 hover:text-teal-500">
+              <a
+                href={`tel:${business.phone}`}
+                className="inline-flex items-center gap-2 text-indigo-500 hover:text-teal-500"
+              >
                 <Phone size={14} className="shrink-0" /> {business.phone}
               </a>
               <button
@@ -592,7 +674,10 @@ export function BusinessResultCard({
           )}
           {business.email && (
             <div className="flex flex-wrap items-center gap-2">
-              <a href={`mailto:${business.email}`} className="inline-flex items-center gap-2 break-all text-indigo-500 hover:text-teal-500">
+              <a
+                href={`mailto:${business.email}`}
+                className="inline-flex items-center gap-2 break-all text-indigo-500 hover:text-teal-500"
+              >
                 <Mail size={14} className="shrink-0" /> {business.email}
               </a>
               <button
@@ -619,6 +704,18 @@ export function BusinessResultCard({
       )}
       {!preview && (
         <div className="mt-4 flex flex-wrap gap-2">
+          {!revealed && onReveal && (
+            <button
+              type="button"
+              onClick={() => void reveal()}
+              disabled={revealing}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+              style={{ background: "rgba(20,184,166,0.15)", color: "#2dd4bf" }}
+            >
+              {revealing ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
+              Reveal Contact
+            </button>
+          )}
           {savedId && onUnsave ? (
             <button
               type="button"
@@ -644,7 +741,7 @@ export function BusinessResultCard({
       )}
       {preview && (
         <p className="mt-3 text-xs" style={{ color: "var(--c-text-dim)" }}>
-          Phone & email unlock after you sign in.
+          Phone & email unlock after you sign in and reveal contacts.
         </p>
       )}
     </article>

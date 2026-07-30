@@ -5,8 +5,8 @@ Production-ready lead finder layered onto the existing Next.js marketing site.
 ## Features
 
 - PostgreSQL + Prisma schema for businesses, locations, users, search history
-- Instant search API with filters, sorting, pagination, and rate limiting
-- Homepage + `/leads` search UI
+- Instant Lead Finder via server-rendered `/leads` (URL params) with rate limiting
+- Homepage + `/leads` search UI (teaser list + credit-gated reveal)
 - SEO pages for `/dentists`, `/dentists-in-miami`, `/roofers-in-texas`
 - Dynamic sitemap for category/city/state routes
 - Admin panel with CSV import, stats, and auth-protected routes
@@ -26,10 +26,14 @@ Admin login defaults:
 - Email: `admin@axenflowai.com`
 - Password: `Admin123!`
 
-## API
+## Lead Finder (SSR)
 
-- `GET /api/search`
-- `GET /api/businesses`
+- `/leads` is server-rendered from the database (URL query params). No public JSON lead list.
+- List HTML is **teaser-only** (name, category, city, state, rating). Contacts require authenticated **Reveal Contact** server actions with a daily quota.
+- `GET /api/search` and `GET /api/businesses` return **410 Gone** (retired).
+
+## Location metadata APIs (no contact fields)
+
 - `GET /api/categories`
 - `GET /api/countries`
 - `GET /api/states?countryId=`

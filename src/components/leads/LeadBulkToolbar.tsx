@@ -24,9 +24,11 @@ type Props = {
   selected: BusinessCard[];
   onClear: () => void;
   onSaved?: () => void;
+  /** Reveal contacts for selected teasers before export (credit-gated server action). */
+  ensureRevealed?: (leads: BusinessCard[]) => Promise<BusinessCard[]>;
 };
 
-export function LeadBulkToolbar({ selected, onClear, onSaved }: Props) {
+export function LeadBulkToolbar({ selected, onClear, onSaved, ensureRevealed }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const count = selected.length;
@@ -57,36 +59,45 @@ export function LeadBulkToolbar({ selected, onClear, onSaved }: Props) {
     }
   };
 
+  const withRevealed = async () => {
+    if (!ensureRevealed) return selected;
+    return ensureRevealed(selected);
+  };
+
   const exportCsv = () =>
     run("csv", async () => {
-      const blob = new Blob([leadsToCsv(selected)], { type: "text/csv;charset=utf-8" });
+      const rows = await withRevealed();
+      const blob = new Blob([leadsToCsv(rows)], { type: "text/csv;charset=utf-8" });
       downloadBlob(blob, exportFilename("csv"));
-      await trackExport("CSV", count);
-      setMessage(`Downloaded ${count} leads as CSV.`);
+      await trackExport("CSV", rows.length);
+      setMessage(`Downloaded ${rows.length} leads as CSV.`);
     });
 
   const exportXlsx = () =>
     run("xlsx", async () => {
-      const buffer = await leadsToXlsxBuffer(selected);
+      const rows = await withRevealed();
+      const buffer = await leadsToXlsxBuffer(rows);
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
       downloadBlob(blob, exportFilename("xlsx"));
-      await trackExport("XLSX", count);
-      setMessage(`Downloaded ${count} leads as Excel.`);
+      await trackExport("XLSX", rows.length);
+      setMessage(`Downloaded ${rows.length} leads as Excel.`);
     });
 
   const exportJson = () =>
     run("json", async () => {
-      const blob = new Blob([leadsToJson(selected)], { type: "application/json" });
+      const rows = await withRevealed();
+      const blob = new Blob([leadsToJson(rows)], { type: "application/json" });
       downloadBlob(blob, exportFilename("json"));
-      await trackExport("JSON", count);
-      setMessage(`Downloaded ${count} leads as JSON.`);
+      await trackExport("JSON", rows.length);
+      setMessage(`Downloaded ${rows.length} leads as JSON.`);
     });
 
   const copyField = (field: "phone" | "email") =>
     run(`copy-${field}`, async () => {
-      const text = copyUniqueField(selected, field);
+      const rows = await withRevealed();
+      const text = copyUniqueField(rows, field);
       if (!text) {
         setMessage(`No ${field}s in selection.`);
         return;

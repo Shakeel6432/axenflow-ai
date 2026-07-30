@@ -239,6 +239,41 @@ export async function getBusinessBySlug(slug: string) {
   });
 }
 
+const cardSelect = {
+  id: true,
+  slug: true,
+  businessName: true,
+  owner: true,
+  categoryName: true,
+  address: true,
+  city: true,
+  state: true,
+  country: true,
+  phone: true,
+  website: true,
+  email: true,
+  rating: true,
+  reviewsCount: true,
+  googleMapsUrl: true,
+} as const;
+
+/** Full contact cards for authenticated reveal / save flows (server-only). */
+export async function getBusinessCardsByIds(ids: string[]): Promise<BusinessCard[]> {
+  if (!isDatabaseConfigured() || !ids.length) return [];
+  const unique = [...new Set(ids)].slice(0, 20);
+  try {
+    const rows = await prisma.business.findMany({
+      where: { id: { in: unique }, status: "APPROVED" },
+      select: cardSelect,
+    });
+    const byId = new Map(rows.map((row) => [row.id, toCard(row)]));
+    return unique.map((id) => byId.get(id)).filter(Boolean) as BusinessCard[];
+  } catch (error) {
+    console.error("getBusinessCardsByIds failed:", error);
+    return [];
+  }
+}
+
 export async function getLocationOptions() {
   if (!isDatabaseConfigured()) {
     return { categories: [], countries: [], states: [], cities: [] };
