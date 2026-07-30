@@ -90,7 +90,7 @@ export function BulkEmailValidationGuideContent() {
         </li>
         <li>
           <strong>Bounce risk estimate:</strong> Combines signals into Low / Medium / High (not a
-          real send
+          real send)
         </li>
       </ul>
 
