@@ -93,14 +93,13 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
     sort: "newest",
   });
 
-  // Teaser-only in HTML for everyone — contacts via /leads reveal flow
-  const results = redactBusinessList(data.results);
+  const results = isAuthed ? data.results : redactBusinessList(data.results);
 
   const heading = locationSlug
     ? `${category.name} in ${titleCase(locationSlug)}`
     : category.name;
 
-  // Public JSON-LD: name + place + rating only (never phone/email/street)
+  // Public JSON-LD: guests get place + rating only; signed-in may include phone/url
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -111,8 +110,11 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
       item: {
         "@type": "LocalBusiness",
         name: item.businessName,
+        ...(isAuthed && item.phone ? { telephone: item.phone } : {}),
+        ...(isAuthed && item.website ? { url: item.website } : {}),
         address: {
           "@type": "PostalAddress",
+          ...(isAuthed && item.address ? { streetAddress: item.address } : {}),
           addressLocality: item.city || undefined,
           addressRegion: item.state || undefined,
           addressCountry: item.country || undefined,
@@ -133,12 +135,12 @@ export default async function SeoLeadPage({ params, searchParams }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageHero
         title={heading}
-        description={`Explore ${data.total} verified ${category.name.toLowerCase()} leads${cityName || stateName ? ` in ${cityName || stateName}` : ""}. Open Lead Finder to reveal contacts after sign-in.`}
+        description={`Explore ${data.total} verified ${category.name.toLowerCase()} leads${cityName || stateName ? ` in ${cityName || stateName}` : ""}${isAuthed ? "." : ". Sign in to unlock contact details."}`}
       />
       <Section tight>
         <div className="grid gap-4 md:grid-cols-2">
           {results.map((business) => (
-            <BusinessResultCard key={business.id} business={business} preview />
+            <BusinessResultCard key={business.id} business={business} preview={!isAuthed} />
           ))}
         </div>
         {!results.length && (

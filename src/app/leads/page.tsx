@@ -78,8 +78,8 @@ export default async function LeadsPage({ searchParams }: PageProps) {
         userId: userId || undefined,
       });
 
-      // Always teaser-only in HTML — contacts only via reveal server action.
-      result = teaserResult(data);
+      // Guests: teaser HTML only. Signed-in: full contacts embedded in SSR HTML (no /api/search JSON).
+      result = isAuthed ? data : teaserResult(data);
     }
   }
 
@@ -91,8 +91,8 @@ export default async function LeadsPage({ searchParams }: PageProps) {
         title="Lead Finder"
         description={
           isAuthed
-            ? "Search, reveal contacts (daily quota), export CSV/Excel/JSON, and save leads to your dashboard."
-            : "Search business leads by keyword, category, and location. Sign in to reveal contacts, export, and save."
+            ? "Search, select, export CSV/Excel/JSON, and save leads to your dashboard."
+            : "Search business leads by keyword, category, and location. Sign in to export and save."
         }
       />
       <Section tight className="!pb-0">

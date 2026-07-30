@@ -6,7 +6,6 @@ import {
   BookmarkPlus,
   Copy,
   ExternalLink,
-  Eye,
   Globe,
   MapPin,
   Phone,
@@ -24,11 +23,7 @@ import { LeadBulkToolbar } from "@/components/leads/LeadBulkToolbar";
 import { formatDisplayAddress } from "@/lib/address";
 import { MAIN_CATEGORIES, getMainCategoryName, getSubcategoriesForMain } from "@/lib/category-taxonomy";
 import { buildLeadsQuery, type LeadSearchFilters } from "@/lib/leads-access";
-import {
-  revealLeadContact,
-  revealLeadContacts,
-  saveLeadAction,
-} from "@/app/leads/actions";
+import { saveLeadAction } from "@/app/leads/actions";
 import type { BusinessCard, PaginatedSearchResult, SearchSort } from "@/types/leads";
 
 type Option = { id: string; name: string; slug?: string; code?: string; countryId?: string; stateId?: string };
@@ -52,10 +47,6 @@ const pagerBtnClass =
 
 function asOptions(value: unknown): Option[] {
   return Array.isArray(value) ? (value as Option[]) : [];
-}
-
-function hasContact(b: BusinessCard) {
-  return Boolean(b.phone || b.email || b.website || b.address || b.owner);
 }
 
 export function LeadFinderSection({
@@ -88,21 +79,15 @@ export function LeadFinderSection({
   const [states, setStates] = useState<Option[]>([]);
   const [cities, setCities] = useState<Option[]>([]);
 
-  /** Merge revealed contacts into teaser rows (client memory only). */
-  const [revealedById, setRevealedById] = useState<Record<string, BusinessCard>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [actionMsg, setActionMsg] = useState("");
-  const [revealError, setRevealError] = useState("");
 
-  const pageResults = useMemo(() => {
-    const rows = result?.results ?? [];
-    return rows.map((row) => revealedById[row.id] ?? row);
-  }, [result, revealedById]);
-
-  const visibleResults = isPreview ? pageResults.slice(0, 3) : pageResults;
+  const visibleResults = isPreview
+    ? (result?.results ?? []).slice(0, 3)
+    : (result?.results ?? []);
   const selectedLeads = useMemo(
-    () => pageResults.filter((r) => selectedIds.has(r.id)),
-    [pageResults, selectedIds]
+    () => visibleResults.filter((r) => selectedIds.has(r.id)),
+    [visibleResults, selectedIds]
   );
   const allPageSelected =
     !isPreview && visibleResults.length > 0 && visibleResults.every((r) => selectedIds.has(r.id));
@@ -175,7 +160,6 @@ export function LeadFinderSection({
   // Reset selection when server result page changes
   useEffect(() => {
     setSelectedIds(new Set());
-    setRevealError("");
   }, [result?.page, result?.total]);
 
   const currentFilters = (): LeadSearchFilters => ({
@@ -205,31 +189,18 @@ export function LeadFinderSection({
   };
 
   const pageHref = (page: number) =>
-    `/leads?${buildLeadsQuery({ ...currentFilters(), page, ...filtersProp, keyword, mainCategory, category, country, state, city, hasPhone, hasEmail, sort })}`;
-
-  const handleReveal = async (id: string) => {
-    setRevealError("");
-    const res = await revealLeadContact(id);
-    if (!res.ok) {
-      setRevealError(res.error);
-      return;
-    }
-    setRevealedById((prev) => ({ ...prev, [id]: res.lead }));
-    setActionMsg(`Contact revealed · ${res.remaining} reveals left today`);
-  };
-
-  const ensureRevealedForExport = async (leads: BusinessCard[]) => {
-    const need = leads.filter((l) => !hasContact(l)).map((l) => l.id);
-    if (!need.length) return leads;
-    const res = await revealLeadContacts(need);
-    if (!res.ok) {
-      setRevealError(res.error);
-      return leads;
-    }
-    const map = Object.fromEntries(res.leads.map((l) => [l.id, l]));
-    setRevealedById((prev) => ({ ...prev, ...map }));
-    return leads.map((l) => map[l.id] ?? revealedById[l.id] ?? l);
-  };
+    `/leads?${buildLeadsQuery({
+      keyword,
+      mainCategory,
+      category,
+      country,
+      state,
+      city,
+      hasPhone,
+      hasEmail,
+      sort,
+      page,
+    })}`;
 
   return (
     <Section id="leads" tight={hideHeading} className={className}>
@@ -239,7 +210,7 @@ export function LeadFinderSection({
           description={
             isPreview
               ? "Preview sample leads below. Create a free account for full search, filters, and download access."
-              : "Search business leads, reveal contacts with your daily quota, export CSV/Excel/JSON, and save lists."
+              : "Search business leads, select results, export CSV/Excel/JSON, and save lists to your dashboard."
           }
         />
       )}
@@ -388,9 +359,7 @@ export function LeadFinderSection({
           </div>
         </form>
 
-        {(error || revealError) && (
-          <p className="mt-4 text-sm text-red-500">{revealError || error}</p>
-        )}
+        {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
         {authRequiredForPage && (
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href="/signup" className="btn-main rounded-xl px-5 py-2.5 text-sm font-semibold">
@@ -412,7 +381,7 @@ export function LeadFinderSection({
               <p className="text-sm" style={{ color: "var(--c-text-muted)" }}>
                 {isPreview
                   ? `Previewing ${Math.min(result.results.length, 3)} of ${result.total} matches`
-                  : `${result.total} results found · contacts hidden until revealed`}
+                  : `${result.total} results found`}
               </p>
               {!isPreview && visibleResults.length > 0 && (
                 <label className="flex items-center gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
@@ -432,7 +401,6 @@ export function LeadFinderSection({
                 selected={selectedLeads}
                 onClear={() => setSelectedIds(new Set())}
                 onSaved={() => setActionMsg("Leads saved. View them under Dashboard → Saved Leads.")}
-                ensureRevealed={ensureRevealedForExport}
               />
             )}
             {actionMsg && <p className="mb-3 text-xs text-teal-500">{actionMsg}</p>}
@@ -446,8 +414,6 @@ export function LeadFinderSection({
                   selectable={!isPreview}
                   selected={selectedIds.has(item.id)}
                   onToggleSelect={() => toggleSelect(item.id)}
-                  revealed={hasContact(item)}
-                  onReveal={!isPreview ? () => handleReveal(item.id) : undefined}
                 />
               ))}
             </div>
@@ -549,8 +515,6 @@ export function BusinessResultCard({
   onToggleSelect,
   onUnsave,
   savedId,
-  revealed = false,
-  onReveal,
 }: {
   business: BusinessCard;
   preview?: boolean;
@@ -559,17 +523,13 @@ export function BusinessResultCard({
   onToggleSelect?: () => void;
   onUnsave?: () => void;
   savedId?: string;
-  revealed?: boolean;
-  onReveal?: () => void | Promise<void>;
 }) {
   const [copied, setCopied] = useState<"phone" | "email" | "">("");
   const [saving, setSaving] = useState(false);
-  const [revealing, setRevealing] = useState(false);
 
-  const locationLine = revealed
-    ? formatDisplayAddress(business.address) ||
-      [business.city, business.state, business.country].filter(Boolean).join(", ")
-    : [business.city, business.state].filter(Boolean).join(", ");
+  const locationLine =
+    formatDisplayAddress(business.address) ||
+    [business.city, business.state, business.country].filter(Boolean).join(", ");
   const mainName = getMainCategoryName(business.category);
 
   const copyText = async (value: string, kind: "phone" | "email") => {
@@ -588,16 +548,6 @@ export function BusinessResultCard({
       await saveLeadAction(business.id);
     } finally {
       setSaving(false);
-    }
-  };
-
-  const reveal = async () => {
-    if (!onReveal) return;
-    setRevealing(true);
-    try {
-      await onReveal();
-    } finally {
-      setRevealing(false);
     }
   };
 
@@ -630,12 +580,12 @@ export function BusinessResultCard({
               </p>
             </div>
           </div>
-          {revealed && business.owner ? (
+          {business.owner && (
             <p className="mt-2 flex items-center gap-2 text-sm" style={{ color: "var(--c-text-muted)" }}>
               <User size={14} className="shrink-0" />
               {business.owner}
             </p>
-          ) : null}
+          )}
         </div>
         {business.rating != null && (
           <span
@@ -649,10 +599,10 @@ export function BusinessResultCard({
       {locationLine && (
         <p className="mt-3 flex items-start gap-2 text-sm" style={{ color: "var(--c-text-dim)" }}>
           <MapPin size={14} className="mt-0.5 shrink-0" />
-          {locationLine}
+          {preview ? [business.city, business.state].filter(Boolean).join(", ") || locationLine : locationLine}
         </p>
       )}
-      {!preview && revealed && (
+      {!preview && (
         <div className="mt-3 flex flex-col gap-2 text-sm">
           {business.phone && (
             <div className="flex flex-wrap items-center gap-2">
@@ -704,18 +654,6 @@ export function BusinessResultCard({
       )}
       {!preview && (
         <div className="mt-4 flex flex-wrap gap-2">
-          {!revealed && onReveal && (
-            <button
-              type="button"
-              onClick={() => void reveal()}
-              disabled={revealing}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
-              style={{ background: "rgba(20,184,166,0.15)", color: "#2dd4bf" }}
-            >
-              {revealing ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
-              Reveal Contact
-            </button>
-          )}
           {savedId && onUnsave ? (
             <button
               type="button"
@@ -741,7 +679,7 @@ export function BusinessResultCard({
       )}
       {preview && (
         <p className="mt-3 text-xs" style={{ color: "var(--c-text-dim)" }}>
-          Phone & email unlock after you sign in and reveal contacts.
+          Phone & email unlock after you sign in.
         </p>
       )}
     </article>

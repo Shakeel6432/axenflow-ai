@@ -28,8 +28,8 @@ Admin login defaults:
 
 ## Lead Finder (SSR)
 
-- `/leads` is server-rendered from the database (URL query params). No public JSON lead list.
-- List HTML is **teaser-only** (name, category, city, state, rating). Contacts require authenticated **Reveal Contact** server actions with a daily quota.
+- `/leads` is server-rendered from the database (URL query params). No public JSON lead list in DevTools.
+- Guests see teaser HTML only. Signed-in users see full contacts in the HTML page (same as before).
 - `GET /api/search` and `GET /api/businesses` return **410 Gone** (retired).
 
 ## Location metadata APIs (no contact fields)
