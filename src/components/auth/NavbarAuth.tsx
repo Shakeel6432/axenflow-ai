@@ -10,14 +10,14 @@ function GuestActions({ mobile }: { mobile: boolean }) {
       <>
         <Link
           href="/signin"
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all"
+          className="flex cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all hover:opacity-90"
           style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
         >
           Sign In
         </Link>
         <Link
           href="/signup"
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all"
+          className="flex cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5 55%, #0d9488)" }}
         >
           Create Account <ArrowRight size={14} />
@@ -30,14 +30,14 @@ function GuestActions({ mobile }: { mobile: boolean }) {
     <>
       <Link
         href="/signin"
-        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
         style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
       >
         Sign In
       </Link>
       <Link
         href="/signup"
-        className="group inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30"
+        className="group inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30"
         style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #0f766e 100%)" }}
       >
         Sign Up
@@ -53,7 +53,7 @@ function UserActions({ mobile }: { mobile: boolean }) {
       <>
         <Link
           href="/dashboard"
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all"
+          className="flex cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all hover:opacity-90"
           style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
         >
           Dashboard
@@ -61,7 +61,7 @@ function UserActions({ mobile }: { mobile: boolean }) {
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20"
+          className="flex cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5 55%, #0d9488)" }}
         >
           Sign Out
@@ -74,7 +74,7 @@ function UserActions({ mobile }: { mobile: boolean }) {
     <>
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
         style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)", color: "var(--c-heading)" }}
       >
         Dashboard
@@ -82,7 +82,7 @@ function UserActions({ mobile }: { mobile: boolean }) {
       <button
         type="button"
         onClick={() => signOut({ callbackUrl: "/" })}
-        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/25"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/25"
         style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #0f766e 100%)" }}
       >
         Sign Out

@@ -486,6 +486,11 @@ body {
 }
 
 /* ─── Buttons ─── */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
 .btn-main {
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: #fff;
