@@ -17,8 +17,7 @@ export function Logo({ size = "nav", className }: LogoProps) {
         width={dim.w}
         height={dim.h}
         className={cn(dim.cls, "object-contain")}
-        priority
-        loading="eager"
+        sizes="(max-width: 640px) 160px, 200px"
       />
     </Link>
   );

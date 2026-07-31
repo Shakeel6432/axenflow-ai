@@ -3,7 +3,6 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FooterCta } from "@/components/layout/FooterCta";
-import { SsrBootLoader } from "@/components/layout/SsrBootLoader";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SessionProvider } from "@/components/auth/SessionProvider";
@@ -63,12 +62,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       </head>
       <body className="site-bg flex min-h-screen flex-col overflow-x-clip antialiased font-[var(--font-inter)]">
         <GoogleAnalytics />
-        <SsrBootLoader />
         <SessionProvider session={session}>
           <ThemeProvider>
             <div aria-hidden className="grid-bg pointer-events-none fixed inset-0 -z-10" />
             <Navbar />
-            {/* FooterCta stays in layout on every page — do not remove. */}
+            {/* FooterCta stays in layout on every page - do not remove. */}
             <main className="relative flex w-full flex-1 flex-col bg-transparent">
               <div className="w-full flex-1">{children}</div>
               <FooterCta />

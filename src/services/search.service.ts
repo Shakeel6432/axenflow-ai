@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { prisma, isDatabaseConfigured } from "@/lib/db";
 import { formatDisplayAddress, US_STATE_NAMES } from "@/lib/address";
@@ -274,13 +275,13 @@ export async function getBusinessCardsByIds(ids: string[]): Promise<BusinessCard
   }
 }
 
-export async function getLocationOptions() {
+async function loadLocationOptions() {
   if (!isDatabaseConfigured()) {
     return { categories: [], countries: [], states: [], cities: [] };
   }
 
   try {
-    // Only fetch dropdown roots — states/cities load lazily by country/state filters.
+    // Only fetch dropdown roots - states/cities load lazily by country/state filters.
     const [categories, countries] = await Promise.all([
       prisma.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, slug: true } }),
       prisma.country.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, code: true } }),
@@ -292,3 +293,8 @@ export async function getLocationOptions() {
     return { categories: [], countries: [], states: [], cities: [] };
   }
 }
+
+/** Cached for Lead Finder SSR - avoids 2 DB hits on every /leads page view. */
+export const getLocationOptions = unstable_cache(loadLocationOptions, ["lead-location-options"], {
+  revalidate: 300,
+});

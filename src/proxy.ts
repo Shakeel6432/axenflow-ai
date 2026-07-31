@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Page-level rate limit for Lead Finder HTML (scraping via repeated document loads)
+  // Lead Finder HTML rate limit (scraping via repeated document loads)
   if (path === "/leads") {
     const limited = rateLimit(`proxy-leads:${ip}`, 40, 60_000);
     if (!limited.ok) {
@@ -44,6 +44,18 @@ export async function proxy(request: NextRequest) {
     if (page >= 5) {
       console.warn("[proxy] sequential leads pagination", { ip, page, ua: ua.slice(0, 80) });
     }
+  }
+
+  // Skip remote Supabase refresh on marketing pages (NextAuth handles UI session).
+  const needsSupabaseRefresh =
+    path.startsWith("/dashboard") ||
+    path.startsWith("/admin") ||
+    path.startsWith("/api/");
+
+  if (!needsSupabaseRefresh) {
+    return NextResponse.next({
+      request: { headers: request.headers },
+    });
   }
 
   return updateSession(request);

@@ -33,6 +33,13 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Tree-shake heavy icon / motion import surfaces in client chunks
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   // Keep large desktop installer out of serverless function traces
   outputFileTracingExcludes: {
     "*": ["./public/downloads/**", "./scripts/**", "./axenflow-ai.zip", "./java_v3.zip"],
