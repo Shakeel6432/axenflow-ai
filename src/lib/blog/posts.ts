@@ -251,7 +251,7 @@ export const BLOG_POSTS: BlogPostMeta[] = [
       "AxenFlowAI AI Outreach",
       "batch cold email CSV",
     ],
-    readingMinutes: 10,
+    readingMinutes: 8,
     category: "Outreach",
     coverImage: "/images/blog/aioutreach-cover.png",
     coverAlt:
