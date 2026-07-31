@@ -1,5 +1,24 @@
 import Link from "@/components/ui/AppLink";
 import { BlogFigure } from "@/components/blog/BlogFigure";
+import { generateOutreach } from "@/lib/outreach";
+
+const SHOWCASE_COLD = generateOutreach("cold_email", {
+  businessName: "Summit Roofing",
+  category: "home services",
+  city: "Denver",
+  senderName: "Jordan Lee",
+  recipientName: "Maria",
+  offerContext: "a steady stream of verified local homeowner leads",
+});
+
+const SHOWCASE_FOLLOW = generateOutreach("follow_up", {
+  businessName: "Northside Dental",
+  category: "healthcare",
+  city: "Chicago",
+  senderName: "Jordan Lee",
+  recipientName: "Dr. Patel",
+  offerContext: "patient-acquisition outreach that stays compliant and on-brand",
+});
 
 export function AiOutreachGuideContent() {
   return (
@@ -13,22 +32,35 @@ export function AiOutreachGuideContent() {
         This guide shows how to use AxenFlowAI{" "}
         <Link href="/tools/ai-outreach" className="text-indigo-400 hover:text-teal-400">
           AI Outreach
-        </Link>{" "}
-        to build templates, personalize with placeholders, fill a CSV or Excel sheet in batch, and
-        export scripts for campaigns. Start from clean contacts with the{" "}
-        <Link href="/blog/businessleaddatabase" className="text-indigo-400 hover:text-teal-400">
-          lead database
         </Link>
-        ,{" "}
+        : start with a free sample (no signup), then sign in to chat-build reusable templates,
+        personalize each CSV/Excel row, and export for your sequencer or dialer. Clean contacts first
+        with the{" "}
         <Link href="/blog/bulkemailvalidation" className="text-indigo-400 hover:text-teal-400">
-          email validator
-        </Link>
-        , and{" "}
-        <Link href="/blog/bulkphonevalidation" className="text-indigo-400 hover:text-teal-400">
-          phone validator
+          email validation guide
         </Link>{" "}
-        guides first.
+        and{" "}
+        <Link href="/blog/bulkphonevalidation" className="text-indigo-400 hover:text-teal-400">
+          phone validation guide
+        </Link>
+        .
       </p>
+      <p>
+        <strong>Want to see the quality first?</strong> Generate a{" "}
+        <Link href="/tools/ai-outreach" className="text-indigo-400 hover:text-teal-400">
+          free sample cold email or call script
+        </Link>{" "}
+        (no signup required). Enter recipient name, company, industry, and outreach type, then read
+        the subject, body, and <strong>Personalized using</strong> tag on the result card
+        (rate-limited).
+      </p>
+
+      <BlogFigure
+        src="/images/blog/aioutreach-cover.png"
+        alt="AxenFlowAI AI Outreach tool showing a generated personalized cold email sample for a sample lead"
+        caption="Free sample above the fold, then unlock chat templates and CSV/Excel batch fill after you create an account."
+        priority
+      />
 
       <h2 className="blog-h2">Why AI Outreach beats copy paste personalization</h2>
       <p>Manual merge fields in a notepad break at scale. Common failure modes:</p>
@@ -48,6 +80,47 @@ export function AiOutreachGuideContent() {
         plus good scripts beats volume alone.
       </p>
 
+      <h2 className="blog-h2">Example outputs (same voice as the tool)</h2>
+      <p>
+        These samples use the same built-in personalization engine as the free generator and batch
+        fill on the tool page:
+      </p>
+      <h3 className="blog-h3">Cold email (Summit Roofing)</h3>
+      <p>
+        <strong>Subject:</strong> {SHOWCASE_COLD.subject}
+      </p>
+      <pre
+        className="overflow-x-auto rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap"
+        style={{
+          background: "var(--c-hover-bg)",
+          color: "var(--c-text-dim)",
+          border: "1px solid var(--c-border)",
+        }}
+      >
+        {SHOWCASE_COLD.body}
+      </pre>
+      <h3 className="blog-h3">Follow-up (Northside Dental)</h3>
+      <p>
+        <strong>Subject:</strong> {SHOWCASE_FOLLOW.subject}
+      </p>
+      <pre
+        className="overflow-x-auto rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap"
+        style={{
+          background: "var(--c-hover-bg)",
+          color: "var(--c-text-dim)",
+          border: "1px solid var(--c-border)",
+        }}
+      >
+        {SHOWCASE_FOLLOW.body}
+      </pre>
+      <p className="text-sm" style={{ color: "var(--c-text-muted)" }}>
+        Try the live generator on{" "}
+        <Link href="/tools/ai-outreach" className="text-indigo-400 hover:text-teal-400">
+          /tools/ai-outreach
+        </Link>{" "}
+        with your own lead fields.
+      </p>
+
       <h2 className="blog-h2">What you can generate</h2>
       <p>Built in outreach kinds cover the core sales sequence:</p>
       <ul className="blog-ul">
@@ -55,17 +128,48 @@ export function AiOutreachGuideContent() {
           <strong>Cold email:</strong> First touch subject and body
         </li>
         <li>
-          <strong>Phone script:</strong> Short spoken opener for dialing
+          <strong>Phone script / call script:</strong> Short spoken opener for dialing
         </li>
         <li>
-          <strong>Follow up:</strong> Second touch bump after no reply
+          <strong>Follow-up email:</strong> Second touch bump after no reply
         </li>
       </ul>
+      <p>
+        After sign-in you can also chat-build custom templates with placeholders, then apply those
+        to a full sheet alongside the built-in kinds.
+      </p>
+
+      <h2 className="blog-h2">How it works on the current tool</h2>
+      <ol className="blog-ol">
+        <li>
+          <strong>Free single sample (no signup):</strong> Fill recipient name, company, industry,
+          outreach type, and optional offer context. You get a result card with subject (for emails)
+          + body, Copy / Regenerate, and a <strong>Personalized using: …</strong> tag.
+        </li>
+        <li>
+          <strong>Sign up for chat templates:</strong> Converse with the assistant to refine tone,
+          length, CTA, and structure. Save a reusable template with placeholders.
+        </li>
+        <li>
+          <strong>Batch CSV / Excel fill:</strong> Upload a list (up to 5,000 rows, max 12MB), select
+          built-in kinds and/or saved customs, and generate personalized subject/body columns per
+          row.
+        </li>
+        <li>
+          <strong>Export:</strong> Download CSV or Excel for your ESP, CRM, or dialer.
+        </li>
+      </ol>
 
       <BlogFigure
-        src="/images/blog/aioutreach-templates.png"
-        alt="AI Outreach built in templates for cold email phone script and follow up"
-        caption="Select one or more message types, then apply them to a single lead or a full sheet."
+        src="/images/blog/aioutreach-free-sample.png"
+        alt="AxenFlowAI AI Outreach free sample generator with personalized cold email subject body and Personalized using tag"
+        caption="What guests see: form fields, generated subject/body, and the Personalized using tag."
+      />
+
+      <BlogFigure
+        src="/images/blog/aioutreach-how-it-works.png"
+        alt="AxenFlowAI AI Outreach How It Works section for chat templates lead-field personalization and batch CSV Excel fill"
+        caption="Chat shapes the template. Lead fields personalize each row. Batch fill scales it across your sheet."
       />
 
       <h2 className="blog-h2">Placeholders that personalize each row</h2>
@@ -85,21 +189,26 @@ export function AiOutreachGuideContent() {
         </li>
       </ul>
       <p>
-        Optional first line format: <code>Subject: ...</code> so email subject and body stay
-        together in one template.
+        The free sample also accepts recipient name and a short “what are you offering?” context.
+        Optional first line format for custom templates: <code>Subject: ...</code> so email subject
+        and body stay together.
       </p>
 
       <h2 className="blog-h2">Chat to create a custom template</h2>
+      <p>
+        Chat-based template building is live after sign-in (Groq assistant when configured). Guests
+        still see the How It Works explainer and signup gate; chat itself is behind the account wall.
+      </p>
       <ol className="blog-ol">
         <li>
           Open{" "}
           <Link href="/tools/ai-outreach" className="text-indigo-400 hover:text-teal-400">
             AI Outreach
           </Link>{" "}
-          and sign in.
+          and sign in (optionally try a free sample first).
         </li>
         <li>Set your sender name so Best regards stays consistent.</li>
-        <li>Use the chat assistant to draft a template for your offer and niche.</li>
+        <li>Use the chat assistant to draft or refine a template for your offer and niche.</li>
         <li>Review placeholders, then save the custom template for reuse.</li>
         <li>Select built in kinds and/or saved customs before batch fill.</li>
       </ol>
@@ -110,13 +219,13 @@ export function AiOutreachGuideContent() {
         caption="Describe the offer in chat, keep placeholders intact, then save the template in your browser."
       />
 
-      <h2 className="blog-h2">Single lead preview</h2>
-      <p>
-        Enter Business Name, Category, and City to preview how a template reads before you touch a
-        full file. This is the fastest way to catch tone issues and missing placeholders.
-      </p>
-
       <h2 className="blog-h2">Batch fill CSV or Excel</h2>
+      <p>
+        Bulk upload is account-gated. Guests see an informative gate with limits and a sample output
+        table (name, company, generated_subject, generated_body), not a blank login wall. There is no
+        credit meter on this tool today: batch personalization uses the same merge engine as the free
+        sample for built-in kinds.
+      </p>
       <ol className="blog-ol">
         <li>Upload a lead file (CSV or Excel) with business name and related fields.</li>
         <li>Select cold email, phone script, follow up, and any saved custom templates.</li>
@@ -125,10 +234,22 @@ export function AiOutreachGuideContent() {
       </ol>
 
       <BlogFigure
-        src="/images/blog/aioutreach-batch.png"
-        alt="AI Outreach batch workflow upload leads select templates and download filled sheet"
-        caption="Lead file in, selected templates applied, filled sheet out for sequences and calling."
+        src="/images/blog/aioutreach-batch-table.png"
+        alt="AxenFlowAI AI Outreach batch CSV Excel output table with name company generated_subject and generated_body columns"
+        caption="Sample batch shape before signup. After sign-in, full subject/body columns land next to your lead fields."
       />
+
+      <h2 className="blog-h2">Privacy and trust (what we say on the tool)</h2>
+      <p>
+        Free samples and batch jobs run for the request and return results to your browser. Uploaded
+        lists are not written into a marketing database, and we do not sell lead lists. Chat needs a
+        signed-in session. For broader practices, see the{" "}
+        <Link href="/privacy" className="text-indigo-400 hover:text-teal-400">
+          Privacy Policy
+        </Link>
+        . We do not run an automated spam-trigger-word scanner on generated copy. Always review before
+        you send.
+      </p>
 
       <h2 className="blog-h2">Recommended workflow with other AxenFlow tools</h2>
       <div className="overflow-x-auto rounded-xl" style={{ border: "1px solid var(--c-border)" }}>
@@ -166,7 +287,7 @@ export function AiOutreachGuideContent() {
       <h2 className="blog-h2">Export checklist</h2>
       <ol className="blog-ol">
         <li>Confirm sender name is set</li>
-        <li>Preview one row before batch</li>
+        <li>Try a free sample (or preview one row after sign-in) before batch</li>
         <li>Select only the template kinds you will use this week</li>
         <li>Download CSV or Excel</li>
         <li>Spot check 10 rows for placeholder leftovers</li>
@@ -175,20 +296,40 @@ export function AiOutreachGuideContent() {
 
       <h2 className="blog-h2">AI Outreach FAQ</h2>
       <p>
-        <strong>Is AxenFlowAI AI Outreach free to use?</strong> Yes after you sign in. Build
-        templates, fill sheets, and download CSV or Excel.
+        <strong>Is there a free sample without signup?</strong> Yes. Use the free generator on{" "}
+        <Link href="/tools/ai-outreach" className="text-indigo-400 hover:text-teal-400">
+          AI Outreach
+        </Link>
+        . Guests get a small number of samples per day (also IP rate-limited). Chat templates and
+        batch fill need an account.
       </p>
       <p>
-        <strong>What placeholders should I use?</strong> Use business name, category, city, and
-        sender name placeholders so every row stays personalized.
+        <strong>Will AI outreach sound generic or get flagged as spam?</strong> Built-in messages are
+        personalized with your lead fields, but they are still templates, not a human rewrite of your
+        voice. Always review before sending. There is no separate spam-word scanner today.
       </p>
       <p>
-        <strong>Can I save my own templates?</strong> Yes. Chat to create a prompt, save it as a
-        custom template, and reuse it on future uploads.
+        <strong>Can I edit or refine the tone before my whole list?</strong> Yes after sign-in. Use
+        chat to refine tone, length, and CTA, edit the template text, then batch-apply it.
       </p>
       <p>
-        <strong>What file types work for batch fill?</strong> CSV and Excel. Include business name
-        and related fields so templates can personalize correctly.
+        <strong>What fields can I personalize?</strong> Company/business name, category/industry,
+        city, sender name, plus recipient name and offer context on the free sample. Custom templates
+        use {"{{business_name}}"}, {"{{category}}"}, {"{{city}}"}, {"{{sender_name}}"}.
+      </p>
+      <p>
+        <strong>How many free generations do I get?</strong> A small daily guest sample allowance.
+        After sign-in, batch fill has no credit meter today (up to 5,000 rows / 12MB). Chat may ask
+        you to retry if the AI is busy.
+      </p>
+      <p>
+        <strong>Can I export to CSV or Excel?</strong> Yes after sign-in. Subject/body (or script)
+        columns download next to your original lead fields.
+      </p>
+      <p>
+        <strong>Do you store the leads I input?</strong> Processing is request-scoped for the tool
+        response. Lists are not saved into a marketing database, and we do not sell lead lists. See
+        the Privacy Policy for general practices.
       </p>
       <p>
         <strong>Should I validate contacts first?</strong> Yes. Run{" "}
@@ -198,18 +339,26 @@ export function AiOutreachGuideContent() {
         and{" "}
         <Link href="/tools/phone-validator" className="text-indigo-400 hover:text-teal-400">
           Phone Validator
+        </Link>
+        , then read the{" "}
+        <Link href="/blog/bulkemailvalidation" className="text-indigo-400 hover:text-teal-400">
+          email guide
         </Link>{" "}
-        before outreach so scripts go to usable contacts.
+        and{" "}
+        <Link href="/blog/bulkphonevalidation" className="text-indigo-400 hover:text-teal-400">
+          phone guide
+        </Link>
+        .
       </p>
 
       <h2 className="blog-h2">Conclusion</h2>
       <p>
-        AI Outreach turns a clean lead sheet into personalized cold emails, call scripts, and follow
-        ups without rewriting every row by hand. Open{" "}
+        Start with a free sample to see subject, body, and personalization tags, then sign in to
+        chat-build templates and fill a full CSV or Excel list. Open{" "}
         <Link href="/tools/ai-outreach" className="text-indigo-400 hover:text-teal-400">
           AI Outreach
-        </Link>
-        , save a template, and fill your next campaign list today.
+        </Link>{" "}
+        and try a lead now.
       </p>
     </>
   );

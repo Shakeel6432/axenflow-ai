@@ -237,12 +237,13 @@ export const BLOG_POSTS: BlogPostMeta[] = [
     slug: "aioutreach",
     title: "AI Outreach Guide: Cold Emails, Call Scripts & Follow Ups from CSV",
     description:
-      "Learn how to use AxenFlowAI AI Outreach to build templates, personalize with placeholders, batch fill CSV or Excel, and export cold emails, phone scripts, and follow ups.",
+      "Step by step AI Outreach guide: free cold email or call script sample (no signup), chat templates, lead-field personalization, and CSV/Excel batch fill on AxenFlowAI.",
     publishedAt: "2026-07-28",
-    updatedAt: "2026-07-28",
+    updatedAt: "2026-08-01",
     keywords: [
       "AI outreach",
       "cold email generator",
+      "free cold email generator",
       "phone script generator",
       "follow up email template",
       "CSV outreach templates",
@@ -250,15 +251,15 @@ export const BLOG_POSTS: BlogPostMeta[] = [
       "AxenFlowAI AI Outreach",
       "batch cold email CSV",
     ],
-    readingMinutes: 8,
+    readingMinutes: 10,
     category: "Outreach",
     coverImage: "/images/blog/aioutreach-cover.png",
     coverAlt:
-      "AxenFlowAI AI Outreach showing cold email phone script and follow up templates with CSV export",
+      "AxenFlowAI AI Outreach tool showing a generated personalized cold email sample for a sample lead",
     cta: {
-      title: "Generate outreach templates free",
+      title: "Try a free outreach sample",
       description:
-        "Chat to build a template, personalize with lead fields, then batch fill CSV or Excel on AxenFlowAI.",
+        "Generate a free cold email or call script (no signup), then sign in for chat templates and CSV/Excel batch fill.",
       primary: { href: "/tools/ai-outreach", label: "Open AI Outreach" },
       secondary: [
         { href: "/tools/email-validator", label: "Email Validator" },
@@ -267,24 +268,24 @@ export const BLOG_POSTS: BlogPostMeta[] = [
     },
     faqs: [
       {
-        question: "Is AxenFlowAI AI Outreach free to use?",
+        question: "Is there a free outreach sample without signup?",
         answer:
-          "Yes after you sign in. Build templates, fill sheets, and download CSV or Excel.",
+          "Yes. Use the free generator on the AI Outreach page for one personalized cold email, follow-up, or call script. Checks are rate-limited. Chat templates and CSV/Excel batch fill require a free account.",
       },
       {
-        question: "What placeholders should I use in templates?",
+        question: "Will AI outreach sound generic or get flagged as spam?",
         answer:
-          "Use business name, category, city, and sender name placeholders so every row stays personalized.",
+          "Built-in messages are personalized with lead fields, but they are still templates. Always review before sending. There is no automated spam-trigger-word scanner on generated copy today.",
       },
       {
-        question: "Can I save my own templates?",
+        question: "What lead fields can I personalize with?",
         answer:
-          "Yes. Chat to create a prompt, save it as a custom template, and reuse it on future uploads.",
+          "Company/business name, category/industry, city, and sender name. Custom templates use {{business_name}}, {{category}}, {{city}}, and {{sender_name}}. The free sample also accepts recipient name and a short offer context.",
       },
       {
-        question: "What file types work for batch fill?",
+        question: "Can I export results to CSV or Excel?",
         answer:
-          "CSV and Excel. Include business name and related fields so templates can personalize correctly.",
+          "Yes after sign-in. Batch fill adds subject/body (or script) columns next to each lead row for download (up to 5,000 rows, max 12MB).",
       },
       {
         question: "Should I validate contacts before AI Outreach?",
