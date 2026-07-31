@@ -6,7 +6,6 @@ import { FooterCta } from "@/components/layout/FooterCta";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SessionProvider } from "@/components/auth/SessionProvider";
-import { auth } from "@/auth";
 import { siteConfig } from "@/lib/constants";
 import "./globals.css";
 
@@ -48,9 +47,11 @@ export const metadata: Metadata = {
   alternates: { canonical: siteConfig.url },
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const session = await auth();
-
+/**
+ * Root layout stays free of await auth() so marketing pages are not blocked on session.
+ * NavbarAuth uses client useSession() against /api/auth/session.
+ */
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-theme="dark" className={`${inter.variable} ${space.variable} h-full`} suppressHydrationWarning>
       <head>
@@ -62,11 +63,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       </head>
       <body className="site-bg flex min-h-screen flex-col overflow-x-clip antialiased font-[var(--font-inter)]">
         <GoogleAnalytics />
-        <SessionProvider session={session}>
+        <SessionProvider>
           <ThemeProvider>
             <div aria-hidden className="grid-bg pointer-events-none fixed inset-0 -z-10" />
             <Navbar />
-            {/* FooterCta stays in layout on every page - do not remove. */}
             <main className="relative flex w-full flex-1 flex-col bg-transparent">
               <div className="w-full flex-1">{children}</div>
               <FooterCta />

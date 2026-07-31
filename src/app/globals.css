@@ -693,6 +693,25 @@ select.form-input optgroup {
   transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
+.nav-header-enter {
+  animation: nav-header-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes nav-header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-link-active {
+  background: var(--c-hover-bg);
+}
+
 .nav-header-scrolled {
   background: color-mix(in srgb, var(--c-nav) 94%, transparent);
 }

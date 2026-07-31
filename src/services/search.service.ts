@@ -99,17 +99,15 @@ export function buildBusinessWhere(params: SearchParams): Prisma.BusinessWhereIn
 
   if (params.keyword?.trim()) {
     const q = params.keyword.trim();
+    // Prefer indexed fields first; avoid scanning address/website on every keyword hit.
     and.push({
       OR: [
         { businessName: { contains: q, mode: "insensitive" } },
-        { owner: { contains: q, mode: "insensitive" } },
         { categoryName: { contains: q, mode: "insensitive" } },
         { city: { contains: q, mode: "insensitive" } },
         { state: { contains: q, mode: "insensitive" } },
         { phone: { contains: q } },
-        { website: { contains: q, mode: "insensitive" } },
         { email: { contains: q, mode: "insensitive" } },
-        { address: { contains: q, mode: "insensitive" } },
       ],
     });
   }
@@ -201,16 +199,37 @@ export async function searchBusinesses(params: SearchParams): Promise<PaginatedS
       select,
     });
 
-    const [total, rows] = reuseTotal
-      ? [params.knownTotal as number, await rowsPromise]
-      : await Promise.all([prisma.business.count({ where }), rowsPromise]);
+    // Guest teaser pages (pageSize <= 3): skip expensive COUNT(*) on 250k+ rows.
+    // Use take+1 to know if more results exist for the signup CTA.
+    const fastPreview = pageSize <= 3 && !reuseTotal;
+    let total: number;
+    let rows: Awaited<typeof rowsPromise>;
 
-    // Log first-page searches only — pagination should stay fast.
-    if (page === 1 && !reuseTotal) {
+    if (reuseTotal) {
+      total = params.knownTotal as number;
+      rows = await rowsPromise;
+    } else if (fastPreview) {
+      const previewRows = await prisma.business.findMany({
+        where,
+        orderBy,
+        skip: 0,
+        take: pageSize + 1,
+        select,
+      });
+      const hasMore = previewRows.length > pageSize;
+      rows = previewRows.slice(0, pageSize);
+      // Synthetic total: enough to show "more available" without a full table count.
+      total = hasMore ? Math.max(pageSize * 40, pageSize + 1) : rows.length;
+    } else {
+      [total, rows] = await Promise.all([prisma.business.count({ where }), rowsPromise]);
+    }
+
+    // Log first-page searches for signed-in users only (less write load from public traffic).
+    if (page === 1 && !reuseTotal && !fastPreview && params.userId) {
       void prisma.searchHistory
         .create({
           data: {
-            userId: params.userId ?? null,
+            userId: params.userId,
             keyword: params.keyword ?? null,
             city: params.city ?? params.state ?? null,
             category: params.category ?? params.mainCategory ?? null,

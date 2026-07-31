@@ -380,7 +380,9 @@ export function LeadFinderSection({
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm" style={{ color: "var(--c-text-muted)" }}>
                 {isPreview
-                  ? `Previewing ${Math.min(result.results.length, 3)} of ${result.total} matches`
+                  ? result.results.length
+                    ? `Previewing ${Math.min(result.results.length, 3)} matches. Sign in for the full list.`
+                    : "No matches in this preview."
                   : `${result.total} results found`}
               </p>
               {!isPreview && visibleResults.length > 0 && (

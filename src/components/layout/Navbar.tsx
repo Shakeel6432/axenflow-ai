@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/ui/AppLink";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { navLinks } from "@/lib/constants";
 import { Logo } from "@/components/ui/Logo";
@@ -42,12 +41,9 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <motion.header
-      initial={{ y: -28, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+    <header
       className={cn(
-        "nav-header fixed inset-x-0 top-0 z-50 overflow-hidden backdrop-blur-xl",
+        "nav-header nav-header-enter fixed inset-x-0 top-0 z-50 overflow-hidden backdrop-blur-xl",
         scrolled && "nav-header-scrolled"
       )}
       style={{
@@ -75,29 +71,16 @@ export function Navbar() {
                     href={link.href}
                     className={cn(
                       "nav-link relative z-10 rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-300",
-                      active ? "text-[var(--c-heading)]" : "text-[var(--c-text-dim)] hover:text-[var(--c-heading)]"
+                      active
+                        ? "nav-link-active text-[var(--c-heading)]"
+                        : "text-[var(--c-text-dim)] hover:text-[var(--c-heading)]"
                     )}
                   >
-                    {active && (
-                      <motion.span
-                        layoutId="nav-active-pill"
-                        className="nav-active-pill absolute inset-0 -z-10 rounded-full"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <motion.span
-                      className="relative inline-block"
-                      whileHover={{ y: -1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                    >
+                    <span className="relative inline-block transition-transform duration-200 hover:-translate-y-px">
                       {link.label}
-                    </motion.span>
+                    </span>
                     {active && (
-                      <motion.span
-                        layoutId="nav-active-underline"
-                        className="absolute inset-x-3 -bottom-[2px] h-[2px] rounded-full bg-gradient-to-r from-indigo-500 via-teal-400 to-indigo-400"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
+                      <span className="absolute inset-x-3 -bottom-[2px] h-[2px] rounded-full bg-gradient-to-r from-indigo-500 via-teal-400 to-indigo-400" />
                     )}
                   </Link>
                 );
@@ -112,87 +95,58 @@ export function Navbar() {
 
           <div className="flex items-center gap-2 lg:hidden">
             <ThemeToggleButton theme={theme} onToggle={toggle} />
-            <motion.button
+            <button
               type="button"
-              whileTap={{ scale: 0.92 }}
-              className="nav-icon-btn flex h-9 w-9 items-center justify-center rounded-xl"
+              className="nav-icon-btn flex h-9 w-9 items-center justify-center rounded-xl transition-transform active:scale-95"
               onClick={() => setOpen(!open)}
               aria-label="Toggle menu"
               aria-expanded={open}
             >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={open ? "close" : "open"}
-                  initial={{ opacity: 0, rotate: -90, scale: 0.6 }}
-                  animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                  exit={{ opacity: 0, rotate: 90, scale: 0.6 }}
-                  transition={{ duration: 0.18 }}
-                  className="inline-flex"
-                >
-                  {open ? <X size={18} /> : <Menu size={18} />}
-                </motion.span>
-              </AnimatePresence>
-            </motion.button>
+              {open ? <X size={18} /> : <Menu size={18} />}
+            </button>
           </div>
         </div>
       </Container>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden lg:hidden"
-          >
-            <div className="nav-mobile-panel backdrop-blur-2xl">
-              <Container className="py-5">
-                <nav className="flex flex-col gap-1">
-                  {navLinks.map((link, i) => {
-                    const active = isActivePath(pathname, link.href);
-                    return (
-                      <motion.div
-                        key={link.href}
-                        initial={{ opacity: 0, x: -14 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.035 * i, duration: 0.28 }}
-                      >
-                        <Link
-                          href={link.href}
-                          onClick={() => setOpen(false)}
-                          className={cn(
-                            "nav-mobile-link flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
-                            active && "nav-mobile-link-active"
-                          )}
-                          style={{
-                            color: active ? "var(--c-heading)" : "var(--c-text-dim)",
-                          }}
-                        >
-                          <span>{link.label}</span>
-                          {active && (
-                            <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 to-teal-400" />
-                          )}
-                        </Link>
-                      </motion.div>
-                    );
-                  })}
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.28, duration: 0.25 }}
-                    className="mt-3 flex flex-col gap-2 pt-4"
-                    style={{ borderTop: "1px solid var(--c-border)" }}
-                  >
-                    <NavbarAuth mobile />
-                  </motion.div>
-                </nav>
-              </Container>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+      {open && (
+        <div className="overflow-hidden lg:hidden">
+          <div className="nav-mobile-panel backdrop-blur-2xl">
+            <Container className="py-5">
+              <nav className="flex flex-col gap-1">
+                {navLinks.map((link) => {
+                  const active = isActivePath(pathname, link.href);
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "nav-mobile-link flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+                        active && "nav-mobile-link-active"
+                      )}
+                      style={{
+                        color: active ? "var(--c-heading)" : "var(--c-text-dim)",
+                      }}
+                    >
+                      <span>{link.label}</span>
+                      {active && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 to-teal-400" />
+                      )}
+                    </Link>
+                  );
+                })}
+                <div
+                  className="mt-3 flex flex-col gap-2 pt-4"
+                  style={{ borderTop: "1px solid var(--c-border)" }}
+                >
+                  <NavbarAuth mobile />
+                </div>
+              </nav>
+            </Container>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }
 
@@ -204,26 +158,13 @@ function ThemeToggleButton({
   onToggle: () => void;
 }) {
   return (
-    <motion.button
+    <button
       type="button"
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.94 }}
       onClick={onToggle}
-      className="nav-icon-btn flex h-9 w-9 items-center justify-center rounded-xl"
+      className="nav-icon-btn flex h-9 w-9 items-center justify-center rounded-xl transition-transform hover:-translate-y-0.5 active:scale-95"
       aria-label="Toggle theme"
     >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={theme}
-          initial={{ opacity: 0, rotate: -40, scale: 0.6 }}
-          animate={{ opacity: 1, rotate: 0, scale: 1 }}
-          exit={{ opacity: 0, rotate: 40, scale: 0.6 }}
-          transition={{ duration: 0.2 }}
-          className="inline-flex"
-        >
-          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-        </motion.span>
-      </AnimatePresence>
-    </motion.button>
+      {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+    </button>
   );
 }
