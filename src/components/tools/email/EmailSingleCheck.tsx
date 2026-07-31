@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  AlertTriangle,
-  CheckCircle2,
-  HelpCircle,
-  Loader2,
-  Mail,
-  ShieldAlert,
-  XCircle,
-} from "lucide-react";
+import { Loader2, Mail, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { consumeDailyCheck, peekDailyRemaining } from "@/lib/free-check-quota";
+import {
+  CheckRowIcon,
+  ValidityBadge,
+  type ValidityBadgeKind,
+} from "@/components/tools/validators/ValidityBadge";
 
 type CheckResult = {
   email: string;
@@ -24,8 +22,6 @@ type CheckResult = {
   notes: string[];
 };
 
-type Badge = "Valid" | "Invalid" | "Risky" | "Unknown";
-
 const LS_KEY = "axenflow_email_free_checks_v1";
 const LS_DAILY_LIMIT = 5;
 
@@ -37,77 +33,18 @@ const STAGES = [
   "Estimating bounce risk...",
 ] as const;
 
-function readLocalUsage(): { day: string; count: number } {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return { day: "", count: 0 };
-    return JSON.parse(raw) as { day: string; count: number };
-  } catch {
-    return { day: "", count: 0 };
-  }
-}
-
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function consumeLocalCheck(): { ok: boolean; remaining: number } {
-  const day = todayKey();
-  const cur = readLocalUsage();
-  const count = cur.day === day ? cur.count : 0;
-  if (count >= LS_DAILY_LIMIT) return { ok: false, remaining: 0 };
-  const next = count + 1;
-  localStorage.setItem(LS_KEY, JSON.stringify({ day, count: next }));
-  return { ok: true, remaining: LS_DAILY_LIMIT - next };
-}
-
-function peekLocalRemaining(): number {
-  const day = todayKey();
-  const cur = readLocalUsage();
-  const count = cur.day === day ? cur.count : 0;
-  return Math.max(0, LS_DAILY_LIMIT - count);
-}
-
-function badgeStyles(badge: Badge) {
-  switch (badge) {
-    case "Valid":
-      return { bg: "rgba(20,184,166,0.15)", color: "#14b8a6", label: "Valid" };
-    case "Invalid":
-      return { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: "Invalid" };
-    case "Risky":
-      return { bg: "rgba(245,158,11,0.15)", color: "#f59e0b", label: "Risky" };
-    default:
-      return { bg: "rgba(148,163,184,0.15)", color: "#94a3b8", label: "Unknown" };
-  }
-}
-
-function RowIcon({
-  ok,
-  warn,
-  bad,
-}: {
-  ok?: boolean;
-  warn?: boolean;
-  bad?: boolean;
-}) {
-  if (bad) return <XCircle size={16} className="shrink-0 text-red-500" />;
-  if (warn) return <AlertTriangle size={16} className="shrink-0 text-amber-500" />;
-  if (ok) return <CheckCircle2 size={16} className="shrink-0 text-teal-500" />;
-  return <HelpCircle size={16} className="shrink-0 text-slate-400" />;
-}
-
 export function EmailSingleCheck() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<CheckResult | null>(null);
-  const [badge, setBadge] = useState<Badge | null>(null);
+  const [badge, setBadge] = useState<ValidityBadgeKind | null>(null);
   const [bounceRisk, setBounceRisk] = useState("");
   const [remaining, setRemaining] = useState(LS_DAILY_LIMIT);
 
   useEffect(() => {
-    setRemaining(peekLocalRemaining());
+    setRemaining(peekDailyRemaining(LS_KEY, LS_DAILY_LIMIT));
   }, []);
 
   async function onCheck(e: React.FormEvent) {
@@ -122,7 +59,7 @@ export function EmailSingleCheck() {
       return;
     }
 
-    const local = consumeLocalCheck();
+    const local = consumeDailyCheck(LS_KEY, LS_DAILY_LIMIT);
     if (!local.ok) {
       setError(
         "Free daily check limit reached in this browser. Sign in for bulk CSV validation, or try again tomorrow."
@@ -152,7 +89,6 @@ export function EmailSingleCheck() {
       setBadge(data.badge);
       setBounceRisk(data.bounceRisk || "");
       if (typeof data.remaining === "number") {
-        // Keep the tighter of IP remaining vs local remaining for display
         setRemaining((prev) => Math.min(prev, data.remaining));
       }
       setStage("Done");
@@ -163,8 +99,6 @@ export function EmailSingleCheck() {
       setBusy(false);
     }
   }
-
-  const style = badge ? badgeStyles(badge) : null;
 
   return (
     <div
@@ -226,7 +160,7 @@ export function EmailSingleCheck() {
       )}
       {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
-      {result && style && (
+      {result && badge && (
         <div
           className="mt-5 rounded-xl p-4 sm:p-5"
           style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
@@ -240,17 +174,12 @@ export function EmailSingleCheck() {
                 {result.email}
               </p>
             </div>
-            <span
-              className="inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-bold"
-              style={{ background: style.bg, color: style.color }}
-            >
-              {style.label}
-            </span>
+            <ValidityBadge badge={badge} />
           </div>
 
           <ul className="mt-4 space-y-2.5 text-sm" style={{ color: "var(--c-text-dim)" }}>
             <li className="flex items-start gap-2">
-              <RowIcon
+              <CheckRowIcon
                 ok={result.syntax === "Valid"}
                 bad={result.syntax === "Invalid"}
               />
@@ -259,7 +188,7 @@ export function EmailSingleCheck() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <RowIcon
+              <CheckRowIcon
                 ok={result.dns === "Valid"}
                 bad={result.dns === "Invalid"}
                 warn={result.dns === "Skipped" || result.dns === "Unknown"}
@@ -269,7 +198,7 @@ export function EmailSingleCheck() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <RowIcon
+              <CheckRowIcon
                 ok={result.mx === "Valid"}
                 bad={result.mx === "Invalid"}
                 warn={result.mx === "Skipped" || result.mx === "Unknown"}
@@ -279,7 +208,7 @@ export function EmailSingleCheck() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <RowIcon
+              <CheckRowIcon
                 ok={result.disposable === false}
                 bad={result.disposable === true}
                 warn={result.disposable == null}
@@ -291,7 +220,7 @@ export function EmailSingleCheck() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <RowIcon
+              <CheckRowIcon
                 ok={result.role === false}
                 warn={result.role === true || result.role == null}
               />
@@ -302,14 +231,14 @@ export function EmailSingleCheck() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <RowIcon warn />
+              <CheckRowIcon warn />
               <span>
                 Catch-all / mailbox existence: not probed (no live SMTP). Valid MX does not prove
                 the inbox exists.
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <RowIcon
+              <CheckRowIcon
                 ok={bounceRisk === "Low"}
                 warn={bounceRisk === "Medium"}
                 bad={bounceRisk === "High"}

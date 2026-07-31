@@ -7,6 +7,10 @@ export type OutreachInput = {
   category: string;
   city: string;
   senderName: string;
+  /** Person to address (optional; cold email greets the team when empty) */
+  recipientName?: string;
+  /** Short offer / product context for the free sample and drafts */
+  offerContext?: string;
 };
 
 export type OutreachDraft = {
@@ -45,14 +49,19 @@ export function generateOutreach(kind: OutreachKind, data: OutreachInput): Outre
   const category = clean(data.category, "your industry");
   const location = clean(data.city, "your area");
   const sender = clean(data.senderName, "AxenFlow AI");
+  const person = clean(data.recipientName || "", "");
+  const offer = clean(data.offerContext || "", "");
+  const greeting = person ? `Hello ${person},` : `Hello ${name} team,`;
 
   if (kind === "phone_script") {
     return {
       subject: `Call script: ${name}`,
       body:
-        `Hi there, this is [Your Name] with ${sender}. ` +
+        `Hi${person ? ` ${person}` : " there"}, this is [Your Name] with ${sender}. ` +
         `I'll keep it brief. I work with ${category} companies around ${location}. ` +
-        `We help teams like ${name} fill their pipeline with verified local leads. ` +
+        (offer
+          ? `We help teams like ${name} with ${offer}. `
+          : `We help teams like ${name} fill their pipeline with verified local leads. `) +
         `Do you have 30 seconds, or should I try you later?`,
     };
   }
@@ -61,9 +70,11 @@ export function generateOutreach(kind: OutreachKind, data: OutreachInput): Outre
     return {
       subject: `Following up: ${name}`,
       body:
-        `Hello ${name} team,\n\n` +
+        `${greeting}\n\n` +
         `Just bumping this in case my last note got buried. ` +
-        `Happy to share a sample of verified leads for your market, no obligation.\n\n` +
+        (offer
+          ? `Happy to share more about ${offer}, no obligation.\n\n`
+          : `Happy to share a sample of verified leads for your market, no obligation.\n\n`) +
         `Worth a quick reply?\n\n` +
         `Best regards,\n${sender}`,
     };
@@ -72,9 +83,11 @@ export function generateOutreach(kind: OutreachKind, data: OutreachInput): Outre
   return {
     subject: `Quick idea for ${name} in ${location}`,
     body:
-      `Hello ${name} team,\n\n` +
+      `${greeting}\n\n` +
       `I help ${category} businesses in ${location} get more qualified leads without adding headcount.\n\n` +
-      `We built a short system that finds ready-to-buy prospects and drafts outreach so your team can focus on closing.\n\n` +
+      (offer
+        ? `For ${name}, that usually looks like: ${offer}.\n\n`
+        : `We built a short system that finds ready-to-buy prospects and drafts outreach so your team can focus on closing.\n\n`) +
       `Open to a 10-minute call this week to see if it's a fit?\n\n` +
       `Best regards,\n${sender}`,
   };
@@ -86,12 +99,14 @@ export function fillCustomPrompt(prompt: string, data: OutreachInput): OutreachD
     business_name: clean(data.businessName, "there"),
     company: clean(data.businessName, "there"),
     name: clean(data.businessName, "there"),
+    recipient_name: clean(data.recipientName || "", clean(data.businessName, "there")),
     category: clean(data.category, "your industry"),
     industry: clean(data.category, "your industry"),
     city: clean(data.city, "your area"),
     location: clean(data.city, "your area"),
     sender_name: clean(data.senderName, "AxenFlow AI"),
     sender: clean(data.senderName, "AxenFlow AI"),
+    offer: clean(data.offerContext || "", ""),
   };
 
   let filled = String(prompt || "");

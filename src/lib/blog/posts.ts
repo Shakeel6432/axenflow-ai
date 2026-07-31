@@ -52,7 +52,7 @@ export const BLOG_POSTS: BlogPostMeta[] = [
     cta: {
       title: "Convert CSV ⇄ Excel free",
       description:
-        "Upload CSV or Excel, preview, auto-format, and download polished XLSX or clean CSV — 100% in your browser on AxenFlowAI.",
+        "Upload CSV or Excel, preview, auto-format, and download polished XLSX or clean CSV (100% in your browser on AxenFlowAI).",
       primary: {
         href: "/tools/csv-excel-converter",
         label: "Open CSV Excel Converter",
@@ -109,14 +109,15 @@ export const BLOG_POSTS: BlogPostMeta[] = [
     slug: "bulkphonevalidation",
     title: "Bulk Phone Validation Guide: Clean CSV Lists Before You Dial",
     description:
-      "Step by step guide to bulk phone validation with E.164 cleanup, Mobile vs Landline vs VoIP detection, and CSV export. Protect dialer ROI with AxenFlowAI Phone Validator.",
+      "Step by step bulk phone validation guide: free single phone check (no signup), E.164 cleanup, Mobile vs Landline vs VoIP, CSV upload limits, and export on AxenFlowAI.",
     publishedAt: "2026-07-23",
-    updatedAt: "2026-07-28",
+    updatedAt: "2026-08-01",
     keywords: [
       "bulk phone validation",
       "phone validator",
       "validate phone numbers CSV",
       "E.164 phone format",
+      "free phone number check",
       "lead list cleaning",
       "mobile vs landline",
       "international phone validator",
@@ -126,41 +127,42 @@ export const BLOG_POSTS: BlogPostMeta[] = [
     category: "Lead Validation",
     coverImage: "/images/blog/phonevalidator-cover.png",
     coverAlt:
-      "AxenFlowAI Phone Validator showing bulk phone validation summary for valid invalid and mobile counts",
+      "AxenFlowAI Phone Validator free single number check with Valid status badge and E.164 checklist",
     cta: {
-      title: "Validate your phone list free",
+      title: "Validate phones free",
       description:
-        "Upload CSV, detect Mobile vs Landline vs VoIP, and export clean E.164 numbers on AxenFlowAI Phone Validator.",
+        "Try a free single phone check (no signup), then upload CSV for bulk E.164 cleanup and Mobile vs Landline vs VoIP detection.",
       primary: { href: "/tools/phone-validator", label: "Open Phone Validator" },
       secondary: [
         { href: "/tools/email-validator", label: "Email Validator" },
-        { href: "/tools/ai-outreach", label: "AI Outreach" },
+        { href: "/tools/csv-excel-converter", label: "CSV Excel Converter" },
       ],
     },
     faqs: [
       {
-        question: "Is AxenFlowAI Phone Validator free to use?",
+        question: "Is there a free phone check without signup?",
         answer:
-          "Yes after you sign in. Run single checks or upload CSV and download cleaned results with status and type columns.",
+          "Yes. Use the single-number checker on the Phone Validator page with a country selector. Checks are rate-limited. Bulk CSV upload requires a free account.",
       },
       {
-        question: "How is this different from carrier lookup?",
+        question: "What is E.164 format and why does it matter?",
         answer:
-          "Bulk format validation confirms the number could exist and is structured correctly. Live carrier lookup confirms current network and is a separate paid layer for custom projects.",
+          "E.164 is the international phone standard: plus sign, country calling code, then the national number (for example +14155552671). SMS gateways, calling APIs, and most CRMs expect this form.",
       },
       {
         question: "Can it tell mobile from landline?",
         answer:
-          "For many countries, yes. US and Canada numbers often show as Fixed or Mobile because the digits alone do not encode line type.",
+          "For many countries, yes. US and Canada numbers often show as Fixed or Mobile because the digits alone do not encode line type without a live carrier lookup.",
       },
       {
-        question: "What file formats can I upload?",
+        question: "Do you store the phone numbers I check?",
         answer:
-          "CSV with a Phone or Phone Numbers column. Export includes status, type, country, region, and E.164 fields.",
+          "Validation runs for the request and returns results to your browser. Numbers are not written into a marketing database, and we do not sell phone lists. See the Privacy Policy for general practices.",
       },
       {
         question: "How many numbers can I validate at once?",
-        answer: "Up to 10,000 phone numbers per request on the bulk endpoint.",
+        answer:
+          "Guests get a small number of free single checks per day. After sign-in, up to 10,000 phone numbers per request (max 8MB CSV). No credit charge on this tool today.",
       },
     ],
   },

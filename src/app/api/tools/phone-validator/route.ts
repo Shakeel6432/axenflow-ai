@@ -3,10 +3,10 @@ import { requireUser } from "@/lib/auth-guards";
 import { parseCsv } from "@/lib/bbb-validate";
 import {
   DEFAULT_PHONE_OPTIONS,
-  validatePhoneLocal,
   type PhoneCheckOptions,
   type PhoneOutputFormat,
 } from "@/lib/validators/phone";
+import { validateOnePhone } from "@/services/phone-validator.service";
 import type { CountryCode } from "libphonenumber-js/max";
 
 export const runtime = "nodejs";
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Max 10000 phones per request" }, { status: 400 });
     }
 
-    const results = phones.map((raw) => validatePhoneLocal(raw, options));
+    const results = phones.map((raw) => validateOnePhone(raw, options));
     const counts = {
       total: results.length,
       valid: results.filter((r) => r.status === "Valid").length,

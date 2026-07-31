@@ -6,72 +6,64 @@ import {
   CheckCircle2,
   Download,
   FileSpreadsheet,
+  Globe2,
   Lock,
-  Shield,
   Sparkles,
   Upload,
 } from "lucide-react";
 import { Accordion } from "@/components/ui/Accordion";
 import { Button } from "@/components/ui/Button";
-import { EMAIL_VALIDATOR_FAQS } from "@/lib/email-validator-faq";
+import { PHONE_VALIDATOR_FAQS } from "@/lib/phone-validator-faq";
 import { BlogGuideCard } from "@/components/tools/validators/BlogGuideCard";
 import { TrustStrip } from "@/components/tools/validators/TrustStrip";
 
 const CHECKS = [
   {
-    title: "Syntax validation",
-    text: "Catches typos and malformed addresses before they hit your CRM or ESP.",
+    title: "Format validation",
+    text: "Confirms the number is structurally valid for its country using libphonenumber rules (length, prefixes, country code).",
   },
   {
-    title: "MX record check",
-    text: "Confirms the domain publishes mail exchangers and can receive email.",
+    title: "E.164 normalization",
+    text: "Converts to the international standard (+countrycode...) used by SMS/calling APIs and CRMs so every row shares one clean format.",
   },
   {
-    title: "DNS validation",
-    text: "Confirms the domain resolves on the public internet (A/AAAA).",
+    title: "Line type detection",
+    text: "Labels Mobile, Landline, VoIP, or Fixed or Mobile where the numbering plan allows. Useful for filtering numbers that cannot receive SMS before a campaign.",
   },
   {
-    title: "Disposable / temporary email detection",
-    text: "Flags throwaway providers (Mailinator, Guerrilla Mail, Yopmail, and similar).",
-  },
-  {
-    title: "Role-based detection",
-    text: "Flags generic addresses like info@, support@, and admin@ that rarely convert.",
-  },
-  {
-    title: "Catch-all / mailbox note",
-    text: "We do not run live SMTP probes, so catch-all domains cannot be confirmed. A valid MX does not prove a specific inbox exists.",
-  },
-  {
-    title: "Bounce risk estimate",
-    text: "Combines syntax, DNS, and MX signals into a Low / Medium / High estimate (not a real send).",
+    title: "Likely carrier from prefixes",
+    text: "Where we have prefix tables (for example some PK/AE/IN ranges, NANP region hints), we show a likely operator. This is not live HLR or porting lookup, so ported numbers may differ.",
   },
 ] as const;
 
 const SAMPLE_ROWS = [
   {
-    email: "alex@acme.com",
-    status: "Valid",
-    reason: "MX found",
-    bounce: "Low",
+    original: "+1 (415) 555-2671",
+    valid: "Valid",
+    e164: "+14155552671",
+    line: "Fixed or Mobile",
+    country: "United States",
   },
   {
-    email: "info@acme.com",
-    status: "Risky",
-    reason: "Role account",
-    bounce: "Low",
+    original: "03001234567",
+    valid: "Valid",
+    e164: "+923001234567",
+    line: "Mobile",
+    country: "Pakistan",
   },
   {
-    email: "temp@mailinator.com",
-    status: "Invalid",
-    reason: "Disposable domain",
-    bounce: "High",
+    original: "02079460958",
+    valid: "Valid",
+    e164: "+442079460958",
+    line: "Landline",
+    country: "United Kingdom",
   },
   {
-    email: "broken@@company",
-    status: "Invalid",
-    reason: "Invalid syntax",
-    bounce: "High",
+    original: "123",
+    valid: "Invalid",
+    e164: "",
+    line: "Unknown",
+    country: "",
   },
 ] as const;
 
@@ -80,7 +72,7 @@ type Props = {
   children?: React.ReactNode;
 };
 
-export function EmailValidatorMarketing({ isAuthed, children }: Props) {
+export function PhoneValidatorMarketing({ isAuthed, children }: Props) {
   const [showSample, setShowSample] = useState(false);
 
   return (
@@ -88,23 +80,22 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
       <TrustStrip
         items={[
           { icon: Sparkles, label: "No signup for quick check" },
-          { icon: Shield, label: "Request-scoped processing" },
-          { icon: FileSpreadsheet, label: "CSV / Excel export" },
+          { icon: FileSpreadsheet, label: "CSV export" },
+          { icon: Globe2, label: "International support" },
           { icon: Upload, label: "Bulk processing available" },
         ]}
       />
 
-      {/* What we check */}
       <section>
         <h2
           className="font-[var(--font-space)] text-xl font-bold sm:text-2xl"
           style={{ color: "var(--c-heading)" }}
         >
-          What we check in bulk email validation
+          What we check
         </h2>
         <p className="mt-2 max-w-2xl text-sm" style={{ color: "var(--c-text-muted)" }}>
-          Same checks for the free single email check and signed-in CSV uploads: syntax, DNS, MX
-          record check, disposable email filter, role flags, and bounce risk estimates.
+          Same checks for the free single phone check and signed-in CSV uploads: format, E.164,
+          line type, and prefix-based carrier hints where available.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {CHECKS.map((item) => (
@@ -113,7 +104,10 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
               className="rounded-xl p-4"
               style={{ background: "var(--c-hover-bg)", border: "1px solid var(--c-border)" }}
             >
-              <h3 className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--c-heading)" }}>
+              <h3
+                className="flex items-center gap-2 text-sm font-semibold"
+                style={{ color: "var(--c-heading)" }}
+              >
                 <CheckCircle2 size={14} className="text-teal-400" />
                 {item.title}
               </h3>
@@ -124,18 +118,17 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
           ))}
         </div>
         <p className="mt-3 text-xs" style={{ color: "var(--c-text-muted)" }}>
-          Accuracy note: we do not publish a single invented “99% accuracy” number. DNS/MX layers
-          use live lookups; inbox existence is not SMTP-confirmed.
+          Accuracy note: we do not publish a single invented accuracy percentage. Format checks use
+          local numbering rules; we do not call or text the number to confirm it is live.
         </p>
       </section>
 
-      {/* Bulk gate or full tool */}
       <section>
         <h2
           className="font-[var(--font-space)] text-xl font-bold sm:text-2xl"
           style={{ color: "var(--c-heading)" }}
         >
-          Bulk CSV email validation
+          Bulk CSV phone validation
         </h2>
         {isAuthed ? (
           <div className="mt-4">{children}</div>
@@ -156,14 +149,14 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
                   Upload a CSV for full list cleaning
                 </p>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--c-text-dim)" }}>
-                  Upload a CSV, Excel, or JSON file with up to <strong>5,000</strong> email addresses
-                  (max <strong>8MB</strong>). We check each one for syntax, MX, DNS, disposable,
-                  role, and bounce risk, then you download a report with status columns. Bulk upload
-                  is free with an account (no credit system on this tool today).
+                  Upload a CSV with up to <strong>10,000</strong> phone numbers (max{" "}
+                  <strong>8MB</strong>). We validate each one, detect line type, normalize to E.164,
+                  and give you a downloadable report. Bulk upload is free with an account (no credit
+                  system on this tool today).
                 </p>
                 <p className="mt-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
                   Processing is request-scoped: uploaded lists are not saved into a marketing
-                  database, and we do not sell email lists. Exports download in your browser.{" "}
+                  database, and we do not sell phone lists. Exports download in your browser.{" "}
                   <Link href="/privacy" className="text-indigo-500 hover:text-teal-500">
                     Privacy Policy
                   </Link>
@@ -172,43 +165,52 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
               </div>
             </div>
 
-            {/* Sample output mock */}
-            <div className="mt-5 overflow-x-auto rounded-xl" style={{ border: "1px solid var(--c-border)" }}>
+            <div
+              className="mt-5 overflow-x-auto rounded-xl"
+              style={{ border: "1px solid var(--c-border)" }}
+            >
               <table className="min-w-full text-left text-xs sm:text-sm">
                 <thead style={{ background: "rgba(99,102,241,0.12)" }}>
                   <tr>
-                    {["original_email", "status", "reason", "bounce_risk"].map((h) => (
-                      <th key={h} className="px-3 py-2.5 font-semibold" style={{ color: "var(--c-heading)" }}>
-                        {h}
-                      </th>
-                    ))}
+                    {["original_number", "valid", "e164_format", "line_type", "country"].map(
+                      (h) => (
+                        <th
+                          key={h}
+                          className="px-3 py-2.5 font-semibold"
+                          style={{ color: "var(--c-heading)" }}
+                        >
+                          {h}
+                        </th>
+                      )
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {SAMPLE_ROWS.map((row) => (
-                    <tr key={row.email} style={{ borderTop: "1px solid var(--c-border)" }}>
-                      <td className="px-3 py-2.5">{row.email}</td>
-                      <td className="px-3 py-2.5 font-semibold">{row.status}</td>
+                    <tr key={row.original} style={{ borderTop: "1px solid var(--c-border)" }}>
+                      <td className="px-3 py-2.5 whitespace-nowrap">{row.original}</td>
+                      <td className="px-3 py-2.5 font-semibold">{row.valid}</td>
+                      <td className="px-3 py-2.5 whitespace-nowrap">{row.e164 || ""}</td>
                       <td className="px-3 py-2.5" style={{ color: "var(--c-text-dim)" }}>
-                        {row.reason}
+                        {row.line}
                       </td>
-                      <td className="px-3 py-2.5">{row.bounce}</td>
+                      <td className="px-3 py-2.5">{row.country || ""}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className="mt-2 text-xs" style={{ color: "var(--c-text-muted)" }}>
-              Sample preview: your signed-in export includes the same style of columns plus DNS/MX
-              detail fields.
+              Sample preview: your signed-in export includes the same style of columns plus
+              operator, region, and notes fields.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button href={`/signup?callbackUrl=${encodeURIComponent("/tools/email-validator")}`}>
+              <Button href={`/signup?callbackUrl=${encodeURIComponent("/tools/phone-validator")}`}>
                 Create Account
               </Button>
               <Button
-                href={`/signin?callbackUrl=${encodeURIComponent("/tools/email-validator")}`}
+                href={`/signin?callbackUrl=${encodeURIComponent("/tools/phone-validator")}`}
                 variant="outline"
               >
                 Login
@@ -227,32 +229,35 @@ export function EmailValidatorMarketing({ isAuthed, children }: Props) {
             {showSample && (
               <pre
                 className="mt-4 overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
-                style={{ background: "var(--c-bg)", color: "var(--c-text-dim)", border: "1px solid var(--c-border)" }}
-              >{`original_email,status,syntax,dns,mx,disposable,role,bounce_risk,reason
-alex@acme.com,Valid,Valid,Valid,Valid,false,false,Low,MX found
-info@acme.com,Valid,Valid,Valid,Valid,false,true,Low,Role account
-temp@mailinator.com,Invalid,Valid,Valid,Valid,true,false,High,Disposable domain
-broken@@company,Invalid,Invalid,Skipped,Skipped,,,High,Invalid syntax`}</pre>
+                style={{
+                  background: "var(--c-bg)",
+                  color: "var(--c-text-dim)",
+                  border: "1px solid var(--c-border)",
+                }}
+              >{`original_number,valid,e164_format,line_type,country,operator
++1 (415) 555-2671,Valid,+14155552671,Fixed or Mobile,United States,California local carrier
+03001234567,Valid,+923001234567,Mobile,Pakistan,Jazz Pakistan
+02079460958,Valid,+442079460958,Landline,United Kingdom,
+123,Invalid,,,Unknown,`}</pre>
             )}
           </div>
         )}
       </section>
 
       <BlogGuideCard
-        href="/blog/bulkemailvalidation"
-        title="Learn more: Bulk Email Validation Guide"
-        description="Step-by-step CSV prep, check meanings, and export tips for deliverability."
+        href="/blog/bulkphonevalidation"
+        title="Learn more: Bulk Phone Validation Guide"
+        description="CSV prep, result fields (E.164, line type, operator), and export tips for SMS-ready lists."
       />
 
-      {/* FAQ */}
       <section>
         <h2
           className="mb-4 font-[var(--font-space)] text-xl font-bold sm:text-2xl"
           style={{ color: "var(--c-heading)" }}
         >
-          Email validator FAQ
+          Phone validator FAQ
         </h2>
-        <Accordion items={[...EMAIL_VALIDATOR_FAQS]} />
+        <Accordion items={[...PHONE_VALIDATOR_FAQS]} />
       </section>
     </div>
   );

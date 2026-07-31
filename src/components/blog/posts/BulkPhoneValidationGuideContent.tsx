@@ -10,17 +10,33 @@ export function BulkPhoneValidationGuideContent() {
         which rows are mobile until after the campaign fails.
       </p>
       <p>
-        <strong>Bulk phone validation</strong> fixes that before you spend budget on dialers, SMS
-        tools, or SDR hours. This guide shows how to prepare a CSV, run checks on the AxenFlowAI{" "}
+        This guide shows how to use the AxenFlowAI{" "}
         <Link href="/tools/phone-validator" className="text-indigo-400 hover:text-teal-400">
           Phone Validator
         </Link>
-        , read status and type fields, and export clean E.164 numbers. Pair it with the{" "}
+        : start with the free single-number check (no signup), then sign in for bulk CSV validation,
+        read status and type fields, and export clean E.164 numbers. Pair it with the{" "}
         <Link href="/blog/bulkemailvalidation" className="text-indigo-400 hover:text-teal-400">
           bulk email validation guide
         </Link>{" "}
         when your lead file has both columns.
       </p>
+      <p>
+        <strong>Want to test a single number first?</strong> Use our{" "}
+        <Link href="/tools/phone-validator" className="text-indigo-400 hover:text-teal-400">
+          free phone checker
+        </Link>{" "}
+        (no signup required). Pick a country, enter one number, and get a color-coded Valid /
+        Invalid / Unknown badge plus a checklist for format, E.164, line type, and likely carrier
+        where prefixes are known (rate-limited to prevent abuse).
+      </p>
+
+      <BlogFigure
+        src="/images/blog/phonevalidator-cover.png"
+        alt="AxenFlowAI Phone Validator free single number check with Valid status badge and E.164 checklist"
+        caption="Free single check above the fold, then unlock bulk CSV upload after you create an account."
+        priority
+      />
 
       <h2 className="blog-h2">Why bulk phone validation beats spot checking</h2>
       <p>Spot checking ten numbers feels productive. It is not.</p>
@@ -45,40 +61,76 @@ export function BulkPhoneValidationGuideContent() {
         or a scraper. Data decays less than reputation.
       </p>
 
-      <h2 className="blog-h2">Phone checks and filters on AxenFlowAI</h2>
-      <p>Configure validation before you run a single number or a CSV upload:</p>
+      <h2 className="blog-h2">What we check (same engine for free and bulk)</h2>
+      <p>
+        The free single check and signed-in bulk upload share the same validation service. On the
+        tool page, the <strong>What We Check</strong> section explains each layer:
+      </p>
       <ul className="blog-ul">
         <li>
-          <strong>Format + country validation:</strong> Numbering rules for every country
+          <strong>Format validation:</strong> Confirms the number is structurally valid for its
+          country (libphonenumber rules)
         </li>
         <li>
-          <strong>Keep one number:</strong> If a cell has multiple values, keep the first valid
+          <strong>E.164 normalization:</strong> Converts to +countrycode form used by SMS, calling
+          APIs, and CRMs
         </li>
         <li>
-          <strong>Reject short codes:</strong> Under 7 digits
+          <strong>Line type detection:</strong> Mobile, Landline, VoIP, or Fixed or Mobile when the
+          numbering plan allows (useful before SMS campaigns)
         </li>
         <li>
-          <strong>Reject toll free:</strong> 800 / freephone style lines
-        </li>
-        <li>
-          <strong>Reject premium:</strong> Premium rate / shared cost
-        </li>
-        <li>
-          <strong>Reject landlines:</strong> Keep mobile focused lists
-        </li>
-        <li>
-          <strong>Reject VoIP:</strong> Flag IP telephony numbers invalid
-        </li>
-        <li>
-          <strong>Default country + output format:</strong> E.164, International, National, or
-          original
+          <strong>Likely carrier from prefixes:</strong> Where prefix tables exist, we show a likely
+          operator. This is <em>not</em> live HLR or porting lookup, so ported numbers may differ
         </li>
       </ul>
+      <p>
+        After sign-in, bulk mode also exposes optional filters: reject short codes, toll free,
+        premium, landlines, or VoIP, plus default country and output format choices.
+      </p>
 
       <BlogFigure
-        src="/images/blog/phonevalidator-checks.png"
-        alt="AxenFlowAI Phone Validator checks for format country reject filters and E.164 output"
-        caption="Set a default country when rows lack a plus country code, then choose E.164 for CRM and dialers."
+        src="/images/blog/phonevalidator-what-we-check.png"
+        alt="AxenFlowAI Phone Validator What We Check section for format E.164 line type and carrier prefixes"
+        caption="Format and E.164 are the core. Line type and prefix carrier hints help segment SMS vs call lists."
+      />
+
+      <h2 className="blog-h2">Free single-number check (no signup)</h2>
+      <p>
+        Open{" "}
+        <Link href="/tools/phone-validator" className="text-indigo-400 hover:text-teal-400">
+          /tools/phone-validator
+        </Link>
+        . Above the fold you will see:
+      </p>
+      <ol className="blog-ol">
+        <li>
+          A <strong>country selector</strong>, phone input, and <strong>Check Number</strong> button
+          (no account wall)
+        </li>
+        <li>
+          A short animated checking sequence (format → country → line type → carrier prefixes →
+          E.164)
+        </li>
+        <li>
+          A result card with a status badge: <strong>Valid</strong> (green),{" "}
+          <strong>Invalid</strong> (red), or <strong>Unknown</strong> (gray)
+        </li>
+        <li>
+          A checklist breakdown: valid format for detected country, E.164 normalization, line type
+          (Mobile / Landline / VoIP / Fixed or Mobile), and likely carrier when available
+        </li>
+      </ol>
+      <p>
+        Free checks are rate-limited (browser daily limit plus IP hourly limit) so the demo stays
+        usable without becoming an open bulk API. Prefer +country code, or pick a default country
+        when the number is local-format only.
+      </p>
+
+      <BlogFigure
+        src="/images/blog/phonevalidator-single-check.png"
+        alt="AxenFlowAI Phone Validator single number check result showing valid mobile number normalized to E.164 format"
+        caption="What you see after a free check: country selector, Valid badge, and format / E.164 / line type checklist."
       />
 
       <h2 className="blog-h2">Preparing your CSV for phone validation</h2>
@@ -92,6 +144,11 @@ export function BulkPhoneValidationGuideContent() {
       <p>
         If your export uses mobile, direct, or contact phone, rename the column before upload. One
         phone per row is ideal. Multi value cells can be collapsed when Keep one number is enabled.
+        If you need CSV ↔ Excel cleanup first, use the{" "}
+        <Link href="/tools/csv-excel-converter" className="text-indigo-400 hover:text-teal-400">
+          CSV to Excel Converter
+        </Link>
+        .
       </p>
 
       <h3 className="blog-h3">Encoding and junk rows</h3>
@@ -141,37 +198,38 @@ export function BulkPhoneValidationGuideContent() {
       </p>
 
       <h2 className="blog-h2">How to run bulk phone validation on AxenFlowAI</h2>
+      <p>
+        Bulk CSV upload is account-gated (that is the list-cleaning product). Guests still see an
+        informative gate with limits and a sample output table, not a blank login wall.
+      </p>
       <ol className="blog-ol">
         <li>
           Open{" "}
           <Link href="/tools/phone-validator" className="text-indigo-400 hover:text-teal-400">
             Phone Validator
           </Link>{" "}
-          (sign in required to run checks).
+          and (optionally) try the free single check first.
         </li>
         <li>
-          Configure checks: Format + country, default country if rows lack +, output format E.164,
-          optional reject filters.
+          Create an account or sign in for bulk. Limits shown on the page: up to{" "}
+          <strong>10,000 phones</strong> per request, max <strong>8MB</strong> file. Bulk is free
+          with an account today (no credit meter on this tool).
         </li>
-        <li>Validate a single number, or upload CSV.</li>
-        <li>Review summary cards: Total, Valid, Invalid, Mobile, Landline, VoIP, Fixed/Mobile.</li>
-        <li>Download results CSV with status and type columns.</li>
+        <li>
+          After sign-in, configure checks (format + country, default country, output format E.164,
+          optional reject filters) and upload CSV, or paste a single number in the signed-in panel.
+        </li>
+        <li>
+          Review summary cards: Total, Valid, Invalid, Mobile, Landline, VoIP, Fixed/Mobile.
+        </li>
+        <li>Download results CSV with status, type, country, operator, and E.164 columns.</li>
       </ol>
 
       <BlogFigure
-        src="/images/blog/phonevalidator-export.png"
-        alt="Bulk phone validation workflow prepare CSV validate then download E.164 list"
-        caption="Upload, validate, then download E.164 results for dialers, SMS tools, and CRM imports."
+        src="/images/blog/phonevalidator-bulk-gate.png"
+        alt="AxenFlowAI Phone Validator bulk CSV upload gate with sample original_number valid e164_format line_type country preview"
+        caption="Before signup you can preview sample report columns: original_number, valid, e164_format, line_type, country."
       />
-
-      <p>
-        Processing up to 10,000 numbers per request covers most SMB batches. Larger files can be
-        split or handled via{" "}
-        <Link href="/contact" className="text-indigo-400 hover:text-teal-400">
-          custom automation
-        </Link>
-        .
-      </p>
 
       <h2 className="blog-h2">Reading your phone validation results</h2>
       <h3 className="blog-h3">Status fields</h3>
@@ -180,10 +238,10 @@ export function BulkPhoneValidationGuideContent() {
           <strong>Valid:</strong> Passes numbering rules for detected country
         </li>
         <li>
-          <strong>Invalid:</strong> Fails format or length rules
+          <strong>Invalid:</strong> Fails format or length rules (or a reject filter you enabled)
         </li>
         <li>
-          <strong>Unknown:</strong> Missing country context (add + or default country)
+          <strong>Unknown:</strong> Missing country context (add + or choose a default country)
         </li>
       </ul>
 
@@ -193,14 +251,15 @@ export function BulkPhoneValidationGuideContent() {
           <strong>Mobile / Landline / VoIP:</strong> Actionable when detected
         </li>
         <li>
-          <strong>Fixed or Mobile:</strong> Common for US/Canada
+          <strong>Fixed or Mobile:</strong> Common for US/Canada (digits alone do not encode line
+          type without live carrier lookup)
         </li>
         <li>
           <strong>Toll free:</strong> Usually HQ or support lines
         </li>
       </ul>
 
-      <h3 className="blog-h3">Geography fields</h3>
+      <h3 className="blog-h3">Geography and operator fields</h3>
       <p>
         For US/CA numbers, expect area code and region. Operator fields reflect numbering prefix
         estimates, not live porting status.
@@ -208,9 +267,21 @@ export function BulkPhoneValidationGuideContent() {
 
       <BlogFigure
         src="/images/blog/phonevalidator-results.png"
-        alt="Phone validator results table with original E.164 status type and country columns"
+        alt="Phone validator results table with E.164 status line type country and operator columns"
         caption="Filter Valid + Mobile for SMS. Keep all Valid E.164 numbers for CRM enrichment."
       />
+
+      <h2 className="blog-h2">Privacy and trust (what we say on the tool)</h2>
+      <p>
+        Free single checks and bulk validation run on our servers for the request and return
+        results to your browser. Checked numbers are not written into a marketing database, and we
+        do not sell phone lists. Exports download client-side. For broader data practices, see the{" "}
+        <Link href="/privacy" className="text-indigo-400 hover:text-teal-400">
+          Privacy Policy
+        </Link>
+        . We do not invent an overall accuracy percentage. Format checks use local numbering rules;
+        we do not call or text the number to prove it is live.
+      </p>
 
       <h2 className="blog-h2">Filtering for your channel</h2>
       <p>
@@ -250,39 +321,72 @@ export function BulkPhoneValidationGuideContent() {
 
       <h2 className="blog-h2">Bulk phone validation FAQ</h2>
       <p>
-        <strong>Is AxenFlowAI Phone Validator free to use?</strong> Yes after you sign in. Run
-        single checks or upload CSV and download cleaned results.
+        <strong>Is there a free check without signup?</strong> Yes. Use the single-number checker on
+        the{" "}
+        <Link href="/tools/phone-validator" className="text-indigo-400 hover:text-teal-400">
+          Phone Validator
+        </Link>{" "}
+        page (country selector + rate limits). Bulk CSV requires an account.
       </p>
       <p>
-        <strong>How is this different from carrier lookup?</strong> Bulk format validation confirms
-        the number could exist and is structured correctly. Live carrier lookup confirms current
-        network. That is a paid layer AxenFlowAI can integrate in custom projects.
+        <strong>What is E.164 format and why does it matter?</strong> E.164 is the international
+        standard: a plus sign, country calling code, then the national number with no punctuation
+        (for example +14155552671). SMS gateways, calling APIs, and most CRMs expect this form.
       </p>
       <p>
-        <strong>Will validation fix typos?</strong> It flags invalid rows; it does not guess missing
-        digits.
+        <strong>Why does Mobile vs Landline matter for SMS?</strong> Mobile numbers can usually
+        receive SMS. Landlines generally cannot. Filtering landlines before an SMS campaign reduces
+        failed sends. US/CA rows often show Fixed or Mobile without a live carrier lookup.
       </p>
       <p>
-        <strong>Can I tell mobile from landline?</strong> For many countries, yes. US and Canada
-        numbers often show as Fixed or Mobile because the digits alone do not encode line type.
+        <strong>Can this detect VoIP numbers used for spam or fraud?</strong> When the numbering
+        plan classifies a number as VoIP, we surface that line type so you can filter it. That is a
+        type estimate, not a live spam or fraud score. Many legitimate businesses also use VoIP.
       </p>
       <p>
-        <strong>Can I validate while scraping?</strong> Yes. Many teams pipe scraper CSV through
-        validators before client delivery. See{" "}
-        <Link href="/download" className="text-indigo-400 hover:text-teal-400">
-          Desktop Scrapers
+        <strong>How accurate is validation without calling or texting?</strong> Format validation
+        is strong for catching typos and impossible lengths. It does not prove the line is currently
+        active or owned by a specific person. We do not publish a fake overall accuracy percentage.
+      </p>
+      <p>
+        <strong>How many numbers can I validate for free / what are bulk limits?</strong> Guests get
+        a small number of free single checks per day (also IP rate-limited). After sign-in: up to
+        10,000 phones per request, max 8MB CSV. No credit charge on this tool today.
+      </p>
+      <p>
+        <strong>Do you store the phone numbers I check?</strong> Validation is request-scoped for
+        the tool response. Numbers are not saved into a marketing database, and we do not sell phone
+        lists. See the Privacy Policy for general practices.
+      </p>
+      <p>
+        <strong>Does this work for international numbers outside the US?</strong> Yes. Prefer
+        +country code, or pick a default country for local-format rows.
+      </p>
+      <p>
+        <strong>Should I validate emails too?</strong> Yes when your sheet has email addresses. Use{" "}
+        <Link href="/tools/email-validator" className="text-indigo-400 hover:text-teal-400">
+          Email Validator
+        </Link>{" "}
+        and the{" "}
+        <Link href="/blog/bulkemailvalidation" className="text-indigo-400 hover:text-teal-400">
+          email CSV guide
+        </Link>
+        . For file format cleanup, see the{" "}
+        <Link href="/blog/csvexcelconverter" className="text-indigo-400 hover:text-teal-400">
+          CSV to Excel converter guide
         </Link>
         .
       </p>
 
       <h2 className="blog-h2">Conclusion</h2>
       <p>
-        Bulk phone validation is the cheapest insurance on outbound ROI. Clean CSV in, E.164 out,
-        types and regions attached, then dial with confidence. Open the{" "}
+        Start with a free single check to see the badge and checklist, then clean full lists with
+        bulk phone validation after sign-in. Clean CSV in, E.164 out, types and regions attached,
+        then dial or text with more confidence. Open the{" "}
         <Link href="/tools/phone-validator" className="text-indigo-400 hover:text-teal-400">
           Phone Validator
         </Link>{" "}
-        and clean your next list today.
+        and try a number now.
       </p>
     </>
   );

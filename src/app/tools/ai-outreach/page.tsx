@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import Link from "@/components/ui/AppLink";
 import { siteConfig } from "@/lib/constants";
 import { getSessionUser } from "@/lib/auth-guards";
-import { AuthRequired } from "@/components/auth/AuthRequired";
+import { AI_OUTREACH_FAQS } from "@/lib/ai-outreach-faq";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 import { OutreachClient } from "@/components/bbb/OutreachClient";
 import { ToolHubLinks } from "@/components/tools/ToolHubLinks";
+import { OutreachSingleSample } from "@/components/tools/outreach/OutreachSingleSample";
+import { OutreachMarketing } from "@/components/tools/outreach/OutreachMarketing";
 
 export const metadata: Metadata = {
   title: "AI Outreach | Cold Email & Call Script Generator",
   description:
-    "Generate cold emails, phone scripts, and follow ups. Chat to build templates, personalize with lead fields, and batch fill CSV or Excel on AxenFlowAI.",
+    "Generate cold emails, phone scripts, and follow ups. Free sample with lead fields, chat to build templates, personalize each row, and batch fill CSV or Excel on AxenFlowAI.",
   keywords: [
     "AI outreach",
     "cold email generator",
@@ -27,34 +28,40 @@ export default async function AiOutreachPage() {
   const session = await getSessionUser();
   const isAuthed = Boolean(session);
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: AI_OUTREACH_FAQS.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <PageHero
         title="AI Outreach"
-        description={
-          isAuthed
-            ? "Chat to create a template, then add it to your CSV or Excel sheet."
-            : "Browse the tool here. Sign in to generate outreach templates and export files."
-        }
+        description="Free personalized sample (no signup). Sign in to chat-build templates, merge lead fields, and batch-fill CSV or Excel."
       />
       <Section tight>
         <Container>
           <ToolHubLinks current="/tools/ai-outreach" />
-          <p className="mb-6 text-sm" style={{ color: "var(--c-text-muted)" }}>
-            New here? Read the{" "}
-            <Link href="/blog/aioutreach" className="text-indigo-500 hover:text-teal-500">
-              AI Outreach guide
-            </Link>{" "}
-            for templates, placeholders, and batch CSV tips.
-          </p>
-          {isAuthed ? (
-            <OutreachClient />
-          ) : (
-            <AuthRequired
-              callbackUrl="/tools/ai-outreach"
-              message="Sign in to generate AI outreach and export CSV or Excel."
-            />
-          )}
+
+          <div className="mt-2 space-y-8">
+            <OutreachSingleSample />
+
+            <OutreachMarketing isAuthed={isAuthed}>
+              <OutreachClient />
+            </OutreachMarketing>
+          </div>
         </Container>
       </Section>
     </>
