@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "@/components/ui/AppLink";
 import { Check, Copy, Loader2, Search, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { consumeDailyCheck, peekDailyRemaining } from "@/lib/free-check-quota";
@@ -16,6 +17,7 @@ type Candidate = {
   confidence: Confidence;
   reason: string;
   rank: number;
+  smtpVerified?: boolean;
 };
 
 type FinderResult = {
@@ -31,17 +33,30 @@ type FinderResult = {
   notes: string[];
   phase: string;
   smtpMailboxProbe: boolean;
+  smtpVerified: boolean;
+  smtpUpgradeAvailable: boolean;
+  verificationProvider: string | null;
+  apiCallsUsed?: number;
 };
 
 const LS_KEY = "axenflow_email_finder_free_v1";
 const LS_DAILY_LIMIT = 5;
 
-const STAGES = [
-  "Checking MX records...",
-  "Generating name patterns...",
-  "Checking domain memory...",
-  "Ranking candidates...",
-] as const;
+function stages(authed: boolean) {
+  return authed
+    ? ([
+        "Checking MX records...",
+        "Generating name patterns...",
+        "Verifying top candidates (API)...",
+        "Ranking results...",
+      ] as const)
+    : ([
+        "Checking MX records...",
+        "Generating name patterns...",
+        "Checking domain memory...",
+        "Ranking candidates...",
+      ] as const);
+}
 
 function confidenceStyle(c: Confidence) {
   switch (c) {
@@ -56,13 +71,25 @@ function confidenceStyle(c: Confidence) {
   }
 }
 
+function confidenceLabel(c: Candidate) {
+  if (c.smtpVerified && c.confidence === "High") return "High — SMTP-verified";
+  if (c.confidence === "Medium" && !c.smtpVerified) {
+    return "Medium — pattern match, not SMTP-verified";
+  }
+  return c.confidence;
+}
+
 const inputStyle = {
   border: "1px solid var(--c-border)",
   background: "var(--c-hover-bg)",
   color: "var(--c-heading)",
 } as const;
 
-export function EmailFinderSingleCheck() {
+type Props = {
+  isAuthed?: boolean;
+};
+
+export function EmailFinderSingleCheck({ isAuthed = false }: Props) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [domain, setDomain] = useState("");
@@ -70,12 +97,25 @@ export function EmailFinderSingleCheck() {
   const [stage, setStage] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<FinderResult | null>(null);
-  const [remaining, setRemaining] = useState(LS_DAILY_LIMIT);
+  const [remaining, setRemaining] = useState(isAuthed ? 50 : LS_DAILY_LIMIT);
   const [copied, setCopied] = useState("");
 
   useEffect(() => {
+    if (isAuthed) {
+      void fetch("/api/tools/email-finder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "usage" }),
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (typeof d?.usage?.remaining === "number") setRemaining(d.usage.remaining);
+        })
+        .catch(() => undefined);
+      return;
+    }
     setRemaining(peekDailyRemaining(LS_KEY, LS_DAILY_LIMIT));
-  }, []);
+  }, [isAuthed]);
 
   async function onFind(e: React.FormEvent) {
     e.preventDefault();
@@ -88,16 +128,19 @@ export function EmailFinderSingleCheck() {
       return;
     }
 
-    const local = consumeDailyCheck(LS_KEY, LS_DAILY_LIMIT);
-    if (!local.ok) {
-      setError(
-        "Free daily search limit reached in this browser. Sign in for bulk CSV (50/month free), or try again tomorrow."
-      );
-      setRemaining(0);
-      return;
+    if (!isAuthed) {
+      const local = consumeDailyCheck(LS_KEY, LS_DAILY_LIMIT);
+      if (!local.ok) {
+        setError(
+          "Free daily search limit reached in this browser. Sign in for SMTP-level verification and bulk CSV (50/month free), or try again tomorrow."
+        );
+        setRemaining(0);
+        return;
+      }
+      setRemaining(local.remaining);
     }
-    setRemaining(local.remaining);
 
+    const STAGES = stages(isAuthed);
     setBusy(true);
     let stageIdx = 0;
     setStage(STAGES[0]);
@@ -119,7 +162,9 @@ export function EmailFinderSingleCheck() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Search failed");
       setResult(data.result);
-      if (typeof data.remaining === "number") {
+      if (typeof data.monthlyRemaining === "number") {
+        setRemaining(data.monthlyRemaining);
+      } else if (typeof data.remaining === "number" && !isAuthed) {
         setRemaining((prev) => Math.min(prev, data.remaining));
       }
       setStage("Done");
@@ -188,18 +233,19 @@ export function EmailFinderSingleCheck() {
             className="font-[var(--font-space)] text-xl font-bold sm:text-2xl"
             style={{ color: "var(--c-heading)" }}
           >
-            Free email finder (Phase 1)
+            {isAuthed ? "Email finder (SMTP-verified)" : "Free email finder"}
           </h2>
           <p className="mt-1 text-sm" style={{ color: "var(--c-text-muted)" }}>
-            Pattern generation + MX/DNS validation + domain pattern memory. No live mailbox SMTP
-            probing yet.
+            {isAuthed
+              ? "Pattern + MX ranking, then API verification of top candidates. Provider timeouts fall back to pattern confidence."
+              : "Pattern generation + MX/DNS + domain memory. Sign in to SMTP-verify top candidates via our verification provider."}
           </p>
         </div>
         <span
           className="rounded-lg px-2.5 py-1 text-xs font-semibold"
           style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
         >
-          {remaining} free left today
+          {isAuthed ? `${remaining} left this month` : `${remaining} free left today`}
         </span>
       </div>
 
@@ -283,16 +329,19 @@ export function EmailFinderSingleCheck() {
                   >
                     Best match
                   </p>
-                  <p className="mt-0.5 break-all text-lg font-semibold" style={{ color: "var(--c-heading)" }}>
+                  <p
+                    className="mt-0.5 break-all text-lg font-semibold"
+                    style={{ color: "var(--c-heading)" }}
+                  >
                     {best.email}
                   </p>
                 </div>
                 <span
-                  className="inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-bold"
+                  className="inline-flex max-w-full items-center rounded-lg px-3 py-1.5 text-sm font-bold"
                   style={{ background: badge.bg, color: badge.color }}
                   title={best.reason}
                 >
-                  {best.confidence}
+                  {confidenceLabel(best)}
                 </span>
               </div>
               <p className="mt-2 text-sm" style={{ color: "var(--c-text-dim)" }} title={best.reason}>
@@ -331,12 +380,52 @@ export function EmailFinderSingleCheck() {
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckRowIcon warn />
+                  <CheckRowIcon
+                    ok={Boolean(best.smtpVerified)}
+                    warn={!best.smtpVerified && !result.smtpUpgradeAvailable}
+                    bad={false}
+                  />
                   <span>
-                    Phase 1: no live SMTP probe of this mailbox. Candidate list ranked below.
+                    {best.smtpVerified
+                      ? `SMTP/API verified${result.verificationProvider ? ` via ${result.verificationProvider}` : ""}`
+                      : result.smtpUpgradeAvailable
+                        ? "Not SMTP-verified (guest). Sign in to verify top candidates."
+                        : "Pattern confidence only (API skipped, timed out, or budget capped)"}
                   </span>
                 </li>
               </ul>
+
+              {result.smtpUpgradeAvailable && (
+                <div
+                  className="mt-4 rounded-xl p-3 text-sm"
+                  style={{
+                    border: "1px solid rgba(99,102,241,0.35)",
+                    background: "rgba(99,102,241,0.08)",
+                    color: "var(--c-text-dim)",
+                  }}
+                >
+                  <p style={{ color: "var(--c-heading)" }} className="font-semibold">
+                    Want SMTP-level verification?
+                  </p>
+                  <p className="mt-1">
+                    Sign in to verify the top 1–2 candidates with our mailbox API and unlock bulk CSV
+                    (50 finds/month free).
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button
+                      href={`/signup?callbackUrl=${encodeURIComponent("/tools/email-finder")}`}
+                    >
+                      Create Account
+                    </Button>
+                    <Button
+                      href={`/signin?callbackUrl=${encodeURIComponent("/tools/email-finder")}`}
+                      variant="outline"
+                    >
+                      Login
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button type="button" variant="outline" onClick={() => void copyEmail(best.email)}>
@@ -360,12 +449,19 @@ export function EmailFinderSingleCheck() {
           ) : null}
 
           {result.candidates.length > 0 && (
-            <div className="mt-5 overflow-x-auto rounded-xl" style={{ border: "1px solid var(--c-border)" }}>
+            <div
+              className="mt-5 overflow-x-auto rounded-xl"
+              style={{ border: "1px solid var(--c-border)" }}
+            >
               <table className="min-w-full text-left text-xs sm:text-sm">
                 <thead style={{ background: "rgba(99,102,241,0.12)" }}>
                   <tr>
                     {["rank", "email", "pattern", "confidence"].map((h) => (
-                      <th key={h} className="px-3 py-2.5 font-semibold" style={{ color: "var(--c-heading)" }}>
+                      <th
+                        key={h}
+                        className="px-3 py-2.5 font-semibold"
+                        style={{ color: "var(--c-heading)" }}
+                      >
                         {h}
                       </th>
                     ))}
@@ -378,7 +474,7 @@ export function EmailFinderSingleCheck() {
                       <td className="px-3 py-2.5 font-medium">{c.email}</td>
                       <td className="px-3 py-2.5">{c.patternLabel}</td>
                       <td className="px-3 py-2.5" title={c.reason}>
-                        {c.confidence}
+                        {confidenceLabel(c)}
                       </td>
                     </tr>
                   ))}
@@ -393,6 +489,19 @@ export function EmailFinderSingleCheck() {
             </p>
           )}
         </div>
+      )}
+
+      {!isAuthed && !result && (
+        <p className="mt-4 text-xs" style={{ color: "var(--c-text-muted)" }}>
+          Guests get pattern + MX only.{" "}
+          <Link
+            href={`/signup?callbackUrl=${encodeURIComponent("/tools/email-finder")}`}
+            className="text-indigo-500 hover:text-teal-500"
+          >
+            Sign up
+          </Link>{" "}
+          for SMTP/API verification of top candidates.
+        </p>
       )}
     </div>
   );

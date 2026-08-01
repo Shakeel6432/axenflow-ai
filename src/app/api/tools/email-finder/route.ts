@@ -5,7 +5,7 @@ import { parseCsv } from "@/lib/bbb-validate";
 import {
   confirmDomainPattern,
   consumeMonthlyFinderUsage,
-  findEmailsPhase1,
+  findEmailsWithVerification,
   getMonthlyFinderUsage,
 } from "@/services/email-finder.service";
 import { isValidPatternKey } from "@/lib/email-finder/patterns";
@@ -24,7 +24,7 @@ const rowSchema = z.object({
   domain: z.string().min(1),
 });
 
-/** Signed-in bulk / confirm endpoints for Email Finder Phase 1. */
+/** Signed-in bulk / confirm endpoints for Email Finder (Phase 2 API verify on top candidates). */
 export async function POST(req: NextRequest) {
   const session = await requireUser();
   if (!session?.user?.id) {
@@ -105,7 +105,7 @@ async function runBulk(
   }
   if (rows.length > 100) {
     return NextResponse.json(
-      { error: "Max 100 rows per bulk request in Phase 1." },
+      { error: "Max 100 rows per bulk request." },
       { status: 400 }
     );
   }
@@ -124,7 +124,13 @@ async function runBulk(
 
   const results = [];
   for (const row of rows) {
-    results.push(await findEmailsPhase1(row));
+    results.push(
+      await findEmailsWithVerification({
+        ...row,
+        userId,
+        bulk: true,
+      })
+    );
   }
 
   return NextResponse.json({

@@ -9,6 +9,12 @@ import {
   type PatternKey,
 } from "@/lib/email-finder/patterns";
 import { probeCatchAll } from "@/lib/email-finder/catchall";
+import { getEmailVerificationProvider } from "@/services/emailVerificationProvider";
+import {
+  canSpendApiCredits,
+  logApiVerification,
+  maybeAlertApiBudget,
+} from "@/services/emailFinderApiBudget";
 
 export type FinderConfidence = "High" | "Medium" | "Low" | "Invalid";
 
@@ -20,6 +26,9 @@ export type FinderCandidateResult = {
   confidence: FinderConfidence;
   reason: string;
   rank: number;
+  /** True when third-party API confirmed this mailbox */
+  smtpVerified?: boolean;
+  apiStatus?: string;
 };
 
 export type EmailFinderResult = {
@@ -31,12 +40,32 @@ export type EmailFinderResult = {
   catchAllDetail: string;
   confirmedPattern: string | null;
   confidenceCount: number;
-  phase: "pattern_mx_v1";
-  smtpMailboxProbe: false;
+  phase: "pattern_mx_v1" | "api_verify_v2";
+  smtpMailboxProbe: boolean;
+  /** Best candidate was SMTP/API-verified as deliverable */
+  smtpVerified: boolean;
+  /** Guests: show signup CTA for API verification */
+  smtpUpgradeAvailable: boolean;
+  verificationProvider: string | null;
+  apiCallsUsed: number;
   best: FinderCandidateResult | null;
   candidates: FinderCandidateResult[];
   notes: string[];
 };
+
+const API_RECHECK_DAYS = 90;
+
+function verifyTopN(bulk: boolean) {
+  const key = bulk ? "EMAIL_FINDER_VERIFY_TOP_N_BULK" : "EMAIL_FINDER_VERIFY_TOP_N";
+  const fallback = bulk ? 1 : 2;
+  const n = Number(process.env[key] || process.env.EMAIL_FINDER_VERIFY_TOP_N || fallback);
+  return Number.isFinite(n) && n > 0 ? Math.min(Math.floor(n), 3) : fallback;
+}
+
+function daysAgo(d: Date | null | undefined, days: number) {
+  if (!d) return false;
+  return Date.now() - d.getTime() < days * 24 * 60 * 60 * 1000;
+}
 
 async function loadDomainMemory(domain: string) {
   if (!isDatabaseConfigured()) return null;
@@ -53,6 +82,7 @@ async function upsertDomainMemory(
     isCatchAll?: boolean | null;
     confirmedPattern?: string | null;
     confidenceCount?: number;
+    lastApiVerified?: Date | null;
     touchChecked?: boolean;
   }
 ) {
@@ -72,6 +102,10 @@ async function upsertDomainMemory(
         patch.confidenceCount === undefined
           ? existing?.confidenceCount ?? 0
           : patch.confidenceCount,
+      lastApiVerified:
+        patch.lastApiVerified === undefined
+          ? existing?.lastApiVerified ?? null
+          : patch.lastApiVerified,
       lastChecked: patch.touchChecked === false ? existing?.lastChecked ?? null : new Date(),
     };
     await prisma.domainPattern.upsert({
@@ -104,7 +138,7 @@ function scoreCandidate(
   if (isConfirmed && opts.isCatchAll !== true) {
     return {
       confidence: "High",
-      reason: "Confirmed pattern for this domain + valid MX (Phase 1; no live mailbox SMTP probe)",
+      reason: "Confirmed pattern for this domain + valid MX (pattern memory; not SMTP-verified yet)",
     };
   }
 
@@ -120,13 +154,34 @@ function scoreCandidate(
     return {
       confidence: "Medium",
       reason:
-        "Valid MX + statistical best-guess pattern (not catch-all confirmed). Phase 1 does not SMTP-probe mailboxes.",
+        "Valid MX + statistical best-guess pattern (not catch-all). Pattern match, not SMTP-verified.",
     };
   }
 
   return {
     confidence: "Low",
-    reason: "Valid MX but lower-probability pattern guess (Phase 1 statistical ranking only)",
+    reason: "Valid MX but lower-probability pattern guess (statistical ranking only)",
+  };
+}
+
+function emptyFinderResult(
+  partial: Partial<EmailFinderResult> & Pick<EmailFinderResult, "domain" | "firstName" | "lastName" | "notes">
+): EmailFinderResult {
+  return {
+    mxValid: false,
+    isCatchAll: null,
+    catchAllDetail: "",
+    confirmedPattern: null,
+    confidenceCount: 0,
+    phase: "pattern_mx_v1",
+    smtpMailboxProbe: false,
+    smtpVerified: false,
+    smtpUpgradeAvailable: false,
+    verificationProvider: null,
+    apiCallsUsed: 0,
+    best: null,
+    candidates: [],
+    ...partial,
   };
 }
 
@@ -145,59 +200,34 @@ export async function findEmailsPhase1(input: {
   const notes: string[] = [];
 
   if (!domain || !domain.includes(".")) {
-    return {
+    return emptyFinderResult({
       domain,
       firstName,
       lastName,
-      mxValid: false,
-      isCatchAll: null,
-      catchAllDetail: "",
-      confirmedPattern: null,
-      confidenceCount: 0,
-      phase: "pattern_mx_v1",
-      smtpMailboxProbe: false,
-      best: null,
-      candidates: [],
       notes: ["Enter a valid domain (e.g. company.com)"],
-    };
+    });
   }
   if (!firstName && !lastName) {
-    return {
+    return emptyFinderResult({
       domain,
       firstName,
       lastName,
-      mxValid: false,
-      isCatchAll: null,
-      catchAllDetail: "",
-      confirmedPattern: null,
-      confidenceCount: 0,
-      phase: "pattern_mx_v1",
-      smtpMailboxProbe: false,
-      best: null,
-      candidates: [],
       notes: ["Enter at least a first or last name"],
-    };
+    });
   }
 
   const mxStatus = await checkMx(domain);
   const mxValid = mxStatus === "Valid";
   if (!mxValid) {
     notes.push("Invalid — domain cannot receive email (no MX)");
-    return {
+    return emptyFinderResult({
       domain,
       firstName,
       lastName,
       mxValid: false,
-      isCatchAll: null,
       catchAllDetail: "Skipped — no MX",
-      confirmedPattern: null,
-      confidenceCount: 0,
-      phase: "pattern_mx_v1",
-      smtpMailboxProbe: false,
-      best: null,
-      candidates: [],
       notes,
-    };
+    });
   }
 
   const memory = await loadDomainMemory(domain);
@@ -291,9 +321,228 @@ export async function findEmailsPhase1(input: {
     confidenceCount,
     phase: "pattern_mx_v1",
     smtpMailboxProbe: false,
+    smtpVerified: false,
+    smtpUpgradeAvailable: false,
+    verificationProvider: null,
+    apiCallsUsed: 0,
     best: candidates[0] || null,
     candidates,
     notes,
+  };
+}
+
+/**
+ * Phase 2: Phase 1 ranking, then verify top candidates via third-party API (signed-in only).
+ * Fails soft to Phase 1 confidence on timeout / budget / provider errors.
+ */
+export async function findEmailsWithVerification(input: {
+  firstName: string;
+  lastName: string;
+  domain: string;
+  userId?: string | null;
+  /** Bulk rows use a lower top-N to control cost */
+  bulk?: boolean;
+}): Promise<EmailFinderResult> {
+  const base = await findEmailsPhase1(input);
+  const provider = getEmailVerificationProvider();
+
+  if (!base.mxValid || !base.candidates.length) {
+    return { ...base, smtpUpgradeAvailable: false };
+  }
+
+  if (!provider.isConfigured()) {
+    base.notes.push("API verification unavailable (provider not configured) — Phase 1 ranking only");
+    return {
+      ...base,
+      phase: "api_verify_v2",
+      smtpMailboxProbe: false,
+      verificationProvider: provider.name,
+    };
+  }
+
+  const topN = verifyTopN(Boolean(input.bulk));
+  const memory = await loadDomainMemory(base.domain);
+  const recentApi =
+    Boolean(memory?.confirmedPattern) && daysAgo(memory?.lastApiVerified ?? null, API_RECHECK_DAYS);
+
+  // Fresh API confirmation for this domain's pattern — skip re-bill within 90 days
+  if (recentApi && memory?.confirmedPattern) {
+    const confirmed = memory.confirmedPattern;
+    const candidates = base.candidates.map((c, idx) => {
+      if (c.pattern !== confirmed) {
+        return { ...c, rank: idx + 1, smtpVerified: false };
+      }
+      return {
+        ...c,
+        rank: idx + 1,
+        confidence: (base.isCatchAll === true ? "Medium" : "High") as FinderConfidence,
+        smtpVerified: base.isCatchAll !== true,
+        reason:
+          base.isCatchAll === true
+            ? "Confirmed pattern on catch-all domain — API recheck skipped (cached <90 days); capped at Medium"
+            : "High — SMTP-verified (cached API confirmation within 90 days)",
+        apiStatus: "cached",
+      };
+    });
+    // Put confirmed first
+    candidates.sort((a, b) => {
+      if (a.pattern === confirmed && b.pattern !== confirmed) return -1;
+      if (b.pattern === confirmed && a.pattern !== confirmed) return 1;
+      return a.rank - b.rank;
+    });
+    candidates.forEach((c, i) => {
+      c.rank = i + 1;
+    });
+    base.notes.push(
+      `Skipped API recheck — last_api_verified within ${API_RECHECK_DAYS} days for pattern "${confirmed}"`
+    );
+    return {
+      ...base,
+      phase: "api_verify_v2",
+      smtpMailboxProbe: false,
+      smtpVerified: base.isCatchAll !== true,
+      verificationProvider: provider.name,
+      apiCallsUsed: 0,
+      confirmedPattern: confirmed,
+      confidenceCount: memory?.confidenceCount ?? base.confidenceCount,
+      candidates,
+      best: candidates[0] || null,
+    };
+  }
+
+  const budget = await canSpendApiCredits(1);
+  if (!budget.ok) {
+    base.notes.push(`${budget.reason} — falling back to Phase 1 confidence`);
+    await maybeAlertApiBudget(true, budget.day, budget.month);
+    return {
+      ...base,
+      phase: "api_verify_v2",
+      smtpMailboxProbe: false,
+      verificationProvider: provider.name,
+    };
+  }
+  if (budget.nearLimit) {
+    await maybeAlertApiBudget(true, budget.day, budget.month);
+  }
+
+  let isCatchAll = base.isCatchAll;
+  let confirmedPattern = base.confirmedPattern;
+  let confidenceCount = base.confidenceCount;
+  let smtpVerified = false;
+  let apiCallsUsed = 0;
+  let apiAttempted = false;
+  const candidates = base.candidates.map((c) => ({ ...c, smtpVerified: false as boolean }));
+  const toVerify = candidates.slice(0, topN);
+
+  for (const candidate of toVerify) {
+    const spend = await canSpendApiCredits(1);
+    if (!spend.ok) {
+      base.notes.push(spend.reason || "API budget exhausted mid-search");
+      break;
+    }
+
+    apiAttempted = true;
+    const verified = await provider.verifyMailbox(candidate.email);
+    apiCallsUsed += verified.billed ? 1 : 0;
+
+    await logApiVerification({
+      userId: input.userId,
+      domain: base.domain,
+      email: candidate.email,
+      status: verified.status,
+      provider: verified.provider,
+      costCredits: verified.billed ? 1 : 0,
+      raw: verified.raw,
+    });
+
+    candidate.apiStatus = verified.status;
+
+    if (verified.status === "catch_all") {
+      isCatchAll = true;
+      candidate.confidence = "Low";
+      candidate.smtpVerified = false;
+      candidate.reason =
+        "Provider marked domain catch-all — cannot confirm this specific mailbox via SMTP";
+      base.notes.push(`API: catch-all for ${candidate.email}`);
+      await upsertDomainMemory(base.domain, {
+        isCatchAll: true,
+        touchChecked: true,
+      });
+      // Further verifies on same domain are low-value
+      break;
+    }
+
+    if (verified.status === "valid") {
+      smtpVerified = true;
+      candidate.confidence = "High";
+      candidate.smtpVerified = true;
+      candidate.reason = `High — SMTP-verified (${verified.detail})`;
+      confirmedPattern = candidate.pattern;
+      const same = memory?.confirmedPattern === candidate.pattern;
+      confidenceCount = same ? (memory?.confidenceCount || 0) + 1 : 1;
+      await upsertDomainMemory(base.domain, {
+        confirmedPattern: candidate.pattern,
+        confidenceCount,
+        isCatchAll: false,
+        lastApiVerified: new Date(),
+        touchChecked: true,
+      });
+      base.notes.push(`API verified deliverable: ${candidate.email}`);
+      // Stop after first valid — top hit is enough
+      break;
+    }
+
+    if (verified.status === "invalid") {
+      candidate.confidence = "Invalid";
+      candidate.smtpVerified = false;
+      candidate.reason = `API rejected mailbox (${verified.detail})`;
+      base.notes.push(`API invalid: ${candidate.email}`);
+      continue;
+    }
+
+    // unknown — keep Phase 1 score
+    candidate.reason = `${candidate.reason} · API inconclusive (${verified.detail})`;
+    base.notes.push(`API unknown/timeout for ${candidate.email}: ${verified.detail}`);
+  }
+
+  // Re-rank: SMTP-valid first, then non-invalid, preserve relative order
+  candidates.sort((a, b) => {
+    const rank = (c: FinderCandidateResult) => {
+      if (c.smtpVerified) return 0;
+      if (c.confidence === "Invalid") return 3;
+      if (c.confidence === "High") return 1;
+      return 2;
+    };
+    const d = rank(a) - rank(b);
+    if (d !== 0) return d;
+    return b.weight - a.weight;
+  });
+  candidates.forEach((c, i) => {
+    c.rank = i + 1;
+  });
+
+  // Soften Medium labels when not SMTP-verified
+  for (const c of candidates) {
+    if (c.confidence === "Medium" && !c.smtpVerified) {
+      c.reason = c.reason.includes("not SMTP-verified")
+        ? c.reason
+        : "Medium — pattern match, not SMTP-verified";
+    }
+  }
+
+  return {
+    ...base,
+    phase: "api_verify_v2",
+    smtpMailboxProbe: apiAttempted,
+    smtpVerified,
+    smtpUpgradeAvailable: false,
+    verificationProvider: provider.name,
+    apiCallsUsed,
+    isCatchAll,
+    confirmedPattern,
+    confidenceCount,
+    candidates,
+    best: candidates.find((c) => c.confidence !== "Invalid") || candidates[0] || null,
   };
 }
 

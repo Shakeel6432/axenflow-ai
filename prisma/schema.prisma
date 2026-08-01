@@ -253,12 +253,33 @@ model DomainPattern {
   confidenceCount  Int       @default(0) @map("confidence_count")
   isCatchAll       Boolean?  @map("is_catch_all")
   lastChecked      DateTime? @map("last_checked")
+  /** Last time a third-party API confirmed a mailbox for this domain pattern */
+  lastApiVerified  DateTime? @map("last_api_verified")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
   @@index([domain])
   @@index([lastChecked])
+  @@index([lastApiVerified])
   @@map("domain_patterns")
+}
+
+/** Audit log of paid Email Finder verification API calls (cost control). */
+model EmailFinderApiLog {
+  id         String   @id @default(cuid())
+  userId     String?  @map("user_id")
+  domain     String
+  email      String
+  status     String
+  provider   String
+  costCredits Int     @default(1) @map("cost_credits")
+  rawJson    String?  @map("raw_json") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([domain])
+  @@index([userId, createdAt])
+  @@map("email_finder_api_logs")
 }
 
 /** Monthly free-tier usage for Email Finder bulk (signed-in). */

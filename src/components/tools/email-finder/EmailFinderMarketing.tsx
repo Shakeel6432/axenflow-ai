@@ -31,7 +31,11 @@ const HOW = [
   },
   {
     title: "Catch-all awareness",
-    text: "If a domain is known catch-all, confidence is capped and we explain why any address may be accepted. Full mailbox SMTP probing is Phase 2.",
+    text: "If a domain is known catch-all, confidence is capped and we explain why any address may be accepted.",
+  },
+  {
+    title: "SMTP/API verify (signed-in)",
+    text: "Top candidates are checked via a third-party mailbox API (not from our app IP). Valid hits become High — SMTP-verified and strengthen domain memory for ~90 days.",
   },
 ] as const;
 
@@ -40,13 +44,13 @@ const SAMPLE_ROWS = [
     name: "Jane Doe",
     domain: "acme.com",
     email: "jane.doe@acme.com",
-    confidence: "Medium",
+    confidence: "Medium — pattern match, not SMTP-verified",
   },
   {
     name: "Alex Kim",
     domain: "acme.com",
     email: "akim@acme.com",
-    confidence: "High",
+    confidence: "High — SMTP-verified",
   },
   {
     name: "Sam Lee",
@@ -76,7 +80,7 @@ export function EmailFinderMarketing({ isAuthed, children }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Bulk find failed");
       setFileMsg(
-        `Processed ${data.results?.length || 0} row(s). Monthly remaining: ${data.remaining}/${data.limit}. Open browser console or download via a future export UI — Phase 1 returns JSON results.`
+        `Processed ${data.results?.length || 0} row(s). Monthly remaining: ${data.remaining}/${data.limit}. Results (with SMTP/API flags) logged to the browser console.`
       );
       console.info("email-finder bulk results", data.results);
     } catch (err) {
@@ -90,9 +94,9 @@ export function EmailFinderMarketing({ isAuthed, children }: Props) {
     <div className="space-y-12">
       <TrustStrip
         items={[
-          { icon: Sparkles, label: "No signup for single search" },
-          { icon: Search, label: "Pattern + MX Phase 1" },
-          { icon: FileSpreadsheet, label: "Bulk CSV after login" },
+          { icon: Sparkles, label: "No signup for pattern search" },
+          { icon: Search, label: "Pattern + MX for everyone" },
+          { icon: FileSpreadsheet, label: "SMTP verify + bulk after login" },
           { icon: Shield, label: "Honest confidence labels" },
         ]}
       />
@@ -102,11 +106,11 @@ export function EmailFinderMarketing({ isAuthed, children }: Props) {
           className="font-[var(--font-space)] text-xl font-bold sm:text-2xl"
           style={{ color: "var(--c-heading)" }}
         >
-          How Email Finder works (Phase 1)
+          How Email Finder works
         </h2>
         <p className="mt-2 max-w-2xl text-sm" style={{ color: "var(--c-text-muted)" }}>
-          Built to be useful without risking your sending IP. Live SMTP mailbox probing is Phase 2
-          and needs separate infrastructure.
+          Pattern ranking for guests. Signed-in searches verify top candidates through a third-party
+          provider so we never SMTP-probe from the app IP.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {HOW.map((item) => (
@@ -190,10 +194,10 @@ export function EmailFinderMarketing({ isAuthed, children }: Props) {
                   Sign up for bulk CSV finds
                 </p>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--c-text-dim)" }}>
-                  Upload a list of names + domains. We return ranked pattern candidates with
-                  confidence for each row. Free tier: <strong>50 finds/month</strong>, max{" "}
-                  <strong>100 rows</strong> per file, <strong>8MB</strong>. When the monthly quota
-                  runs out, wait for the next month or ask us about paid volume.
+                  Upload a list of names + domains. We return ranked candidates with SMTP/API
+                  verification on the top hit per row. Free tier: <strong>50 finds/month</strong>,
+                  max <strong>100 rows</strong> per file, <strong>8MB</strong>. When the monthly
+                  quota runs out, wait for the next month or ask us about paid volume.
                 </p>
               </div>
             </div>

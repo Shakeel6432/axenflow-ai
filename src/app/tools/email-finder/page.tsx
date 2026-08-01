@@ -12,7 +12,7 @@ import { EmailFinderMarketing } from "@/components/tools/email-finder/EmailFinde
 export const metadata: Metadata = {
   title: "Email Finder | Find Work Emails by Name + Domain",
   description:
-    "Find likely work emails from first name, last name, and domain. Phase 1: pattern generation, MX validation, catch-all awareness, and domain pattern memory on AxenFlowAI.",
+    "Find likely work emails from first name, last name, and domain. Pattern + MX ranking for everyone; signed-in users get SMTP-level API verification of top candidates on AxenFlowAI.",
   keywords: [
     "email finder",
     "find email by name",
@@ -45,13 +45,13 @@ export default async function EmailFinderPage() {
       />
       <PageHero
         title="Email Finder"
-        description="Phase 1: generate likely emails from name + domain, verify MX, reuse domain pattern memory. Free single search. Sign in for bulk CSV."
+        description="Generate likely emails from name + domain, verify MX, reuse domain pattern memory. Sign in for SMTP-level API verification of top candidates and bulk CSV."
       />
       <Section tight>
         <Container>
           <ToolHubLinks current="/tools/email-finder" />
           <div className="mt-2 space-y-8">
-            <EmailFinderSingleCheck />
+            <EmailFinderSingleCheck isAuthed={isAuthed} />
             <EmailFinderMarketing isAuthed={isAuthed} />
           </div>
         </Container>
