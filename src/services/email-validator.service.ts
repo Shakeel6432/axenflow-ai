@@ -51,6 +51,19 @@ export async function checkMx(domain: string): Promise<LeadStatus> {
   }
 }
 
+/** MX exchanges sorted by priority (lowest first). Shared by Email Finder. */
+export async function resolveMxExchanges(domain: string): Promise<string[]> {
+  try {
+    const mx = await dns.resolveMx(domain);
+    if (!mx?.length) return [];
+    return [...mx]
+      .sort((a, b) => a.priority - b.priority)
+      .map((row) => row.exchange.replace(/\.$/, ""));
+  } catch {
+    return [];
+  }
+}
+
 /** Shared single-email validation used by bulk API and free public check. */
 export async function validateOneEmail(
   raw: string,

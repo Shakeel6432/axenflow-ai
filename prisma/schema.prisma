@@ -20,6 +20,8 @@ model User {
   country         String?
   notifyProduct   Boolean         @default(true) @map("notify_product")
   notifyMarketing Boolean         @default(false) @map("notify_marketing")
+  /** Legacy lead credits column still present in production DB */
+  leadCredits     Int             @default(50) @map("lead_credits")
   role            UserRole        @default(USER)
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
@@ -238,4 +240,36 @@ model ExportHistory {
   @@index([userId, createdAt])
   @@index([format])
   @@map("export_history")
+}
+
+/**
+ * Email Finder Phase 1: remembered domain patterns + catch-all cache.
+ * confirmedPattern uses keys like "first.last" from the pattern table.
+ */
+model DomainPattern {
+  id               String    @id @default(cuid())
+  domain           String    @unique
+  confirmedPattern String?   @map("confirmed_pattern")
+  confidenceCount  Int       @default(0) @map("confidence_count")
+  isCatchAll       Boolean?  @map("is_catch_all")
+  lastChecked      DateTime? @map("last_checked")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@index([domain])
+  @@index([lastChecked])
+  @@map("domain_patterns")
+}
+
+/** Monthly free-tier usage for Email Finder bulk (signed-in). */
+model EmailFinderUsage {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  monthKey  String   @map("month_key")
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, monthKey])
+  @@index([userId])
+  @@map("email_finder_usage")
 }

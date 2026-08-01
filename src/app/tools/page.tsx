@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Link from "@/components/ui/AppLink";
-import { Wrench, Sparkles, ShieldCheck, Mail, Phone, MessageSquare, FileSpreadsheet } from "lucide-react";
+import {
+  Wrench,
+  Sparkles,
+  ShieldCheck,
+  Mail,
+  Phone,
+  MessageSquare,
+  FileSpreadsheet,
+  Search,
+} from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
 
@@ -17,6 +26,14 @@ const tools = [
     href: "/leads",
     status: "Live",
     icon: Sparkles,
+  },
+  {
+    title: "Email Finder",
+    description:
+      "Find likely work emails from name + domain. Phase 1: patterns, MX check, domain memory.",
+    href: "/tools/email-finder",
+    status: "Live",
+    icon: Search,
   },
   {
     title: "Email Validator",

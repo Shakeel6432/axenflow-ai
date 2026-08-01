@@ -2,6 +2,7 @@ import Link from "@/components/ui/AppLink";
 
 const LINKS = [
   { href: "/leads", label: "Lead Finder" },
+  { href: "/tools/email-finder", label: "Email Finder" },
   { href: "/tools/email-validator", label: "Email Validator" },
   { href: "/tools/phone-validator", label: "Phone Validator" },
   { href: "/tools/ai-outreach", label: "AI Outreach" },

@@ -254,6 +254,7 @@ export const footerLinks = {
     { label: "Home", href: "/" },
     { label: "Leads", href: "/leads" },
     { label: "Blog", href: "/blog" },
+    { label: "Email Finder", href: "/tools/email-finder" },
     { label: "Email Validator", href: "/tools/email-validator" },
     { label: "Phone Validator", href: "/tools/phone-validator" },
     { label: "AI Outreach", href: "/tools/ai-outreach" },
