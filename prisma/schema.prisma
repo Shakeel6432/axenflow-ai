@@ -31,6 +31,7 @@ model User {
   downloads       Download[]
   savedLeads      SavedLead[]
   exportHistory   ExportHistory[]
+  connectedMailboxes ConnectedMailbox[]
 
   @@map("users")
 }
@@ -293,4 +294,46 @@ model EmailFinderUsage {
   @@unique([userId, monthKey])
   @@index([userId])
   @@map("email_finder_usage")
+}
+
+/** Encrypted mailbox credentials for Email Warmup (app password / SMTP-IMAP). */
+model ConnectedMailbox {
+  id                    String    @id @default(cuid())
+  userId                String    @map("user_id")
+  email                 String
+  provider              String    // gmail | outlook | custom
+  displayName           String?   @map("display_name")
+  /** Envelope-encrypted credential blob (JSON). Never plaintext app passwords. */
+  encryptedCredentials  String    @map("encrypted_credentials") @db.Text
+  keyId                 String    @default("env-v1") @map("key_id")
+  status                String    @default("connected") // connected | auth_failed | disconnected
+  lastVerifiedAt        DateTime? @map("last_verified_at")
+  lastAuthError         String?   @map("last_auth_error")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auditLogs             MailboxAuditLog[]
+
+  @@unique([userId, email])
+  @@index([userId])
+  @@index([status])
+  @@index([lastVerifiedAt])
+  @@map("connected_mailboxes")
+}
+
+/** Audit trail for mailbox connect/send/read actions (no credential content). */
+model MailboxAuditLog {
+  id          String   @id @default(cuid())
+  mailboxId   String?  @map("mailbox_id")
+  userId      String   @map("user_id")
+  action      String   // connect | disconnect | smtp_test | imap_test | send | imap_scan | auth_revoked
+  messageUid  String?  @map("message_uid")
+  detail      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  mailbox     ConnectedMailbox? @relation(fields: [mailboxId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([mailboxId, createdAt])
+  @@index([action, createdAt])
+  @@map("mailbox_audit_logs")
 }

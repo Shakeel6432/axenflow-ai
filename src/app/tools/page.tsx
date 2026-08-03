@@ -9,6 +9,7 @@ import {
   MessageSquare,
   FileSpreadsheet,
   Search,
+  Flame,
 } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -34,6 +35,14 @@ const tools = [
     href: "/tools/email-finder",
     status: "Live",
     icon: Search,
+  },
+  {
+    title: "Email Warmup",
+    description:
+      "Connect your mailbox with an App Password for warmup. Encrypted storage, tagged IMAP only.",
+    href: "/tools/email-warmup",
+    status: "Live",
+    icon: Flame,
   },
   {
     title: "Email Validator",

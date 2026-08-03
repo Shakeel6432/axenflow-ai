@@ -1,4 +1,11 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+
+const webpackCacheDir =
+  process.env.NEXT_WEBPACK_CACHE_DIR?.trim() ||
+  (process.platform === "win32" && path.parse(process.cwd()).root.toUpperCase() === "C:\\"
+    ? "Z:/cursor-cache/axenflow-ai-webpack"
+    : undefined);
 
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
@@ -65,6 +72,16 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
     ];
+  },
+  webpack: (config, { dev }) => {
+    // Keep dev webpack cache off C: when Z: is available (avoids ENOSPC on full system drive)
+    if (dev && webpackCacheDir) {
+      config.cache = {
+        type: "filesystem",
+        cacheDirectory: webpackCacheDir,
+      };
+    }
+    return config;
   },
 };
 

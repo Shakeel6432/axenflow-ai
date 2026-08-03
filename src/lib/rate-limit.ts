@@ -19,3 +19,15 @@ export function rateLimit(key: string, limit = 60, windowMs = 60_000): { ok: boo
   bucket.count += 1;
   return { ok: true, remaining: limit - bucket.count };
 }
+
+export function peekRateLimit(key: string, limit = 60): { ok: boolean; remaining: number } {
+  const now = Date.now();
+  const bucket = buckets.get(key);
+  if (!bucket || now > bucket.resetAt) {
+    return { ok: true, remaining: limit };
+  }
+  if (bucket.count >= limit) {
+    return { ok: false, remaining: 0 };
+  }
+  return { ok: true, remaining: limit - bucket.count };
+}

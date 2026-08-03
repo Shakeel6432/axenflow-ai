@@ -20,6 +20,7 @@ export default function TermsPage() {
               { h: "Services", p: `${siteConfig.name} provides AI automation, web scraping, and workflow consulting. Deliverables are defined per project agreement.` },
               { h: "Payment & Delivery", p: "Terms, timelines, and payments are agreed before project start. We deliver within agreed timeframes." },
               { h: "Intellectual Property", p: "Upon full payment, clients receive ownership of custom workflows and code built for their project." },
+              { h: "Email Warmup & connected mailboxes", p: "If you connect a mailbox, you authorize AxenFlow AI to send and read only warmup-tagged messages for deliverability automation. You must use an App Password, not your main account password. You may disconnect and delete stored credentials at any time from your dashboard. This section is informational, not legal advice; review with counsel before public launch." },
               { h: "Contact", p: `Questions? Email ${siteConfig.email}` },
             ].map(({ h, p }) => (
               <div key={h}>

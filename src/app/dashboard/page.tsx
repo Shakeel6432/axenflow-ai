@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "@/components/ui/AppLink";
 import { redirect } from "next/navigation";
-import { Bookmark, Download, FileDown, History, Search, Settings } from "lucide-react";
+import { Bookmark, Download, FileDown, Flame, History, Search, Settings } from "lucide-react";
 import { requireUser } from "@/lib/auth-guards";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section } from "@/components/ui/Section";
@@ -41,6 +41,12 @@ const cards = [
     description: "Review recent lead searches tied to your account.",
     href: "/dashboard/history",
     icon: History,
+  },
+  {
+    title: "Email Warmup",
+    description: "Connect mailboxes with App Passwords for warmup automation.",
+    href: "/dashboard/email-warmup",
+    icon: Flame,
   },
   {
     title: "Account Settings",

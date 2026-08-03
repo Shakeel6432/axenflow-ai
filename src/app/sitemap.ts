@@ -9,6 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/leads",
     "/tools",
     "/tools/email-finder",
+    "/tools/email-warmup",
     "/tools/email-validator",
     "/tools/phone-validator",
     "/tools/ai-outreach",
@@ -25,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/contact",
     "/privacy",
     "/terms",
+    "/security/email-protection",
   ];
   const entries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
     url: `${siteConfig.url}${route}`,
