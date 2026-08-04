@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/mailbox-reverify",
+      "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/cron/warmup-tick",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}

@@ -247,11 +247,11 @@ export function EmailSingleCheck() {
             </li>
           </ul>
 
-          {result.notes?.length > 0 && (
+          {result.notes.length > 0 ? (
             <p className="mt-3 text-xs" style={{ color: "var(--c-text-muted)" }}>
               Notes: {result.notes.join(" · ")}
             </p>
-          )}
+          ) : null}
         </div>
       )}
     </div>

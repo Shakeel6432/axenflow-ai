@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // Tree-shake heavy icon / motion import surfaces in client chunks
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion"],
+    optimizePackageImports: ["lucide-react", "framer-motion", "recharts"],
   },
   images: {
     formats: ["image/avif", "image/webp"],

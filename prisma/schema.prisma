@@ -307,16 +307,29 @@ model ConnectedMailbox {
   encryptedCredentials  String    @map("encrypted_credentials") @db.Text
   keyId                 String    @default("env-v1") @map("key_id")
   status                String    @default("connected") // connected | auth_failed | disconnected
+  /** Warmup engine status: active | paused | flagged */
+  warmupStatus          String    @default("active") @map("warmup_status")
+  rampDay               Int       @default(1) @map("ramp_day")
+  totalRampDays         Int       @default(28) @map("total_ramp_days")
+  warmupStartedAt       DateTime? @map("warmup_started_at")
+  pausedAt              DateTime? @map("paused_at")
+  pauseReason           String?   @map("pause_reason")
+  dailySendLimit        Int       @default(5) @map("daily_send_limit")
+  sendsToday            Int       @default(0) @map("sends_today")
+  sendsTodayDate        String?   @map("sends_today_date") // YYYY-MM-DD UTC
   lastVerifiedAt        DateTime? @map("last_verified_at")
   lastAuthError         String?   @map("last_auth_error")
   createdAt             DateTime  @default(now()) @map("created_at")
   updatedAt             DateTime  @updatedAt @map("updated_at")
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   auditLogs             MailboxAuditLog[]
+  warmupEvents          WarmupEvent[]
+  pendingRescues        WarmupPendingRescue[]
 
   @@unique([userId, email])
   @@index([userId])
   @@index([status])
+  @@index([warmupStatus])
   @@index([lastVerifiedAt])
   @@map("connected_mailboxes")
 }
@@ -336,4 +349,45 @@ model MailboxAuditLog {
   @@index([mailboxId, createdAt])
   @@index([action, createdAt])
   @@map("mailbox_audit_logs")
+}
+
+/**
+ * Warmup activity events for analytics dashboard.
+ * eventType: sent | delivered_inbox | delivered_spam | rescued | opened | replied | flagged_important | bounced
+ */
+model WarmupEvent {
+  id                   String   @id @default(cuid())
+  userId               String   @map("user_id")
+  mailboxId            String   @map("mailbox_id")
+  eventType            String   @map("event_type")
+  messageId            String?  @map("message_id")
+  counterpartMailboxId String?  @map("counterpart_mailbox_id")
+  counterpartEmail     String?  @map("counterpart_email")
+  detail               String?
+  createdAt            DateTime @default(now()) @map("created_at")
+  mailbox              ConnectedMailbox @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([mailboxId, createdAt])
+  @@index([eventType, createdAt])
+  @@index([mailboxId, eventType, createdAt])
+  @@map("warmup_events")
+}
+
+/** Delayed spam→inbox rescues (5–30 min after detection so pattern is less bot-like). */
+model WarmupPendingRescue {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  mailboxId   String   @map("mailbox_id")
+  messageUid  String   @map("message_uid")
+  spamFolder  String   @map("spam_folder")
+  messageId   String?  @map("message_id")
+  executeAt   DateTime @map("execute_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  mailbox     ConnectedMailbox @relation(fields: [mailboxId], references: [id], onDelete: Cascade)
+
+  @@unique([mailboxId, messageUid, spamFolder])
+  @@index([executeAt])
+  @@index([mailboxId])
+  @@map("warmup_pending_rescues")
 }
